@@ -1238,6 +1238,39 @@ select.inp{cursor:pointer;
   #pdfArea .tbl tr{break-inside:avoid;page-break-inside:avoid}
   #pdfArea .notes{break-inside:avoid;page-break-inside:avoid}
 }
+/* Program editor and document refinements */
+.pg-tools{display:flex;flex-wrap:wrap;gap:8px;grid-column:1/-1;margin-block:8px}
+.pg-tools .btn{min-height:44px}
+.pg-drag{touch-action:none;cursor:grab}.pg-drag.dragging{cursor:grabbing;background:var(--brand-wash)}
+.pg-field{display:flex;flex-direction:column;gap:6px;min-width:0;font-size:var(--t-12);color:var(--soft)}
+.pg-field .inp{width:100%;font-size:1rem}
+.erow.pgex,.erow.pgcar{grid-template-columns:repeat(2,minmax(0,1fr));padding:16px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);margin-bottom:12px}
+.erow .pg-field.field-n-in{grid-column:1/-1}
+.erow.pgex .del-row,.erow.pgcar .del-row{grid-column:1/-1;grid-row:auto;justify-self:end}
+.erow .pg-field.field-rest-in,.erow .pg-field.field-note-in,.erow .pg-field.field-v-in{grid-column:1/-1}
+.erow .pg-field.field-en-in,.erow .pg-field.field-m-in{grid-column:1/-1}
+#pgModal .modal-foot{flex-wrap:wrap}
+#pgDraftStatus{flex-basis:100%;order:2;margin:0;line-height:1.5;font-size:var(--t-12)}
+#pgDraftStatus:empty{display:none}
+@media(min-width:700px){.erow .pg-field.field-en-in,.erow .pg-field.field-m-in{grid-column:1/-1}}
+.pdfsheet .pp{overflow-wrap:anywhere}
+.pdfsheet .pp-head{padding-bottom:5mm;margin-bottom:7mm}
+.pdfsheet .pp-logo,.pdfsheet .pp-cover .cv-logo{object-fit:contain}
+.pdfsheet .tbl{table-layout:auto;font-size:10pt}
+.pdfsheet .tbl thead{display:table-header-group}
+.pdfsheet .tbl th{background:#F1EFEB;color:#222;border-color:#D8D5CE;border-top:1.5pt solid var(--pa)}
+.pdfsheet .tbl td{padding:3mm 2mm;border-color:#E0DED8}
+.pdfsheet .tbl .num{white-space:normal;overflow-wrap:anywhere}
+.pdfsheet .tbl td.log{min-width:8mm}
+.pdfsheet .ex-detail{display:block;font-size:8.5pt;color:#555;margin-top:1.4mm;line-height:1.6}
+.pdfsheet .pp-cover{border-top:3mm solid var(--pa);border-bottom:.5pt solid #ddd;padding-block:14mm}
+.pdfsheet .cv-meta{display:flex;justify-content:center;flex-wrap:wrap;gap:4mm;margin:0 0 9mm;font-size:10pt;color:#555}
+.pdfsheet .cv-meta span{padding:2mm 4mm;border:1px solid #ddd;border-radius:2mm}
+.pdfsheet .pp-foot{color:#555;margin-top:6mm}
+.pdfsheet .pp-body{padding-bottom:5mm}
+.pdfsheet.mono .tbl th{color:#111;background:#eee}
+.pg-measure{position:fixed;left:-10000px;top:0;width:182mm;visibility:hidden;pointer-events:none}
+@media print{.pdfsheet .tbl tr{break-inside:avoid}.pdfsheet h3{break-after:avoid}body.printing{overflow:visible!important}}
 </style>
 </head>
 <body>
@@ -1647,7 +1680,7 @@ select.inp{cursor:pointer;
       <button class="btn btn-ghost" type="button" id="pgPrintBtn">
         <svg class="icon"><use href="#i-print"></use></svg><span data-t="pg.print">طباعة / PDF</span>
       </button>
-      <button class="btn btn-primary" id="pgSaveBtn" type="button" data-t="app.save">حفظ</button>
+      <span id="pgDraftStatus" role="status" class="hint"></span><button class="btn btn-primary" id="pgSaveBtn" type="button" data-t="app.save">حفظ</button>
     </div>
   </div>
 </div>
@@ -4201,24 +4234,28 @@ function buildExIndex(){
     EX_INDEX.set(k, { n:o.n, en:o.en || old.en || '', m:o.m || old.m || '', v:o.v || old.v || '' });
   };
   EX_SEED.forEach(put);
-  ROWS.programs.forEach(p => {
+  [...ROWS.programs].sort((a,b) => new Date(a.updated_at || a.created_at) - new Date(b.updated_at || b.created_at)).forEach(p => {
     if (p.kind !== 'training') return;
     ((p.content || {}).days || []).forEach(day =>
       (day.rows || []).forEach(r => { if (r && r.n) put(r) }));
   });
   const dl = $('#pg-exlist');
   if (dl) dl.innerHTML = [...EX_INDEX.values()]
-    .map(o => `<option value="${esc(o.n)}">${esc(o.en || '')}</option>`).join('');
+    .map(o => `<option value="${esc(o.n)}">${esc([o.en,o.m].filter(Boolean).join(" · "))}</option>${o.en ? `<option value="${esc(o.en)}">${esc(o.n)} · ${esc(o.m)}</option>` : ""}`).join('');
 }
 
 /* لمن تكتب الكوتش اسم تمرين معروف، نملي الحقول الفاضية بس —
    ⚠️ ما ندوس على شي كتبته هي، حتى لو مختلف عن المكتبة */
 function autofillExercise(input){
   const row = input.closest('.erow'); if (!row) return;
-  const hit = EX_INDEX.get(norm(input.value)); if (!hit) return;
+  const hit = [...EX_INDEX.values()].find(x => norm(x.n) === norm(input.value) || norm(x.en) === norm(input.value));
+  if (!hit) return;
+  input.value = hit.n;
   [['.en-in', hit.en], ['.m-in', hit.m], ['.v-in', hit.v]].forEach(([sel, val]) => {
     const el = row.querySelector(sel);
-    if (el && !el.value.trim() && val) el.value = val;
+    if (el && (!el.value.trim() || el.value === el.dataset.autofill)) {
+      el.value = val || ''; el.dataset.autofill = el.value;
+    }
   });
 }
 
@@ -4291,7 +4328,26 @@ function renderPrograms(){
 }
 
 /* ── فتح وإغلاق المحرر ── */
+let pgBaseline = '', pgSaving = false, pgOwner = '', pgDraftKey = '';
+const pgText = (ar,en) => document.documentElement.lang === 'en' ? en : ar;
+function pgDirty(){ return PG && JSON.stringify(PG) !== pgBaseline }
+function persistPgDraft(){
+  if (!PG || !pgOwner || !pgDirty()) return;
+  try { localStorage.setItem(pgDraftKey, JSON.stringify({at:Date.now(), program:PG}));
+    const status = $('#pgDraftStatus'); if(status) status.textContent = pgText('المسودة محفوظة على هذا الجهاز','Draft saved on this device');
+  } catch(e) { const status=$('#pgDraftStatus'); if(status) status.textContent=pgText('تعذر حفظ المسودة محلياً — احفظي البرنامج','Local draft unavailable — save the program'); }
+}
 function openProgram(row){
+  clearTimeout(prevTimer);
+  $('#pgDraftStatus').textContent = '';
+  pgDraftKey = 'cz-program-draft:' + pgOwner + ':' + (row?.id || ('new-' + row?.kind));
+  const original = row;
+  try {
+    const saved = JSON.parse(localStorage.getItem(pgDraftKey));
+    if(saved?.program && Date.now()-saved.at < 30*86400000 && saved.program.kind === row.kind &&
+       confirm(pgText('توجد مسودة غير محفوظة. تريدين استرجاعها؟','Restore your unsaved draft?'))) row = saved.program;
+  } catch(e){}
+  pgBaseline = JSON.stringify(original);
   /* ⚠️ وجود `id` هو اللي يفرّق التعديل عن الإضافة — مو وجود الصف نفسه.
      البرنامج الجديد والنسخة الجديدة الثنين ينوصلون كصف كامل بلا id،
      ولو حسبناهم تعديل چان الحفظ يسوي update على id غير موجود. */
@@ -4311,6 +4367,8 @@ function openProgram(row){
   const m = $('#pgModal');
   lastFocus = document.activeElement;
   m.hidden = false;
+  syncProgram();
+  if(row === original) pgBaseline = JSON.stringify(PG);
   $('#pgSplit').dataset.view = 'edit';
   $$('.pg-seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pgview === 'edit')));
   requestAnimationFrame(() => m.classList.add('open'));
@@ -4320,11 +4378,18 @@ function openProgram(row){
   requestAnimationFrame(() => $('#pg-title')?.focus());
 }
 
-function closeProgram(){
+function closeProgram(force = false){
+  if(pgSaving) return;
+  syncProgram();
+  if(!force && pgDirty()) {
+    persistPgDraft();
+    if(!confirm(pgText('عندك تعديلات غير محفوظة. تغلقين المحرر؟','You have unsaved changes. Close the editor?'))) return;
+  }
+  clearTimeout(prevTimer);
   const m = $('#pgModal');
   m.classList.remove('open');
   document.body.style.overflow = '';
-  setTimeout(() => { m.hidden = true; PG = null; PG_EDIT = null; }, 200);
+  m.hidden = true; PG = null; PG_EDIT = null;
   lastFocus?.focus();
 }
 
@@ -4377,6 +4442,8 @@ function syncProgram(){
         o.sets = r.querySelector('.sets-in')?.value.trim() ?? o.sets;
         o.reps = r.querySelector('.reps-in')?.value.trim() ?? o.reps;
         o.v    = r.querySelector('.v-in')?.value.trim()    ?? o.v;
+        o.rest = r.querySelector('.rest-in')?.value.trim() ?? o.rest;
+        o.note = r.querySelector('.note-in')?.value.trim() ?? o.note;
       });
     });
   } else {
@@ -4442,9 +4509,33 @@ function drawProgram(){
   h += isT ? pgDaysBlock() : pgMealsBlock();
   h += pgDesignBlock(d);
 
-  $('#pgBody').innerHTML = h;
+  const body = $('#pgBody'), scroll = body.scrollTop;
+  body.innerHTML = h;
+  body.scrollTop = scroll;
+  body.querySelectorAll('.erow input').forEach(input => {
+    if (!input.closest('label')) {
+      const label=document.createElement('label'); label.className='pg-field field-' + [...input.classList].find(x=>x!=='inp');
+      const caption=document.createElement('span'); caption.textContent=input.placeholder;
+      input.before(label); label.append(caption,input);
+    }
+  });
+  body.querySelectorAll('details[data-day]').forEach(el => {
+    const di=+el.dataset.day;
+    el.querySelector('.acc-body').insertAdjacentHTML('afterbegin',pgTools('day',di,di,PG.content.days.length));
+    el.querySelectorAll('.erow').forEach(row => {
+      row.insertAdjacentHTML('beforeend',pgTools('row',di,+row.dataset.i,PG.content.days[di].rows.length));
+      const hit=EX_INDEX.get(norm(row.querySelector('.n-in').value));
+      if(hit) [['.en-in','en'],['.m-in','m'],['.v-in','v']].forEach(([sel,key])=>{
+        const input=row.querySelector(sel); if(input && input.value===hit[key]) input.dataset.autofill=input.value;
+      });
+    });
+  });
 }
 
+function pgTools(kind,day,i,length){
+  return '<div class="pg-tools"><button type="button" class="btn btn-quiet btn-sm pg-drag" data-kind="'+kind+'" data-day="'+day+'" data-i="'+i+'" aria-label="'+pgText('اسحبي لتغيير الترتيب؛ أو استخدمي أزرار الأعلى والأسفل','Drag to reorder, or use the move buttons')+'">⠿ '+pgText('سحب','Drag')+'</button>' + [['copy',pgText('نسخ','Duplicate')],['up',pgText('↑ للأعلى','↑ Move up')],['down',pgText('↓ للأسفل','↓ Move down')]].map(([action,label]) =>
+    '<button type="button" class="btn btn-quiet btn-sm" data-pgtool="'+action+'" data-kind="'+kind+'" data-day="'+day+'" data-i="'+i+'" '+((action==='up' && i===0)||(action==='down' && i===length-1)?'disabled':'')+'>'+label+'</button>').join('') + '</div>';
+}
 function pgDaysBlock(){
   let h = `<div class="fset">
     <h4>${esc(t('pg.days'))}</h4>`;
@@ -4519,6 +4610,7 @@ function pgExRows(day, di){
          <input class="inp reps-in" value="${esc(r.reps || '')}" placeholder="${esc(t('pg.cardioReps'))}">
          <button class="del-row" type="button" data-pgdel="row" data-day="${di}" data-i="${i}"
            aria-label="${esc(t('pg.removeRow'))}">${ico('i-trash')}</button>
+         ${pgExtraFields(r)}
        </div>`
     : `<div class="erow pgex" data-i="${i}">
          <input class="inp n-in" list="pg-exlist" value="${esc(r.n  || '')}" placeholder="${esc(t('pg.rowN'))}">
@@ -4529,7 +4621,11 @@ function pgExRows(day, di){
          <button class="del-row" type="button" data-pgdel="row" data-day="${di}" data-i="${i}"
            aria-label="${esc(t('pg.removeRow'))}">${ico('i-trash')}</button>
          <input class="inp v-in" value="${esc(r.v || '')}" placeholder="${esc(t('pg.rowV'))}" dir="ltr">
+         ${pgExtraFields(r)}
        </div>`).join('');
+}
+function pgExtraFields(r){
+  return `<input class="inp rest-in" value="${esc(r.rest || '')}" placeholder="${pgText('الراحة (مثلاً ٦٠ ثانية)','Rest (e.g. 60 sec)')}"><input class="inp note-in" value="${esc(r.note || '')}" placeholder="${pgText('ملاحظات الأداء','Exercise notes')}">`;
 }
 
 function pgMealsBlock(){
@@ -4744,17 +4840,17 @@ function pgDayTable(day, d){
     /* الاسم الإنكليزي بسطر ثاني — dir/lang صريحة حتى الترتيب ما ينقلب
        جوّا فقرة عربية، والقارئ الآلي يلفظه إنكليزي */
     const name = `${esc(r.n || '')}${(d.showEn && r.en)
-      ? `<span class="en" dir="ltr" lang="en">${esc(r.en)}</span>` : ''}`;
+      ? `<span class="en" dir="ltr" lang="en">${esc(r.en)}</span>` : ''}${r.rest ? `<span class="ex-detail">${pgText('الراحة','Rest')}: ${esc(r.rest)}</span>` : ''}${r.note ? `<span class="ex-detail">${esc(r.note)}</span>` : ''}`;
     const url = pgSafeUrl(r.v);
     return cardio
       ? `<tr><td class="num">${i + 1}</td><td>${name}</td>
-           <td>${esc(r.m || '')}</td><td class="num">${esc(r.reps || '')}</td></tr>`
+           <td>${esc(r.m || '')}</td><td class="num"><bdi dir="ltr">${esc(r.reps || '')}</bdi></td></tr>`
       : `<tr>
            <td class="num">${i + 1}</td>
            <td>${name}</td>
            ${gym ? `<td>${esc(r.m || '')}</td>` : ''}
-           <td class="num">${esc(r.sets || '')}</td>
-           <td class="num">${esc(r.reps || '')}</td>
+           <td class="num"><bdi dir="ltr">${esc(r.sets || '')}</bdi></td>
+           <td class="num"><bdi dir="ltr">${esc(r.reps || '')}</bdi></td>
            ${d.showVideo ? (d.qr
               ? `<td class="qrcell">${pgQrSvg(url) || '<span class="qr-none">—</span>'}</td>`
               : `<td class="num">${url
@@ -4880,6 +4976,7 @@ function buildSheet(){
         <div class="cv-kicker">${esc(PG.kind === 'nutrition' ? 'NUTRITION PLAN' : 'TRAINING PROGRAM')}</div>
         <h1>${esc(PG.title)}</h1>
         <div class="cv-rule"></div>
+        <div class="cv-meta">${[tr.weeks ? tr.weeks+' '+pgText('أسابيع','weeks') : '',tr.daysPerWeek ? tr.daysPerWeek+' '+pgText('أيام بالأسبوع','days / week') : '', tr.start ? pgDate(tr.start) : ''].filter(Boolean).map(x=>'<span>'+esc(x)+'</span>').join('')}</div>
         ${tr.name ? `<div class="cv-name">${esc(tr.name)}</div>` : ''}
         ${tr.coach ? `<div class="sub" style="font-size:10.5pt;color:#666">${esc(t('pg.tCoach'))}: ${esc(tr.coach)}</div>` : ''}
       </section>`;
@@ -4887,11 +4984,46 @@ function buildSheet(){
     return pgPage(p, d, i + 1, total);
   }).join('');
 
-  return { html, count:total, design:d };
+  return pgPaginate(html, d);
 }
 
 /* يحقن ناتج buildSheet() بعنصر — يستعمله كل من الطباعة والمعاينة.
    ⚠️ مصدر واحد للحقيقة: لو انفصلوا، الـPDF تطلع مختلفة عن المعاينة */
+function pgPaginate(html, d){
+  const probe=document.createElement('div'); probe.className='pdfsheet pg-measure';
+  probe.style.setProperty('--pa', d.mono ? '#3A3A3A' : d.accent);
+  probe.innerHTML=html; document.body.append(probe);
+  const limit=263/25.4*96;
+  try {
+    for(let index=0; index<probe.children.length; index++){
+      const page=probe.children[index], body=page.querySelector('.pp-body');
+      if(!body || page.getBoundingClientRect().height<=limit+1) continue;
+      const next=page.cloneNode(true), nextBody=next.querySelector('.pp-body'); nextBody.replaceChildren();
+      let moved=false;
+      while(page.getBoundingClientRect().height>limit+1 && body.children.length){
+        const last=body.lastElementChild;
+        if(last.matches('table') && last.tBodies[0]?.rows.length>1){
+          const copy=last.cloneNode(true); copy.tBodies[0].replaceChildren();
+          nextBody.prepend(copy);
+          while(page.getBoundingClientRect().height>limit+1 && last.tBodies[0].rows.length>1){
+            copy.tBodies[0].prepend(last.tBodies[0].lastElementChild); moved=true;
+          }
+          break;
+        }
+        if(body.children.length===1 || [...body.children].slice(0,-1).every(x=>x.matches('h3,.lead'))) break;
+        nextBody.prepend(last); moved=true;
+      }
+      if(moved){
+        const title=body.querySelector('h3');
+        if(title && !nextBody.firstElementChild?.matches('h3')){const heading=title.cloneNode(true);heading.dataset.baseTitle=title.dataset.baseTitle || title.textContent;heading.textContent=heading.dataset.baseTitle+' — '+pgText('تكملة','continued');nextBody.prepend(heading);}
+        page.after(next);
+      }
+    }
+    const total=probe.children.length;
+    [...probe.children].forEach((page,i)=>{const n=page.querySelector('.pno');if(n)n.innerHTML=esc(t('pg.sheetPage'))+' <bdi dir="ltr">'+(i+1)+' / '+total+'</bdi>';});
+    return {html:probe.innerHTML,count:total,design:d};
+  } finally {probe.remove();}
+}
 function paintSheet(el, sheet, extraClass){
   const d = sheet.design;
   el.className = (extraClass || '') + (d.mono ? ' mono' : '');
@@ -4958,25 +5090,37 @@ function fitPreview(){
 let prevTimer;
 function schedulePreview(){
   clearTimeout(prevTimer);
-  prevTimer = setTimeout(() => { syncProgram(); drawPreview() }, 260);
+  prevTimer = setTimeout(() => { syncProgram(); persistPgDraft(); drawPreview() }, 400);
 }
 
-function printProgram(){
+async function printProgram(){
   syncProgram();
   if (!PG.title.trim()){ toast(t('pg.errTitle'), 'bad'); return }
+  const program = PG;
+  await document.fonts.ready;
+  if(PG !== program) return;
   buildPdf();
+  await Promise.all([...$('#pdfArea').querySelectorAll('img')].map(img => img.decode().catch(()=>{})));
+  if(PG !== program) return;
+  const oldTitle=document.title;
+  document.title=PG.title;
   document.body.classList.add('printing');
   /* finally مو then — لو المستخدم لغى الطباعة لازم الكلاس ينشال بأي حال */
-  try { window.print() } finally { document.body.classList.remove('printing') }
+  try { window.print() } finally { document.body.classList.remove('printing'); document.title=oldTitle; }
 }
 
 /* ══════════════════════════════════════════════════════════
    حفظ ونسخ وحذف البرامج
    ══════════════════════════════════════════════════════════ */
 async function saveProgram(){
+  if(pgSaving || !PG) return;
   syncProgram();
-  if (!PG.title.trim()){ toast(t('pg.errTitle'), 'bad'); return }
-
+  if (!PG.title.trim()){ toast(t('pg.errTitle'), 'bad'); $('#pg-title').focus(); return }
+  const invalid=$('#pgBody input:invalid'); if(invalid){ invalid.reportValidity(); return }
+  pgSaving = true;
+  $('#pgBody').inert = true;
+  $('#pgPrintBtn').disabled = true;
+  const editId=PG_EDIT?.id, savedKey=pgDraftKey;
   const btn = $('#pgSaveBtn');
   btn.disabled = true;
   const old = btn.textContent;
@@ -4992,14 +5136,18 @@ async function saveProgram(){
     ? sb.from('programs').update(payload).eq('id', PG_EDIT.id).select().single()
     : sb.from('programs').insert(payload).select().single();
 
-  const { data, error } = await q;
+  let data, error;
+  try { ({data,error}=await q); } catch(e){error=e}
+  pgSaving = false;
+  $('#pgBody').inert = false;
+  $('#pgPrintBtn').disabled = false;
   btn.disabled = false;
   btn.textContent = old;
 
   if (error){ toast(error.message, 'bad'); return }
 
-  if (PG_EDIT){
-    const i = ROWS.programs.findIndex(x => x.id === PG_EDIT.id);
+  if (editId){
+    const i = ROWS.programs.findIndex(x => x.id === editId);
     if (i > -1) ROWS.programs[i] = data;
   } else {
     ROWS.programs.unshift(data);
@@ -5007,7 +5155,8 @@ async function saveProgram(){
   sortPrograms();
   buildExIndex();          /* التمارين الجديدة تدخل المكتبة فوراً */
   renderPrograms();
-  closeProgram();
+  try { localStorage.removeItem(savedKey); } catch(e){}
+  closeProgram(true);
   toast(t('pg.saved'));
 }
 
@@ -5027,7 +5176,7 @@ function dupProgram(id){
   const copy = JSON.parse(JSON.stringify(src));
   delete copy.id; delete copy.created_at; delete copy.updated_at;
   copy.is_template = false;
-  copy.trainee = Object.assign({}, copy.trainee, { name:'', weight:'', start:'' });
+  copy.trainee = Object.assign({}, copy.trainee, { name:'', height:'', weight:'', start:'' });
   openProgram(copy);
   toast(t('pg.duped'));
 }
@@ -5036,15 +5185,35 @@ function dupProgram(id){
    بالداتابيس مو localStorage حتى ينمشي بين تلفونها ولابتوبها */
 async function savePgDefaultDesign(){
   syncProgram();
+  const design=JSON.parse(JSON.stringify(PG.design));
   const { error } = await sb.from('site_info')
-    .update({ program_design:PG.design }).eq('id', 1);
+    .update({ program_design:design }).eq('id', 1);
   if (error){ toast(error.message, 'bad'); return }
-  if (INFO) INFO.program_design = JSON.parse(JSON.stringify(PG.design));
+  if (INFO) INFO.program_design = design;
   toast(t('pg.defaultSaved'));
 }
 
 /* ── ربط أحداث تبويب البرامج ── */
 function wirePrograms(){
+  let drag=null;
+  $('#pgBody').addEventListener('pointerdown',e=>{
+    const handle=e.target.closest('.pg-drag'); if(!handle || pgSaving) return;
+    syncProgram(); drag={handle,kind:handle.dataset.kind,day:+handle.dataset.day,i:+handle.dataset.i,x:e.clientX,y:e.clientY};
+    handle.setPointerCapture(e.pointerId); handle.classList.add('dragging');
+  });
+  $('#pgBody').addEventListener('pointerup',e=>{
+    if(!drag)return;
+    const from=drag; drag=null; from.handle.classList.remove('dragging');
+    if(Math.hypot(e.clientX-from.x,e.clientY-from.y)<8)return;
+    const target=document.elementFromPoint(e.clientX,e.clientY)?.closest(from.kind==='day'?'details[data-day]':'.erow');
+    if(!target)return;
+    if(from.kind==='row' && +target.closest('details[data-day]')?.dataset.day!==from.day)return;
+    const to=+(from.kind==='day'?target.dataset.day:target.dataset.i);
+    const list=from.kind==='day'?PG.content.days:PG.content.days[from.day].rows;
+    if(!Number.isInteger(to)||to===from.i)return;
+    list.splice(to,0,list.splice(from.i,1)[0]);drawProgram();persistPgDraft();drawPreview();
+  });
+  $('#pgBody').addEventListener('pointercancel',()=>{drag?.handle.classList.remove('dragging');drag=null;});
   let dq;
   $('#pgQ').addEventListener('input', () => {
     clearTimeout(dq); dq = setTimeout(renderPrograms, 130);
@@ -5074,7 +5243,7 @@ function wirePrograms(){
     }
   });
 
-  $('#pgList').addEventListener('click', e => {
+  $('#pgList').addEventListener('click', async e => {
     const b = e.target.closest('[data-pg]'); if (!b) return;
     const id = b.dataset.id;
     const row = ROWS.programs.find(x => x.id === id);
@@ -5097,15 +5266,29 @@ function wirePrograms(){
       /* الطباعة من القائمة تشتغل بلا ما نفتح المحرر */
       PG_EDIT = row; PG = JSON.parse(JSON.stringify(row));
       PG.trainee = PG.trainee || {}; PG.design = PG.design || {}; PG.content = PG.content || {};
+      await document.fonts.ready;
       buildPdf();
+      await Promise.all([...$('#pdfArea').querySelectorAll('img')].map(img => img.decode().catch(()=>{})));
       document.body.classList.add('printing');
       try { window.print() } finally { document.body.classList.remove('printing') }
       PG = null; PG_EDIT = null;
     }
   });
 
+  addEventListener('beforeunload', e => { syncProgram(); if(pgDirty()){persistPgDraft(); e.preventDefault(); e.returnValue='';} });
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){syncProgram();persistPgDraft();}});
   /* ── المحرر ── */
   $('#pgModal').addEventListener('click', e => {
+    if(pgSaving) return;
+    const tool=e.target.closest('[data-pgtool]');
+    if(tool){
+      syncProgram();
+      const list=tool.dataset.kind==='day'?PG.content.days:PG.content.days[+tool.dataset.day].rows;
+      const i=+tool.dataset.i, action=tool.dataset.pgtool;
+      if(action==='copy') {const copy=JSON.parse(JSON.stringify(list[i])); if(tool.dataset.kind==='day') copy.label += pgText(' — نسخة',' — copy'); list.splice(i+1,0,copy);}
+      else {const j=i+(action==='up'?-1:1); if(j>=0 && j<list.length) [list[i],list[j]]=[list[j],list[i]];}
+      drawProgram(); persistPgDraft(); drawPreview(); return;
+    }
     if (e.target === e.currentTarget) return closeProgram();
     if (e.target.closest('[data-pgact="cancel"]')) return closeProgram();
 
@@ -5121,7 +5304,7 @@ function wirePrograms(){
       if (k === 'mrow')  (PG.content.meals[+add.dataset.meal].rows ||= [])
                            .push({ n:'', m:'', reps:'' });
       if (k === 'habit') PG.content.habits.push('');
-      drawProgram(); drawPreview();
+      drawProgram(); persistPgDraft(); drawPreview();
       return;
     }
 
@@ -5134,7 +5317,7 @@ function wirePrograms(){
       if (k === 'meal')  PG.content.meals.splice(+del.dataset.meal, 1);
       if (k === 'mrow')  PG.content.meals[+del.dataset.meal].rows.splice(+del.dataset.i, 1);
       if (k === 'habit') PG.content.habits.splice(+del.dataset.i, 1);
-      drawProgram(); drawPreview();
+      drawProgram(); persistPgDraft(); drawPreview();
       return;
     }
 
@@ -5154,7 +5337,7 @@ function wirePrograms(){
     if (e.target.closest('#pg-logoClear')){
       syncProgram();
       PG.design.logo = '';
-      drawProgram(); drawPreview();
+      drawProgram(); persistPgDraft(); drawPreview();
       return;
     }
     if (e.target.closest('#pg-setDefault')) return savePgDefaultDesign();
@@ -5162,7 +5345,7 @@ function wirePrograms(){
 
   /* تبديل نوع اليوم يغيّر أعمدة الجدول، فنعيد الرسم */
   $('#pgModal').addEventListener('change', e => {
-    if (e.target.classList.contains('d-kind')){ syncProgram(); drawProgram(); drawPreview(); return }
+    if (e.target.classList.contains('d-kind')){ syncProgram(); drawProgram(); persistPgDraft(); drawPreview(); return }
     /* مفاتيح التصميم والإطالات تغيّر الورقة فوراً */
     schedulePreview();
   });
@@ -5263,6 +5446,7 @@ async function saveNewPassword(e){
 let SIGNED_IN = false;   /* يمنع جلب البيانات مرتين عند أول تحميل */
 
 async function showApp(session){
+  pgOwner = session?.user?.id || '';
   if (RECOVERING) return;          /* لا تتخطّى شاشة كلمة السر */
   $('#gate').hidden = true;
   $('#pwGate').hidden = true;
@@ -5603,13 +5787,14 @@ function wire(){
     if (e.key !== 'Escape') return;
     if (!$('#confirm').hidden) return closeConfirm();
     if (!$('#picker').hidden)  return closePicker();
+    if (!$('#pgModal').hidden) return closeProgram();
     if (!$('#modal').hidden)   return closeForm();
   });
 
   /* حصر التركيز داخل المودال المفتوح */
   document.addEventListener('keydown', e => {
     if (e.key !== 'Tab') return;
-    const box = !$('#confirm').hidden ? $('#confirm') : (!$('#modal').hidden ? $('#modal') : null);
+    const box = !$('#confirm').hidden ? $('#confirm') : (!$('#picker').hidden ? $('#picker') : !$('#pgModal').hidden ? $('#pgModal') : !$('#pgPick').hidden ? $('#pgPick') : !$('#modal').hidden ? $('#modal') : null);
     if (!box) return;
     const f = [...box.querySelectorAll('a[href],button:not([disabled]),input:not([type=hidden]),select,textarea,[tabindex="0"]')]
                 .filter(el => el.offsetParent !== null);
