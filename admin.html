@@ -1026,6 +1026,53 @@ select.inp{cursor:pointer;
   .modal-card.pg-card{max-width:1380px}
 }
 
+/* زرّان جنب بعض: «إضافة» و«من الموقع» */
+.add-row-pair{display:grid;gap:var(--s-2);grid-template-columns:1fr}
+@media(min-width:520px){ .add-row-pair{grid-template-columns:1fr 1fr} }
+
+/* عنوان فرعي داخل صندوق الإطالات */
+.sub-h{
+  font-family:var(--f-head);font-size:var(--t-13);font-weight:700;color:var(--soft);
+  margin:var(--s-2) 0 0;
+}
+.erow.pgstr{grid-template-columns:1fr 44px}
+.erow.pgstr .en-in{grid-column:1/-1;font-family:var(--f-num);font-size:var(--t-13)}
+.erow.pgstr .d-in{grid-column:1/-1}
+@media(min-width:720px){
+  .erow.pgstr{grid-template-columns:1.3fr 1.1fr 130px 44px}
+  .erow.pgstr .en-in,.erow.pgstr .d-in{grid-column:auto}
+}
+
+/* صفوف نافذة الاستيراد — زر بشكل صف قائمة */
+.imp-row{text-align:start;width:100%;cursor:pointer}
+@media (hover:hover) and (pointer:fine){ .imp-row:hover{border-color:var(--brand)} }
+.imp-row:active{transform:scale(.99)}
+
+/* ── مختار قالب الورقة ── */
+.th-row{display:grid;gap:var(--s-2);grid-template-columns:repeat(3,1fr)}
+.th-opt input{position:absolute;opacity:0;width:0;height:0}
+.th-card{
+  display:grid;gap:3px;padding:var(--s-2);cursor:pointer;text-align:center;
+  border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface);
+  transition:border-color .18s var(--ease),background-color .18s var(--ease);
+}
+.th-card b{font-family:var(--f-head);font-size:var(--t-13);color:var(--ink)}
+.th-card span:last-child{font-size:var(--t-11);color:var(--soft);line-height:1.45}
+.th-opt input:checked + .th-card{border-color:var(--brand);background:var(--brand-wash)}
+.th-opt input:focus-visible + .th-card{outline:2.5px solid var(--ring);outline-offset:2px}
+/* مصغّرة تبيّن شكل القالب بلمحة بدل ما تجرّبيه */
+.th-mini{
+  height:38px;border-radius:5px;background:#fff;border:1px solid var(--line);
+  position:relative;overflow:hidden;margin-bottom:2px;
+}
+.th-mini::before{content:"";position:absolute;inset:6px 6px auto 6px;height:3px;background:#d8d3cd;border-radius:2px}
+.th-mini::after{content:"";position:absolute;inset:14px 6px 6px 6px;background:
+  repeating-linear-gradient(#eae7e2 0 3px,transparent 3px 6px)}
+.th-mini-energy{background:linear-gradient(150deg,rgba(194,65,12,.14),transparent 55%)}
+.th-mini-energy::before{background:var(--brand)}
+.th-mini-bold::before{content:"";inset:0 0 auto 0;height:13px;background:var(--brand);border-radius:0}
+.th-mini-bold::after{inset:17px 6px 6px 6px}
+
 /* شرائح لون التمييز */
 .sw-row{display:flex;flex-wrap:wrap;gap:9px}
 .sw{
@@ -1206,12 +1253,103 @@ select.inp{cursor:pointer;
 }
 .pdfsheet .pp-foot .pno{font-family:"IBM Plex Mono","Noto Sans Arabic",monospace;font-variant-numeric:tabular-nums}
 
+/* ── صورة الوجبة ── */
+.pdfsheet .meal-img{
+  display:block;width:100%;max-height:62mm;object-fit:cover;
+  border-radius:2.5mm;margin:0 0 5mm;
+  box-shadow:inset 0 0 0 .4pt rgba(0,0,0,.14);
+}
+
+/* ══════════════════════════════════════════════════════════
+   قوالب الورقة
+   ══════════════════════════════════════════════════════════
+
+   ⚠️ كلها CSS خالص — ماكو صور خلفية. السبب:
+   ① الصورة النقطية تطلع مشوّشة بالطابعة، والتدرّجات والأشكال
+      المرسومة بالـCSS vector فتبقى حادة بأي دقة
+   ② ماكو ملف زايد ينرفع ولا رابط ينكسر
+   ③ لون التمييز --pa ينسحب عليها تلقائياً
+
+   ⚠️ **الحبر**: الأشكال محصورة بالحواف والغلاف. جسم الصفحة يبقى
+   أبيض دائماً — خلفية ملوّنة تحت جدول فيه خانات تنكتب بالقلم يعني
+   ورقة ما تنكتب عليها، وطابعة تخلص حبر بعشر أوراق.
+
+   ⚠️ الوضع الأبيض والأسود يطفّي كل هذا (قواعد .mono تحت). */
+
+/* ── قالب «الطاقة»: أشرطة مائلة ── */
+.pdfsheet.th-energy .pp{position:relative}
+/* شريط مائل بالزاوية العليا — clip-path مو صورة، فينطبع حاد */
+.pdfsheet.th-energy .pp::before{
+  content:"";position:absolute;top:0;inset-inline-start:0;
+  width:38mm;height:10mm;background:var(--pa,#B07D62);opacity:.13;
+  clip-path:polygon(0 0,100% 0,72% 100%,0 100%);
+  pointer-events:none;
+}
+.pdfsheet.th-energy .pp-head{
+  border-bottom-width:2.4pt;
+  border-image:linear-gradient(to left,var(--pa,#B07D62),rgba(0,0,0,0)) 1;
+}
+.pdfsheet.th-energy .pp-cover{
+  background:linear-gradient(160deg,rgba(0,0,0,.045) 0%,rgba(0,0,0,0) 46%);
+}
+.pdfsheet.th-energy .pp-cover::after{
+  content:"";position:absolute;bottom:0;inset-inline-end:0;
+  width:100%;height:52mm;background:var(--pa,#B07D62);opacity:.16;
+  clip-path:polygon(0 100%,100% 34%,100% 100%);
+  pointer-events:none;
+}
+.pdfsheet.th-energy h3{
+  padding-inline-start:3.4mm;border-inline-start:2.6pt solid var(--pa,#B07D62);
+}
+
+/* ── قالب «جريء»: غلاف ملوّن كامل ورؤوس سميكة ── */
+.pdfsheet.th-bold .pp-cover{
+  background:var(--pa,#B07D62);color:#fff;
+  margin:-14mm;padding:14mm;   /* يمد اللون لحافة الورقة بدل هامش @page */
+}
+.pdfsheet.th-bold .pp-cover h1,
+.pdfsheet.th-bold .pp-cover .cv-name{color:#fff}
+.pdfsheet.th-bold .pp-cover .cv-kicker{color:rgba(255,255,255,.82)}
+.pdfsheet.th-bold .pp-cover .cv-rule{background:#fff}
+.pdfsheet.th-bold .pp-cover .sub{color:rgba(255,255,255,.86)!important}
+/* شرائح بيانات المتمرن على غلاف ملوّن — نص داكن على بني غامق ما
+   ينقرأ، فنقلبها لحدود وخط أبيض شفافين */
+.pdfsheet.th-bold .pp-cover .cv-meta{color:rgba(255,255,255,.9)}
+.pdfsheet.th-bold .pp-cover .cv-meta span{border-color:rgba(255,255,255,.45)}
+.pdfsheet.th-bold .pp-cover .cv-logo{box-shadow:0 0 0 1.2pt rgba(255,255,255,.5)}
+.pdfsheet.th-bold .pp-head{
+  background:var(--pa,#B07D62);color:#fff;
+  margin:-14mm -14mm 5mm;padding:6mm 14mm 5mm;border-bottom:none;
+}
+.pdfsheet.th-bold .pp-head h2{color:#fff}
+.pdfsheet.th-bold .pp-head .sub{color:rgba(255,255,255,.85)}
+.pdfsheet.th-bold h3{
+  padding-inline-start:3.4mm;border-inline-start:3pt solid var(--pa,#B07D62);
+}
+
 /* ── الوضع الأبيض والأسود ──
    يشيل لون التمييز من كل مكان بدل ما ينطبع رمادي عشوائي */
 .pdfsheet.mono .pp-head{border-bottom-color:#333}
 .pdfsheet.mono .tbl th{background:#3A3A3A;border-color:#3A3A3A}
 .pdfsheet.mono .cv-kicker,.pdfsheet.mono a.watch{color:#333}
 .pdfsheet.mono .cv-rule{background:#333}
+/* الأبيض والأسود يغلب القالب — الأشكال الملوّنة تنطبع رمادي ثقيل
+   وتاكل الحبر بلا فايدة، فنشيلها كلها */
+.pdfsheet.mono.th-energy .pp::before,
+.pdfsheet.mono.th-energy .pp-cover::after,
+.pdfsheet.mono.th-energy .pp-cover{background:none;opacity:1;content:none}
+.pdfsheet.mono.th-energy .pp-head{border-image:none;border-bottom:1.8pt solid #333}
+.pdfsheet.mono.th-bold .pp-cover{background:#fff;color:#141414;margin:0;padding:0}
+.pdfsheet.mono.th-bold .pp-cover h1,
+.pdfsheet.mono.th-bold .pp-cover .cv-name{color:#111}
+.pdfsheet.mono.th-bold .pp-cover .cv-kicker{color:#333}
+.pdfsheet.mono.th-bold .pp-cover .cv-meta{color:#555}
+.pdfsheet.mono.th-bold .pp-cover .cv-meta span{border-color:#ddd}
+.pdfsheet.mono.th-bold .pp-head{background:none;color:#141414;margin:0 0 5mm;padding:0 0 3mm;border-bottom:1.8pt solid #333}
+.pdfsheet.mono.th-bold .pp-head h2{color:#141414}
+.pdfsheet.mono.th-bold .pp-head .sub{color:#5A5A5A}
+.pdfsheet.mono.th-energy h3,
+.pdfsheet.mono.th-bold h3{border-inline-start-color:#333}
 
 /* ══ المعاينة الحيّة داخل المحرر ══
    الورقة عرضها 210mm ثابت، وتنصغّر بـ transform حتى تدخل بالعمود.
@@ -1636,6 +1774,27 @@ select.inp{cursor:pointer;
   </div>
 </div>
 
+<!-- ══ استيراد كورس أو وصفة من الموقع ══ -->
+<div class="modal" id="pgImport" role="dialog" aria-modal="true" aria-labelledby="pgImportTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="pgImportTitle"></h2>
+      <button class="icon-btn sq" type="button" id="pgImportClose" data-t-aria="app.close">
+        <svg class="icon"><use href="#i-close"></use></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="gap:var(--s-3)">
+      <p class="hint" id="pgImportSub"></p>
+      <div class="search">
+        <svg class="icon s-ico"><use href="#i-search"></use></svg>
+        <label class="sr-only" for="pgImportQ" data-t="app.search">بحث</label>
+        <input class="inp" id="pgImportQ" type="search" autocomplete="off">
+      </div>
+      <div class="list" id="pgImportList" style="margin-top:0"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ محرر البرنامج ══ -->
 <div class="modal" id="pgModal" role="dialog" aria-modal="true" aria-labelledby="pgTitle" hidden>
   <div class="modal-card pg-card">
@@ -1935,6 +2094,36 @@ const T = {
     "pg.dShowVideo":"إظهار عمود الفيديو",
     "pg.dQr":"رمز QR بدل كلمة «شاهد»",
     "pg.dQrHint":"للطباعة على ورق — المتمرن يصوّر الرمز بكاميرا التلفون ويفتح الفيديو. بالـPDF كلمة «شاهد» تنضغط مباشرة فما تحتاجينه.",
+
+    "pg.strEdit":"تعديل الإطالات",
+    "pg.strUpper":"الجزء العلوي",
+    "pg.strLower":"الجزء السفلي",
+    "pg.strBefore":"قبل التمرين — متحركة",
+    "pg.strAfter":"بعد التمرين — ثابتة",
+    "pg.strAdd":"إضافة إطالة",
+    "pg.strDur":"التكرار / المدة",
+    "pg.strReset":"استرجاع الإطالات الافتراضية",
+    "pg.strResetDone":"رجعت الإطالات الافتراضية.",
+
+    "pg.mealImg":"صورة الوجبة",
+    "pg.mealImgHint":"تظهر بأعلى صفحة الوجبة بالورقة.",
+
+    "pg.fromSite":"من الموقع",
+    "pg.importCourse":"جيبي كورس من الموقع",
+    "pg.importRecipe":"جيبي وصفة من الموقع",
+    "pg.importCourseSub":"الكورس ينضاف كيوم كامل بتمارينه.",
+    "pg.importRecipeSub":"الوصفة تنضاف كوجبة بمكوّناتها وصورتها.",
+    "pg.importEmpty":"ماكو شي بالموقع بعد",
+    "pg.imported":"انضاف — عدّليه براحتك.",
+    "pg.importSearch":"دوّري بالعنوان…",
+
+    "pg.theme":"قالب الورقة",
+    "pg.thClean":"هادئ",
+    "pg.thCleanSub":"أبيض ونظيف — أقل حبر",
+    "pg.thEnergy":"طاقة",
+    "pg.thEnergySub":"أشرطة مائلة وغلاف حيوي",
+    "pg.thBold":"جريء",
+    "pg.thBoldSub":"غلاف ملوّن كامل ورؤوس سميكة",
     "pg.setDefault":"اجعليه التصميم الافتراضي",
     "pg.defaultSaved":"انحفظ كتصميم افتراضي لكل برنامج جديد.",
 
@@ -2339,6 +2528,36 @@ const T = {
     "pg.dShowVideo":"Show video column",
     "pg.dQr":"QR code instead of the “Watch” link",
     "pg.dQrHint":"For paper printing — the trainee scans it with a phone camera. In a PDF the “Watch” link is already tappable.",
+
+    "pg.strEdit":"Edit stretches",
+    "pg.strUpper":"Upper body",
+    "pg.strLower":"Lower body",
+    "pg.strBefore":"Before — dynamic",
+    "pg.strAfter":"After — static",
+    "pg.strAdd":"Add stretch",
+    "pg.strDur":"Reps / duration",
+    "pg.strReset":"Restore default stretches",
+    "pg.strResetDone":"Default stretches restored.",
+
+    "pg.mealImg":"Meal photo",
+    "pg.mealImgHint":"Shown at the top of the meal page on the sheet.",
+
+    "pg.fromSite":"From the site",
+    "pg.importCourse":"Import a course from the site",
+    "pg.importRecipe":"Import a recipe from the site",
+    "pg.importCourseSub":"The course is added as a full day with its exercises.",
+    "pg.importRecipeSub":"The recipe is added as a meal with its ingredients and photo.",
+    "pg.importEmpty":"Nothing on the site yet",
+    "pg.imported":"Added — edit it as you like.",
+    "pg.importSearch":"Search by title…",
+
+    "pg.theme":"Sheet template",
+    "pg.thClean":"Calm",
+    "pg.thCleanSub":"White and clean — least ink",
+    "pg.thEnergy":"Energy",
+    "pg.thEnergySub":"Angled bands and a lively cover",
+    "pg.thBold":"Bold",
+    "pg.thBoldSub":"Full-color cover and heavy headers",
     "pg.setDefault":"Make this the default design",
     "pg.defaultSaved":"Saved as the default design for every new program.",
 
@@ -3009,6 +3228,7 @@ function pickFolder(){
   if (!PICK_TARGET) return 'recipes';
   if (PICK_TARGET === 'avatar')          return 'avatar';
   if (PICK_TARGET === 'pglogo')          return 'programs';
+  if (PICK_TARGET.startsWith('pgmeal:'))  return 'programs';
   if (PICK_TARGET === 'hero:add')        return 'site';
   if (PICK_TARGET.startsWith('ct:'))     return 'site';
   return destFolder();                   /* recipes أو courses حسب التبويب */
@@ -3047,6 +3267,14 @@ function choosePicked(url){
   if (PICK_TARGET === 'pglogo'){
     syncProgram();
     PG.design.logo = url;
+    closePicker();
+    drawProgram();
+    return drawPreview();
+  }
+  if (PICK_TARGET && PICK_TARGET.startsWith('pgmeal:')){
+    syncProgram();
+    const meal = PG.content.meals[+PICK_TARGET.slice(7)];
+    if (meal) meal.img = url;
     closePicker();
     drawProgram();
     return drawPreview();
@@ -4137,7 +4365,8 @@ const PG_ACCENTS = ['#B07D62','#C2410C','#0E7C66','#A62F40','#4A5D7E','#6B5B95',
    ضبطت تصميمها، وبعدين بتصميم البرنامج نفسه */
 const PG_DESIGN_BASE = {
   logo:'', logoPos:'right', cover:true, accent:'#B07D62', mono:false,
-  footer:'', pageNum:true, logCols:3, showEn:true, showVideo:true, qr:false
+  footer:'', pageNum:true, logCols:3, showEn:true, showVideo:true, qr:false,
+  theme:'clean'
 };
 
 /* ── الإطالات: ثابتة بكل برنامج، فما نخلي الكوتش تعيد كتابتها ──
@@ -4257,6 +4486,26 @@ function autofillExercise(input){
       el.value = val || ''; el.dataset.autofill = el.value;
     }
   });
+}
+
+/* نسخة قابلة للتعديل من البذرة — JSON.parse حتى ما تنمسّ STRETCH_PRESET
+   نفسها. لو انمسّت، أول تعديل بالإطالات ينسحب على كل البرامج الجاية. */
+const freshStretches = () => JSON.parse(JSON.stringify(STRETCH_PRESET));
+
+/* الإطالات الفعلية للبرنامج المفتوح.
+   ⚠️ البرامج المحفوظة قبل ما تصير الإطالات قابلة للتعديل ماكو بيها
+   stretchList — ترجع للبذرة بدل ما تطلع فاضية. */
+function pgStretches(){
+  const c = PG.content;
+  if (!c.stretchList) c.stretchList = freshStretches();
+  const L = c.stretchList;
+  ['upper','lower'].forEach(part => {
+    if (!L[part]) L[part] = { before:[], after:[] };
+    ['before','after'].forEach(ph => {
+      if (!Array.isArray(L[part][ph])) L[part][ph] = [];
+    });
+  });
+  return L;
 }
 
 let PG      = null;   /* مسودة البرنامج المفتوح */
@@ -4417,11 +4666,22 @@ function syncProgram(){
   if ($('#pg-dShowEn'))   d.showEn    = $('#pg-dShowEn').checked;
   if ($('#pg-dShowVideo'))d.showVideo = $('#pg-dShowVideo').checked;
   if ($('#pg-dQr'))       d.qr        = $('#pg-dQr').checked;
+  const th = $('#pg-dTheme input:checked'); if (th) d.theme = th.value;
   if ($('#pg-dLogCols'))  d.logCols   = nz($('#pg-dLogCols').value);
   if ($('#pg-dLogoPos'))  d.logoPos   = $('#pg-dLogoPos').value;
 
   if (PG.kind === 'training'){
     if ($('#pg-stretch')) PG.content.stretch = $('#pg-stretch').checked;
+    if ($('#pgBody .erow.pgstr')){
+      const L = pgStretches();
+      $$('#pgBody .erow.pgstr').forEach(r => {
+        const list = L[r.dataset.str] && L[r.dataset.str][r.dataset.phase];
+        const o = list && list[+r.dataset.i]; if (!o) return;
+        o.n  = r.querySelector('.n-in')?.value.trim()  ?? o.n;
+        o.en = r.querySelector('.en-in')?.value.trim() ?? o.en;
+        o.d  = r.querySelector('.d-in')?.value.trim()  ?? o.d;
+      });
+    }
     /* ⚠️ `details[data-day]` مو `[data-day]` المجرّدة — أزرار «إضافة
        تمرين» و«حذف» تحمل نفس الخاصية، والحلقة چانت تمر عليها بعد.
        الحقول تنجو بـ `?? old` لأن querySelector يرجع null، بس
@@ -4584,17 +4844,68 @@ function pgDaysBlock(){
 
   if (!PG.content.days.length) h += `<p class="rows-empty">${esc(t('pg.emptySub'))}</p>`;
 
-  h += `<button class="add-row" type="button" data-pgadd="day">${ico('i-plus')}${esc(t('pg.addDay'))}</button>
-  </div>
+  h += `<div class="add-row-pair">
+      <button class="add-row" type="button" data-pgadd="day">${ico('i-plus')}${esc(t('pg.addDay'))}</button>
+      <button class="add-row" type="button" data-pgimport="course">${ico('i-dumbbell')}${esc(t('pg.fromSite'))}</button>
+    </div>
+  </div>`;
 
-  <div class="fset">
+  h += pgStretchBlock();
+  return h;
+}
+
+/* ── الإطالات ──
+   المفتاح يشغّلها، وجدولها ينفتح للتعديل بس لمن يكون شغّال — ماكو
+   فايدة نعرض ٣٢ حقل لبرنامج ما راح يستعمل الإطالات أصلاً. */
+function pgStretchBlock(){
+  const on = PG.content.stretch !== false;
+  let h = `<div class="fset">
     <h4>${esc(t('pg.stretch'))}</h4>
     <label class="switch">
-      <input type="checkbox" id="pg-stretch" ${PG.content.stretch !== false ? 'checked' : ''}>
+      <input type="checkbox" id="pg-stretch" ${on ? 'checked' : ''}>
       <span class="track"></span><span class="lbl-txt">${esc(t('pg.stretch'))}</span>
     </label>
-    <span class="hint">${esc(t('pg.stretchHint'))}</span>
-  </div>`;
+    <span class="hint">${esc(t('pg.stretchHint'))}</span>`;
+
+  if (on){
+    const L = pgStretches();
+    h += [['upper', t('pg.strUpper')], ['lower', t('pg.strLower')]].map(([part, title]) => {
+      const n = L[part].before.length + L[part].after.length;
+      return `<details class="acc" data-strpart="${part}">
+        <summary>
+          <span class="ai">${ico('i-refresh')}</span>
+          <span class="atxt"><span>${esc(title)}</span>
+            <span class="asub">${esc(t('pg.strEdit'))}</span></span>
+          <span class="acount">${n}</span>
+          <span class="chev">${ico('i-down')}</span>
+        </summary>
+        <div class="acc-body">
+          ${['before','after'].map(ph => `
+            <h5 class="sub-h">${esc(t(ph === 'before' ? 'pg.strBefore' : 'pg.strAfter'))}</h5>
+            <div class="rows">${
+              L[part][ph].length
+                ? L[part][ph].map((r, i) => `<div class="erow pgstr"
+                    data-str="${part}" data-phase="${ph}" data-i="${i}">
+                    <input class="inp n-in"  value="${esc(r.n  || '')}" placeholder="${esc(t('pg.rowN'))}">
+                    <input class="inp en-in" value="${esc(r.en || '')}" placeholder="${esc(t('pg.rowEn'))}" dir="ltr">
+                    <input class="inp d-in"  value="${esc(r.d  || '')}" placeholder="${esc(t('pg.strDur'))}">
+                    <button class="del-row" type="button" data-pgdel="str"
+                      data-str="${part}" data-phase="${ph}" data-i="${i}"
+                      aria-label="${esc(t('pg.removeRow'))}">${ico('i-trash')}</button>
+                  </div>`).join('')
+                : `<p class="rows-empty">${esc(t('pg.strAdd'))}</p>`
+            }</div>
+            <button class="add-row" type="button" data-pgadd="str"
+              data-str="${part}" data-phase="${ph}">${ico('i-plus')}${esc(t('pg.strAdd'))}</button>`).join('')}
+        </div>
+      </details>`;
+    }).join('');
+
+    h += `<button class="btn btn-quiet btn-sm" type="button" id="pg-strReset" style="justify-self:start">
+      ${ico('i-refresh')}<span>${esc(t('pg.strReset'))}</span></button>`;
+  }
+
+  h += `</div>`;
   return h;
 }
 
@@ -4648,6 +4959,23 @@ function pgMealsBlock(){
         <div class="field"><label>${esc(t('pg.mealSub'))}</label>
           <input class="inp m-sub" value="${esc(meal.sub || '')}" placeholder="الوجبة الأولى"></div>
       </div>
+
+      <div class="field"><span class="lbl-txt">${esc(t('pg.mealImg'))}</span>
+        <div class="cover-box">
+          <div class="cover-prev">${meal.img
+            ? `<img src="${esc(meal.img)}" alt="">`
+            : `${ico('i-image')}<span>${esc(t('f.coverNone'))}</span>`}</div>
+          <div class="cover-ctl">
+            <div class="cover-btns">
+              <button class="btn btn-ghost btn-sm" type="button" data-pgmealimg="${i}">
+                ${ico('i-image')}<span>${esc(t('media.pick'))}</span></button>
+              ${meal.img ? `<button class="btn btn-quiet btn-sm" type="button" data-pgmealimgclear="${i}">
+                ${ico('i-close')}<span>${esc(t('app.delete'))}</span></button>` : ''}
+            </div>
+            <span class="hint">${esc(t('pg.mealImgHint'))}</span>
+          </div>
+        </div>
+      </div>
       <div class="rows">${
         (meal.rows || []).length
           ? meal.rows.map((r, j) => `<div class="erow pgmeal" data-i="${j}">
@@ -4671,7 +4999,10 @@ function pgMealsBlock(){
 
   if (!PG.content.meals.length) h += `<p class="rows-empty">${esc(t('pg.emptySub'))}</p>`;
 
-  h += `<button class="add-row" type="button" data-pgadd="meal">${ico('i-plus')}${esc(t('pg.addMeal'))}</button>
+  h += `<div class="add-row-pair">
+      <button class="add-row" type="button" data-pgadd="meal">${ico('i-plus')}${esc(t('pg.addMeal'))}</button>
+      <button class="add-row" type="button" data-pgimport="recipe">${ico('i-salad')}${esc(t('pg.fromSite'))}</button>
+    </div>
   </div>
 
   <div class="fset">
@@ -4698,8 +5029,24 @@ function pgMealsBlock(){
 }
 
 function pgDesignBlock(d){
+  const themes = [
+    ['clean',  t('pg.thClean'),  t('pg.thCleanSub')],
+    ['energy', t('pg.thEnergy'), t('pg.thEnergySub')],
+    ['bold',   t('pg.thBold'),   t('pg.thBoldSub')]
+  ];
   return `<div class="fset">
     <h4>${esc(t('pg.design'))}</h4>
+
+    <div class="field"><span class="lbl-txt">${esc(t('pg.theme'))}</span>
+      <div class="th-row" id="pg-dTheme">${themes.map(([v, name, sub]) => `
+        <label class="th-opt">
+          <input type="radio" name="pgtheme" value="${v}" ${(d.theme || 'clean') === v ? 'checked' : ''}>
+          <span class="th-card">
+            <span class="th-mini th-mini-${v}" aria-hidden="true"></span>
+            <b>${esc(name)}</b><span>${esc(sub)}</span>
+          </span>
+        </label>`).join('')}</div>
+    </div>
 
     <div class="cover-box">
       <div class="cover-prev" id="pg-logoPrev">${d.logo
@@ -4759,6 +5106,128 @@ function pgDesignBlock(d){
     <button class="btn btn-ghost btn-sm" type="button" id="pg-setDefault" style="justify-self:start">
       ${ico('i-check')}<span>${esc(t('pg.setDefault'))}</span></button>
   </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   الاستيراد من الموقع
+   ══════════════════════════════════════════════════════════
+
+   الكوتش كاتبة كورسات ووصفات بالموقع أصلاً — ماكو معنى تعيد كتابتها
+   بالبرنامج. الاستيراد ينسخ المحتوى **نسخة مستقلة**: تعديل البرنامج
+   ما يمس الكورس بالموقع، والعكس. */
+
+let IMPORT_KIND = null;   /* 'course' أو 'recipe' */
+
+/* «3 × 12» أو «3 × 40 ثانية» → جولات وعدات منفصلة.
+   اللي ما ينفهم يروح كامل لعمود العدات بدل ما يضيع. */
+function splitSets(str){
+  const m = String(str || '').match(/^\s*(\d+)\s*[x×*]\s*(.+)$/i);
+  return m ? { sets:m[1], reps:m[2].trim() } : { sets:'', reps:String(str || '').trim() };
+}
+
+function courseToDay(c){
+  const moves = Array.isArray(c.moves) ? c.moves : [];
+  return {
+    label: 'DAY ' + (PG.content.days.length + 1),
+    title: c.title || '',
+    kind:  'bodyweight',            /* الكورسات بالموقع ماكو بيها عمود عضلة */
+    muscles: c.area ? c.area.split(/[،,·]/).map(x => x.trim()).filter(Boolean) : [],
+    rows: moves.map(mv => {
+      const sp = splitSets(mv.s);
+      /* الفيديو مال الكورس واحد للكورس كله — ننسخه لكل تمرين لأن
+         عمود الفيديو بالورقة على مستوى التمرين */
+      return { n:mv.n || '', en:'', m:'', sets:sp.sets, reps:sp.reps, v:c.video || '' };
+    }),
+    note: c.duration ? c.duration : ''
+  };
+}
+
+function recipeToMeal(r){
+  const ing = Array.isArray(r.ingredients) ? r.ingredients : [];
+  const macros = [
+    r.kcal    ? r.kcal + ' سعرة'      : '',
+    r.protein ? 'بروتين ' + r.protein : '',
+    r.carbs   ? 'كارب '   + r.carbs   : '',
+    r.fat     ? 'دهون '   + r.fat     : ''
+  ].filter(Boolean).join(' · ');
+  return {
+    title: r.title || '',
+    sub:   [r.tag, r.duration].filter(Boolean).join(' · '),
+    img:   r.cover || '',
+    /* المكوّنات بالداتابيس للوصفة كاملة — ننسخها مثل ما هي ونذكر
+       عدد الحصص بالملاحظة حتى ما تنفهم غلط */
+    rows: ing.map(i => ({
+      n:    i.n || '',
+      m:    (Array.isArray(i.alt) && i.alt.length) ? 'بدائل: ' + i.alt.join(' · ') : '',
+      reps: [i.q, i.u].filter(Boolean).join(' ')
+    })),
+    note: [macros, r.servings ? 'الكمية لـ' + r.servings + ' حصة' : ''].filter(Boolean).join(' — ')
+  };
+}
+
+function openImport(kind){
+  IMPORT_KIND = kind;
+  const isC = kind === 'course';
+  $('#pgImportTitle').textContent = t(isC ? 'pg.importCourse' : 'pg.importRecipe');
+  $('#pgImportSub').textContent   = t(isC ? 'pg.importCourseSub' : 'pg.importRecipeSub');
+  $('#pgImportQ').value = '';
+  $('#pgImportQ').placeholder = t('pg.importSearch');
+  renderImport();
+  const m = $('#pgImport');
+  m.hidden = false;
+  requestAnimationFrame(() => m.classList.add('open'));
+}
+
+function closeImport(){
+  const m = $('#pgImport');
+  m.classList.remove('open');
+  setTimeout(() => { m.hidden = true }, 220);
+  IMPORT_KIND = null;
+}
+
+function renderImport(){
+  const rows = ROWS[IMPORT_KIND === 'course' ? 'courses' : 'recipes'] || [];
+  const q = norm($('#pgImportQ').value);
+  const hits = rows.filter(x => !q || norm(x.title).includes(q));
+  if (!hits.length){
+    $('#pgImportList').innerHTML = `<div class="empty">${ico('i-empty')}
+      <b>${esc(t('pg.importEmpty'))}</b></div>`;
+    return;
+  }
+  $('#pgImportList').innerHTML = hits.map(x => {
+    const n = IMPORT_KIND === 'course'
+      ? ((x.moves || []).length + ' ' + t('pg.rows'))
+      : ((x.ingredients || []).length + ' ' + t('pg.mealRows'));
+    return `<button class="row imp-row" type="button" data-imp="${esc(x.id)}">
+      <div class="row-thumb">${x.cover
+        ? `<img src="${esc(x.cover)}" alt="">`
+        : ico(IMPORT_KIND === 'course' ? 'i-dumbbell' : 'i-salad')}</div>
+      <div class="row-main">
+        <h3>${esc(x.title)}</h3>
+        <div class="row-meta">
+          <span class="pill">${esc(tag(x.tag))}</span>
+          <span>${esc(n)}</span>
+          ${x.area ? `<span>${esc(x.area)}</span>` : ''}
+        </div>
+      </div>
+    </button>`;
+  }).join('');
+}
+
+function doImport(id){
+  syncProgram();
+  if (IMPORT_KIND === 'course'){
+    const c = ROWS.courses.find(x => x.id === id); if (!c) return;
+    PG.content.days.push(courseToDay(c));
+  } else {
+    const r = ROWS.recipes.find(x => x.id === id); if (!r) return;
+    PG.content.meals.push(recipeToMeal(r));
+  }
+  closeImport();
+  drawProgram();
+  drawPreview();
+  buildExIndex();
+  toast(t('pg.imported'));
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -4867,13 +5336,13 @@ function pgDayTable(day, d){
 }
 
 function pgStretchPage(part, title){
-  const tbl = (rows, cap) => `<h3>${esc(cap)}</h3>
+  const tbl = (rows, cap) => !rows.length ? '' : `<h3>${esc(cap)}</h3>
     <table class="tbl"><thead><tr>
       <th class="num">#</th><th>${esc(t('pg.sheetEx'))}</th><th class="num">${esc(t('pg.sheetStretchDur'))}</th>
     </tr></thead><tbody>${rows.map((r, i) => `<tr>
       <td class="num">${i + 1}</td>
-      <td>${esc(r.n)}<span class="en" dir="ltr" lang="en">${esc(r.en)}</span></td>
-      <td class="num">${esc(r.d)}</td>
+      <td>${esc(r.n)}${r.en ? `<span class="en" dir="ltr" lang="en">${esc(r.en)}</span>` : ''}</td>
+      <td class="num">${esc(r.d || '')}</td>
     </tr>`).join('')}</tbody></table>`;
   return `<h3 style="font-size:13pt">${esc(title)}</h3>
     ${tbl(part.before, t('pg.sheetStretchBefore'))}
@@ -4929,12 +5398,17 @@ function buildSheet(){
     PG.content.days.forEach(day => pages.push(pgDayTable(day, d)));
 
     if (PG.content.stretch !== false){
-      pages.push(pgStretchPage(STRETCH_PRESET.upper, t('pg.sheetStretchUpper')));
-      pages.push(pgStretchPage(STRETCH_PRESET.lower, t('pg.sheetStretchLower')));
+      /* من stretchList مو من البذرة — الكوتش تقدر تعدّلها */
+      const L = pgStretches();
+      if (L.upper.before.length || L.upper.after.length)
+        pages.push(pgStretchPage(L.upper, t('pg.sheetStretchUpper')));
+      if (L.lower.before.length || L.lower.after.length)
+        pages.push(pgStretchPage(L.lower, t('pg.sheetStretchLower')));
     }
   } else {
     PG.content.meals.forEach(meal => {
       pages.push(`<h3>${esc(meal.title || '')}${meal.sub ? ' — ' + esc(meal.sub) : ''}</h3>
+        ${meal.img ? `<img class="meal-img" src="${esc(meal.img)}" alt="">` : ''}
         <table class="tbl"><thead><tr>
           <th>${esc(t('pg.sheetGroup'))}</th><th>${esc(t('pg.rowGroup'))}</th><th class="num">${esc(t('pg.sheetQty'))}</th>
         </tr></thead><tbody>${(meal.rows || []).map(r => `<tr>
@@ -5026,7 +5500,8 @@ function pgPaginate(html, d){
 }
 function paintSheet(el, sheet, extraClass){
   const d = sheet.design;
-  el.className = (extraClass || '') + (d.mono ? ' mono' : '');
+  const th = ['clean','energy','bold'].includes(d.theme) ? d.theme : 'clean';
+  el.className = (extraClass || '') + ' th-' + th + (d.mono ? ' mono' : '');
   /* لون التمييز ينحط inline — هو القيمة الوحيدة المتغيّرة بالورقة،
      وباقي الألوان صريحة بالـCSS حتى الوضع الليلي ما يطبع أسود */
   el.style.setProperty('--pa', d.mono ? '#3A3A3A' : (d.accent || '#B07D62'));
@@ -5300,10 +5775,11 @@ function wirePrograms(){
                                                 title:'', kind:'gym', muscles:[], rows:[], note:'' });
       if (k === 'row')   (PG.content.days[+add.dataset.day].rows ||= [])
                            .push({ n:'', en:'', m:'', sets:'3', reps:'12', v:'' });
-      if (k === 'meal')  PG.content.meals.push({ title:'', sub:'', rows:[], note:'' });
+      if (k === 'meal')  PG.content.meals.push({ title:'', sub:'', img:'', rows:[], note:'' });
       if (k === 'mrow')  (PG.content.meals[+add.dataset.meal].rows ||= [])
                            .push({ n:'', m:'', reps:'' });
       if (k === 'habit') PG.content.habits.push('');
+      if (k === 'str')   pgStretches()[add.dataset.str][add.dataset.phase].push({ n:'', en:'', d:'' });
       drawProgram(); persistPgDraft(); drawPreview();
       return;
     }
@@ -5317,6 +5793,7 @@ function wirePrograms(){
       if (k === 'meal')  PG.content.meals.splice(+del.dataset.meal, 1);
       if (k === 'mrow')  PG.content.meals[+del.dataset.meal].rows.splice(+del.dataset.i, 1);
       if (k === 'habit') PG.content.habits.splice(+del.dataset.i, 1);
+      if (k === 'str')   pgStretches()[del.dataset.str][del.dataset.phase].splice(+del.dataset.i, 1);
       drawProgram(); persistPgDraft(); drawPreview();
       return;
     }
@@ -5341,6 +5818,30 @@ function wirePrograms(){
       return;
     }
     if (e.target.closest('#pg-setDefault')) return savePgDefaultDesign();
+
+    if (e.target.closest('#pg-strReset')){
+      syncProgram();
+      PG.content.stretchList = freshStretches();
+      drawProgram(); persistPgDraft(); drawPreview();
+      toast(t('pg.strResetDone'));
+      return;
+    }
+
+    /* صورة الوجبة — نخزن الفهرس بـPICK_TARGET حتى نعرف أي وجبة نرجع لها */
+    const mi = e.target.closest('[data-pgmealimg]');
+    if (mi){ syncProgram(); return openPicker('pgmeal:' + mi.dataset.pgmealimg) }
+
+    const mic = e.target.closest('[data-pgmealimgclear]');
+    if (mic){
+      syncProgram();
+      const meal = PG.content.meals[+mic.dataset.pgmealimgclear];
+      if (meal) meal.img = '';
+      drawProgram(); persistPgDraft(); drawPreview();
+      return;
+    }
+
+    const imp = e.target.closest('[data-pgimport]');
+    if (imp){ syncProgram(); return openImport(imp.dataset.pgimport) }
   });
 
   /* تبديل نوع اليوم يغيّر أعمدة الجدول، فنعيد الرسم */
@@ -5375,6 +5876,18 @@ function wirePrograms(){
   addEventListener('resize', () => {
     if ($('#pgModal').hidden) return;
     clearTimeout(rz); rz = setTimeout(() => fitPreview(), 120);
+  });
+
+  /* ── نافذة الاستيراد ── */
+  $('#pgImportClose').addEventListener('click', closeImport);
+  $('#pgImport').addEventListener('click', e => {
+    if (e.target === e.currentTarget) return closeImport();
+    const b = e.target.closest('[data-imp]');
+    if (b) doImport(b.dataset.imp);
+  });
+  let iq;
+  $('#pgImportQ').addEventListener('input', () => {
+    clearTimeout(iq); iq = setTimeout(renderImport, 130);
   });
 
   $('#pgSaveBtn').addEventListener('click', saveProgram);
