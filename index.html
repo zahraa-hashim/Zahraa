@@ -1398,9 +1398,278 @@ ul.list li{min-height:44px}                                                     
 /* ═══════════════════════════════════════════════════════════
    ⑱  حاسبة السعرات
    ═══════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════
+   ⑲  شاشة الترحيب — أرقام البرنامج تتجمّع ويتشكّل منها إنسان
+       ٥ ثواني بالتمام، وتنشال من الـ DOM بعدها.
+   ═══════════════════════════════════════════════════════════ */
+#welcome{
+  position:fixed;inset:0;z-index:900;padding:24px;
+  display:grid;place-items:center;align-content:center;gap:16px;
+  background:var(--paper);
+  transition:opacity .45s var(--ease),visibility .45s
+}
+#welcome.gone{opacity:0;visibility:hidden;pointer-events:none}
+#wcStage{width:min(272px,60vw);height:auto;overflow:visible}
+#wcCap{
+  margin:0;min-height:2.7em;max-width:26ch;text-align:center;
+  font-size:clamp(15px,3.6vw,17px);font-weight:700;line-height:1.7;
+  color:var(--ink-2);transition:opacity .3s var(--ease)
+}
+#wcCap b{color:var(--brand);font-weight:800}
+#wcSkip{
+  position:absolute;inset-inline:0;margin-inline:auto;width:max-content;
+  inset-block-end:calc(22px + env(safe-area-inset-bottom));
+  font:inherit;font-size:var(--t-12);font-weight:700;color:var(--soft);
+  padding:8px 18px;border-radius:999px;border:1px solid var(--line);
+  background:transparent;cursor:pointer;touch-action:manipulation
+}
+html.wc-on{overflow:hidden}
+
+.wc-dot{font-family:var(--f-num);font-weight:700;
+  text-anchor:middle;dominant-baseline:middle;
+  fill:var(--soft);transition:fill .7s var(--ease)}
+.wc-dot.edge{fill:var(--brand-glow)}
+/* بعد التحوّل: من «مجرد بيانات» إلى جسم حي */
+.wc-dot.fit{fill:var(--pine)}
+.wc-dot.fit.edge{fill:var(--brand)}
+.wc-tag{font-weight:800;font-size:11px;text-anchor:middle;
+  dominant-baseline:middle;fill:var(--ink-2);opacity:0}
+.wc-tag.hot{fill:var(--brand)}
+
+/* تقليل الحركة: الترحيبة تنلغي أصلاً — الموقع يفتح مباشرة */
+@media (prefers-reduced-motion:reduce){ #welcome{display:none} }
 </style>
 </head>
 <body>
+
+<!-- ══ شاشة الترحيب ══
+     أرقام حقيقية من برنامج تدريب تتجمّع، يتشكّل منها إنسان، ثم يرفع
+     يديه ويصير أقوى. ٥ ثواني حد أقصى، وأي لمسة تتخطّاها فوراً.
+     تنشال من الـ DOM بعد ما تخلص فما تضل تاخذ ذاكرة.
+     الماركب هنا (مو منشأ بالجافاسكربت) حتى تبدي بأول ما تنقرا الصفحة. -->
+<div id="welcome" aria-hidden="true">
+  <svg id="wcStage" viewBox="0 0 220 300" aria-hidden="true" focusable="false">
+    <defs>
+      <!-- الشكلان مخفيان — يُستعملان بس لحساب مواقع الأرقام.
+           لتبديل الرسمة: بدّل الـ d وبس، كود الحركة ما يتغيّر.
+           كل المسارات الفرعية تدور بنفس الاتجاه (عقرب الساعة): المعكوسة
+           انكتبت بترتيب نقاط مقلوب عمداً، لأن قاعدة nonzero تحسب تقاطع
+           مسارين باتجاهين متعاكسين «فراغ» فتنثقب الرسمة عند التقاطع. -->
+      <path id="wcA" d="M110 21 C118.3 21 125 27.7 125 36 C125 44.3 118.3 51 110 51 C101.7 51 95 44.3 95 36 C95 27.7 101.7 21 110 21 Z M102 46 L118 46 L118 64 L102 64 Z M110 60 C126 60 138 68 142 80 C151 104 155 124 153 144 C151 170 138 186 110 186 C82 186 69 170 67 144 C65 124 69 104 78 80 C82 68 94 60 110 60 Z M140 78 L157 88 L171 158 L159 162 L147 112 L134 92 Z M86 92 L73 112 L61 162 L49 158 L63 88 L80 78 Z M112 182 L142 182 L140 236 L136 290 L120 290 L118 236 Z M102 236 L100 290 L84 290 L80 236 L78 182 L108 182 Z"/>
+      <path id="wcB" d="M110 21 C118.3 21 125 27.7 125 36 C125 44.3 118.3 51 110 51 C101.7 51 95 44.3 95 36 C95 27.7 101.7 21 110 21 Z M102 46 L118 46 L118 64 L102 64 Z M110 60 C125 60 138 68 143 82 L147 110 L130 146 L129 176 L91 176 L90 146 L73 110 L77 82 C82 68 95 60 110 60 Z M138 76 L156 56 L178 26 L190 34 L170 60 L154 84 Z M66 84 L50 60 L30 34 L42 26 L64 56 L82 76 Z M112 172 L131 176 L136 232 L132 290 L116 290 L114 232 Z M106 232 L104 290 L88 290 L84 232 L89 176 L108 172 Z"/>
+    </defs>
+    <g id="wcDots"></g>
+    <g id="wcTags"></g>
+  </svg>
+  <p id="wcCap"></p>
+  <button id="wcSkip" type="button">تخطّي</button>
+</div>
+
+<script>
+(function(){
+'use strict';
+var box = document.getElementById('welcome');
+if (!box) return;
+
+/* متى تنعرض:
+   'once'    — مرة وحدة بالجهاز (الافتراضي: الزائر الراجع ما يستنى)
+   'session' — مرة بكل جلسة تصفّح
+   'always'  — كل فتحة */
+var MODE = 'once';
+
+var BUILD    = 2400;   /* تجمّع الأرقام            */
+var MORPH_AT = 2850;   /* بداية التحوّل            */
+var MORPH    = 1250;   /* مدة التحوّل             */
+var END      = 4400;   /* بداية الاختفاء → تخلص بـ ٤٫٩ث */
+
+var done = false;
+function dismiss(){
+  if (done) return; done = true;
+  box.classList.add('gone');
+  document.documentElement.classList.remove('wc-on');
+  removeEventListener('keydown', dismiss, true);
+  setTimeout(function(){ if (box.parentNode) box.remove(); }, 600);
+}
+
+/* نتخطّاها كلياً إذا: المستخدم يقلّل الحركة، أو فاتح رابط مباشر
+   لكورس معيّن (ما ينطر ترحيبة)، أو شافها من قبل */
+var skip = false;
+try{
+  skip = matchMedia('(prefers-reduced-motion: reduce)').matches
+      || (location.hash && location.hash.length > 1)
+      || (MODE === 'once'    && localStorage.getItem('cz-welcome') === '1')
+      || (MODE === 'session' && sessionStorage.getItem('cz-welcome') === '1');
+}catch(e){}
+if (skip){ box.remove(); return; }
+
+try{
+  if (MODE === 'once')    localStorage.setItem('cz-welcome','1');
+  if (MODE === 'session') sessionStorage.setItem('cz-welcome','1');
+}catch(e){}
+
+document.documentElement.classList.add('wc-on');
+
+/* أي تفاعل يتخطّاها فوراً — ما نحبس المستخدم ٥ ثواني */
+box.addEventListener('click', dismiss);
+box.addEventListener('touchstart', dismiss, {passive:true});
+addEventListener('wheel',   dismiss, {passive:true, once:true});
+addEventListener('keydown', dismiss, true);
+
+/* حزام أمان: حتى لو انكسر شي بالأسفل، الموقع ما يضل مغطّى */
+setTimeout(dismiss, 6000);
+
+try{
+  var NS     = 'http://www.w3.org/2000/svg';
+  var gDots  = document.getElementById('wcDots');
+  var gTags  = document.getElementById('wcTags');
+  var capEl  = document.getElementById('wcCap');
+  var narrow = innerWidth < 640;
+  var rnd = function(a,b){ return a + Math.random()*(b-a); };
+
+  var TOKENS = ['18','140','60','180','78','2.5','45','32','8k','75',
+                '16','1.6','52','30','21','65','1.2','90','41','22',
+                '15','68','48','2.1','27','35','12','3×8','94','36'];
+
+  var TAGS = [
+    {t:'1800 سعرة',   x: 62, y: 30, hot:1},
+    {t:'140غ بروتين', x:158, y: 66, hot:1},
+    {t:'180غ كارب',   x: 54, y:112},
+    {t:'60غ دهون',    x:166, y:156, hot:1},
+    {t:'78.4 كغم',    x: 58, y:262, hot:1}
+  ];
+
+  var CAPS = [
+    [   0, 'سعرات… ماكروز… أوزان.'],
+    [1450, 'ورا كل رقم … <b>إنسان</b>.'],
+    [3000, 'وهذا الإنسان … <b>انتِ</b>.']
+  ];
+
+  /* ── عيّنة نقاط من شكل: حشو داخلي + محيط ──
+     الكثافة أقل بالشاشات الضيّقة: ٣١٠ عنصر متحرّك تثقّل موبايل ضعيف */
+  var step  = narrow ? 11.2 : 8.8;
+  var NEDGE = narrow ? 84   : 120;
+
+  function sample(id){
+    var p    = document.getElementById(id);
+    var p2d  = new Path2D(p.getAttribute('d'));
+    var ctx  = document.createElement('canvas').getContext('2d');
+    var fill = [], edge = [], x, y, i, pt;
+
+    for (y = 10; y < 296; y += step)
+      for (x = 30; x < 192; x += step)
+        if (ctx.isPointInPath(p2d, x, y))
+          fill.push({ x:x + rnd(-2.2,2.2), y:y + rnd(-2.2,2.2) });
+
+    var len = p.getTotalLength();
+    for (i = 0; i < NEDGE; i++){
+      pt = p.getPointAtLength(len * i / NEDGE);
+      edge.push({ x:pt.x + rnd(-1,1), y:pt.y + rnd(-1,1) });
+    }
+    return { fill:fill, edge:edge };
+  }
+
+  /* ترتيب بصفوف أفقية مطبّعة — هذا اللي يخلي الانتقال مفهوم:
+     الراس يروح للراس والرجل للرجل، وكتلة الكرش تنساب للأعلى
+     وتصير أكتاف وذراعين مرفوعات. */
+  function order(list){
+    var xs = list.map(function(p){return p.x}), ys = list.map(function(p){return p.y});
+    var x0 = Math.min.apply(null,xs), x1 = Math.max.apply(null,xs);
+    var y0 = Math.min.apply(null,ys), y1 = Math.max.apply(null,ys);
+    list.forEach(function(p){
+      p.u = (p.x-x0)/(x1-x0||1);
+      p.v = (p.y-y0)/(y1-y0||1);
+    });
+    return list.sort(function(a,b){
+      return (Math.round(a.v*26)*10 + a.u*9) - (Math.round(b.v*26)*10 + b.u*9);
+    });
+  }
+  function pick(list,n){
+    var out=[], i;
+    for (i=0;i<n;i++) out.push(list[Math.floor(i*list.length/n)]);
+    return out;
+  }
+  function pairUp(a,b){
+    var n = Math.min(a.length,b.length);
+    var A = pick(order(a),n), B = pick(order(b),n);
+    return A.map(function(p,i){ return { a:p, b:B[i] }; });
+  }
+
+  var SA = sample('wcA'), SB = sample('wcB');
+  var parts = pairUp(SA.edge,SB.edge).map(function(p){ p.edge=1; return p; })
+      .concat(pairUp(SA.fill,SB.fill).map(function(p){ p.edge=0; return p; }));
+
+  parts.forEach(function(p,i){
+    var el = document.createElementNS(NS,'text');
+    el.setAttribute('class','wc-dot' + (p.edge ? ' edge' : ''));
+    el.setAttribute('font-size', (p.edge ? rnd(4,4.9) : rnd(4.4,5.8)).toFixed(1));
+    el.textContent = TOKENS[(Math.random()*TOKENS.length)|0];
+    gDots.appendChild(el);
+    var op = p.edge ? 1 : .72;
+
+    /* البداية: مبعثرة برّه الإطار — كأن الأرقام جاية من كل جهة */
+    var ang = rnd(0,Math.PI*2), rad = rnd(150,300);
+    var sx = 110 + Math.cos(ang)*rad,          sy = 155 + Math.sin(ang)*rad*.72;
+    var mx = 110 + Math.cos(ang)*rnd(58,104),  my = 155 + Math.sin(ang)*rnd(46,88);
+
+    el.animate([
+      { transform:'translate('+sx+'px,'+sy+'px) scale(.5)', opacity:0 },
+      { transform:'translate('+mx+'px,'+my+'px) scale(1)',  opacity:.5, offset:.34 },
+      { transform:'translate('+p.a.x+'px,'+p.a.y+'px) scale(1)', opacity:op, offset:.86 },
+      { transform:'translate('+p.a.x+'px,'+p.a.y+'px) scale(1)', opacity:op }
+    ], { duration:BUILD, delay:rnd(0,380) + i*0.8,
+         easing:'cubic-bezier(.22,.68,.16,1)', fill:'both' });
+
+    /* التحوّل: ننشئه من الآن بـ delay (مو setTimeout) حتى يضل على
+       نفس الخط الزمني مال المتصفح فما يصير انزياح */
+    var midX = (p.a.x+p.b.x)/2, midY = (p.a.y+p.b.y)/2;
+    var ox = (midX-110)*.14, oy = (midY-155)*.14;
+    el.animate([
+      { transform:'translate('+p.a.x+'px,'+p.a.y+'px) scale(1)', opacity:op },
+      { transform:'translate('+(midX+ox)+'px,'+(midY+oy)+'px) scale(1.3)',
+        opacity:1, offset:.45 },
+      { transform:'translate('+p.b.x+'px,'+p.b.y+'px) scale(1)', opacity:op }
+    ], { duration:MORPH, delay:MORPH_AT + rnd(0,220),
+         easing:'cubic-bezier(.5,0,.2,1)', fill:'both' });
+
+    /* اللون ينقلب بالكلاس مو بالجافاسكربت، حتى يضل تابع للثيم */
+    setTimeout(function(){ el.classList.add('fit'); }, MORPH_AT + rnd(200,900));
+  });
+
+  /* اللافتات المقروءة: تظهر أول، وتذوب داخل الجسم */
+  TAGS.forEach(function(tg,i){
+    var el = document.createElementNS(NS,'text');
+    el.setAttribute('class','wc-tag' + (tg.hot ? ' hot' : ''));
+    el.setAttribute('transform','translate('+tg.x+' '+tg.y+')');
+    el.textContent = tg.t;
+    gTags.appendChild(el);
+    var cx = 110 + (tg.x-110)*.24, cy = 155 + (tg.y-155)*.24;
+    el.animate([
+      { opacity:0, transform:'translate('+tg.x+'px,'+tg.y+'px) scale(.86)' },
+      { opacity:1, transform:'translate('+tg.x+'px,'+tg.y+'px) scale(1)', offset:.16 },
+      { opacity:1, transform:'translate('+tg.x+'px,'+tg.y+'px) scale(1)', offset:.44 },
+      { opacity:0, transform:'translate('+cx+'px,'+cy+'px) scale(.5)',    offset:.70 },
+      { opacity:0, transform:'translate('+cx+'px,'+cy+'px) scale(.5)' }
+    ], { duration:BUILD, delay:150 + i*130,
+         easing:'cubic-bezier(.3,.6,.2,1)', fill:'both' });
+  });
+
+  CAPS.forEach(function(c){
+    setTimeout(function(){
+      if (done) return;
+      capEl.style.opacity = 0;
+      setTimeout(function(){ capEl.innerHTML = c[1]; capEl.style.opacity = 1; }, 200);
+    }, c[0]);
+  });
+
+  document.getElementById('wcSkip').addEventListener('click', dismiss);
+  setTimeout(dismiss, END);
+}catch(e){
+  /* أي خلل بالرسم = نفتح الموقع فوراً بدل ما نعلّق الزائر */
+  dismiss();
+}
+})();
+</script>
 
 <a class="skip" href="#catalog" data-t="skip">الانتقال إلى المحتوى</a>
 
