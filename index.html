@@ -1401,7 +1401,7 @@ ul.list li{min-height:44px}                                                     
 
 /* ═══════════════════════════════════════════════════════════
    ⑲  شاشة الترحيب — أرقام البرنامج تتجمّع ويتشكّل منها إنسان
-       ٥ ثواني بالتمام، وتنشال من الـ DOM بعدها.
+       ٧ ثواني بالتمام، وتنشال من الـ DOM بعدها.
    ═══════════════════════════════════════════════════════════ */
 #welcome{
   position:fixed;inset:0;z-index:900;padding:24px;
@@ -1445,7 +1445,7 @@ html.wc-on{overflow:hidden}
 
 <!-- ══ شاشة الترحيب ══
      أرقام حقيقية من برنامج تدريب تتجمّع، يتشكّل منها إنسان، ثم يرفع
-     يديه ويصير أقوى. ٥ ثواني حد أقصى، وأي لمسة تتخطّاها فوراً.
+     يديه ويصير أقوى. ٧ ثواني حد أقصى، وأي لمسة تتخطّاها فوراً.
      تنشال من الـ DOM بعد ما تخلص فما تضل تاخذ ذاكرة.
      الماركب هنا (مو منشأ بالجافاسكربت) حتى تبدي بأول ما تنقرا الصفحة. -->
 <div id="welcome" aria-hidden="true">
@@ -1478,14 +1478,16 @@ if (!box) return;
    'always'  — كل فتحة */
 var MODE = 'session';
 
-var BUILD    = 2400;   /* تجمّع الأرقام            */
-var MORPH_AT = 2850;   /* بداية التحوّل            */
-var MORPH    = 1250;   /* مدة التحوّل             */
-var END      = 4400;   /* بداية الاختفاء → تخلص بـ ٤٫٩ث */
+/* الميزانية ٧ ثواني: END + ٦٠٠ (زمن الاختفاء والشيل) = ٧٠٠٠ بالتمام */
+var BUILD    = 3200;   /* تجمّع الأرقام → الشكل يكتمل بـ ٣٫٤٣ث */
+var MORPH_AT = 3800;   /* بداية التحوّل (بعد وقفة تخلي شكل الكرش ينقرا) */
+var MORPH    = 2000;   /* مدة التحوّل — لحظة الطاقة صارت ذروتها ~٠٫٩ث */
+var END      = 6400;   /* بداية الاختفاء → تخلص بـ ٧٫٠ث */
 
-var done = false;
+var done = false, fade = null;
 function dismiss(){
   if (done) return; done = true;
+  if (fade && fade.playState !== 'finished') fade.cancel();
   box.classList.add('gone');
   document.documentElement.classList.remove('wc-on');
   removeEventListener('keydown', dismiss, true);
@@ -1523,7 +1525,7 @@ addEventListener('wheel',   dismiss, {passive:true, once:true});
 addEventListener('keydown', dismiss, true);
 
 /* حزام أمان: حتى لو انكسر شي بالأسفل، الموقع ما يضل مغطّى */
-setTimeout(dismiss, 6000);
+setTimeout(dismiss, 8500);
 
 try{
   var NS     = 'http://www.w3.org/2000/svg';
@@ -1545,10 +1547,13 @@ try{
     {t:'78.4 كغم',    x: 58, y:262, hot:1}
   ];
 
+  /* الوقت الزايد سمح نرجّع بيت القصيد: نسمّي الحالتين بدل ما نترك
+     السطر الأخير معلّق ٣ ثواني بلا شغلة */
   var CAPS = [
     [   0, 'سعرات… ماكروز… أوزان.'],
-    [1450, 'ورا كل رقم … <b>إنسان</b>.'],
-    [3000, 'وهذا الإنسان … <b>انتِ</b>.']
+    [1900, 'ورا كل رقم … <b>إنسان</b>.'],
+    [3550, 'هذا الإنسان انتِ <b>اليوم</b>.'],
+    [5200, 'وهذا … انتِ <b>بعد ٩٠ يوم</b>.']
   ];
 
   /* ── عيّنة نقاط من شكل: حشو داخلي + محيط ──
@@ -1623,7 +1628,7 @@ try{
       { transform:'translate('+mx+'px,'+my+'px) scale(1)',  opacity:.5, offset:.34 },
       { transform:'translate('+p.a.x+'px,'+p.a.y+'px) scale(1)', opacity:op, offset:.86 },
       { transform:'translate('+p.a.x+'px,'+p.a.y+'px) scale(1)', opacity:op }
-    ], { duration:BUILD, delay:rnd(0,380) + i*0.8,
+    ], { duration:BUILD, delay:rnd(0,450) + i*0.9,
          easing:'cubic-bezier(.22,.68,.16,1)', fill:'both' });
 
     /* التحوّل: ننشئه من الآن بـ delay (مو setTimeout) حتى يضل على
@@ -1635,11 +1640,11 @@ try{
       { transform:'translate('+(midX+ox)+'px,'+(midY+oy)+'px) scale(1.3)',
         opacity:1, offset:.45 },
       { transform:'translate('+p.b.x+'px,'+p.b.y+'px) scale(1)', opacity:op }
-    ], { duration:MORPH, delay:MORPH_AT + rnd(0,220),
+    ], { duration:MORPH, delay:MORPH_AT + rnd(0,250),
          easing:'cubic-bezier(.5,0,.2,1)', fill:'both' });
 
     /* اللون ينقلب بالكلاس مو بالجافاسكربت، حتى يضل تابع للثيم */
-    setTimeout(function(){ el.classList.add('fit'); }, MORPH_AT + rnd(200,900));
+    setTimeout(function(){ el.classList.add('fit'); }, MORPH_AT + rnd(400,1400));
   });
 
   /* اللافتات المقروءة: تظهر أول، وتذوب داخل الجسم */
@@ -1669,7 +1674,15 @@ try{
   });
 
   document.getElementById('wcSkip').addEventListener('click', dismiss);
-  setTimeout(dismiss, END);
+
+  /* الاختفاء ينمشي على خط الحركة مو على setTimeout، حتى يضل ملزوم
+     بحركة الجزيئات نفسها. السبب: لو الزائر بدّل تبويب وسط الترحيبة،
+     المتصفح يوقّف الحركات بس يضل يعدّ الـ setTimeout — فيرجع ويلگي
+     الترحيبة انصرفت والشكل نص مبني. هيچي الاثنين ينتظرون سوة.
+     الشيل من الـ DOM يصير بعدها بأي وقت — الطبقة مخفية أصلاً. */
+  fade = box.animate([{opacity:1},{opacity:0}],
+           { duration:450, delay:END, fill:'forwards' });
+  fade.finished.then(dismiss, function(){});
 }catch(e){
   /* أي خلل بالرسم = نفتح الموقع فوراً بدل ما نعلّق الزائر */
   dismiss();
