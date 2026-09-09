@@ -1476,7 +1476,7 @@ if (!box) return;
    'once'    — مرة وحدة بالجهاز (الافتراضي: الزائر الراجع ما يستنى)
    'session' — مرة بكل جلسة تصفّح
    'always'  — كل فتحة */
-var MODE = 'once';
+var MODE = 'session';
 
 var BUILD    = 2400;   /* تجمّع الأرقام            */
 var MORPH_AT = 2850;   /* بداية التحوّل            */
@@ -1494,16 +1494,22 @@ function dismiss(){
 
 /* نتخطّاها كلياً إذا: المستخدم يقلّل الحركة، أو فاتح رابط مباشر
    لكورس معيّن (ما ينطر ترحيبة)، أو شافها من قبل */
+/* باب تجريب: إضافة ?welcome للرابط تعرضها غصباً وما تسجّل إنها انعرضت.
+   يعني تكدر تشوفها بأي متصفح وبأي وقت بلا ما تمسح شي وبلا كونسول:
+   https://…/index.html?welcome */
+var force = /[?&]welcome\b/.test(location.search);
+
 var skip = false;
 try{
-  skip = matchMedia('(prefers-reduced-motion: reduce)').matches
+  skip = !force && (
+         matchMedia('(prefers-reduced-motion: reduce)').matches
       || (location.hash && location.hash.length > 1)
       || (MODE === 'once'    && localStorage.getItem('cz-welcome') === '1')
-      || (MODE === 'session' && sessionStorage.getItem('cz-welcome') === '1');
+      || (MODE === 'session' && sessionStorage.getItem('cz-welcome') === '1'));
 }catch(e){}
 if (skip){ box.remove(); return; }
 
-try{
+if (!force) try{
   if (MODE === 'once')    localStorage.setItem('cz-welcome','1');
   if (MODE === 'session') sessionStorage.setItem('cz-welcome','1');
 }catch(e){}
