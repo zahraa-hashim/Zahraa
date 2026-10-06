@@ -3850,13 +3850,19 @@ async function runAi(file){
     const { data, error } = await sb.functions.invoke('recipe-from-photo',
       { body: { image, media_type: 'image/jpeg', model, hint } });
     if (error){
+      /* FunctionsHttpError: الفنكشن ردّت — context هو الـ Response.
+         FunctionsFetchError/RelayError: الطلب ما وصل أو الفنكشن وقعت قبل ما
+         ترد (مثلاً خطأ بالإقلاع) — ماكو JSON، فنعرض اسم الخطأ ورسالته */
       let code = 'generic', msg = '';
+      const st = error.context?.status;
       try {
-        const st = error.context?.status;
-        const j  = await error.context.json();
-        code = j.error || code; msg = j.message || '';
-        if (st === 404 && !j.error) code = 'not_found';
-      } catch(e){ if (error.context?.status === 404) code = 'not_found' }
+        const body = await error.context.text();
+        try { const j = JSON.parse(body); code = j.error || code; msg = j.message || '' }
+        catch(e){ msg = body.slice(0, 200) }
+      } catch(e){}
+      if (st === 404 && code === 'generic') code = 'not_found';
+      if (code === 'generic' && !msg) msg = `${error.name}${st ? ' ' + st : ''}: ${error.message}`;
+      else if (code === 'generic' && st) msg = st + ' — ' + msg;
       const k = 'ai.e.' + code;
       note = { bad:true, text: (t(k) !== k ? t(k) : t('ai.e.generic')) + (msg ? ' — ' + msg : '') };
     } else {
