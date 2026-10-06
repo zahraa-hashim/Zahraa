@@ -8,7 +8,7 @@
 //
 //  المفتاح ANTHROPIC_API_KEY يُقرا من Secrets المشروع، وما يطلع للمتصفح.
 //  النشر: لوحة Supabase ← Edge Functions ← Deploy a new function ← Via Editor
-//  الاسم لازم يكون recipe-from-photo بالضبط، و Verify JWT يبقى شغّال.
+//  منشورة باسم smart-processor (اللوحة تطلبها بـ AI_FN)، و Verify JWT شغّال.
 // ═══════════════════════════════════════════════════════════════
 import Anthropic from "npm:@anthropic-ai/sdk";
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -111,41 +111,65 @@ Deno.serve(async (req) => {
   const text = "حلّلي هالوجبة وطلّعي وصفتها." +
     (hint.trim() ? `\nملاحظة من المدربة: ${hint.trim().slice(0, 500)}` : "");
 
-  try {
-    const res = await client.beta.messages.create({
-      model,
-      max_tokens: 16000,
-      system: SYSTEM,
-      messages: [{
-        role: "user",
-        content: [
-          { type: "image", source: { type: "base64", media_type: media_type as "image/jpeg", data: image } },
-          { type: "text", text },
-        ],
-      }],
-      output_config: {
-        format: { type: "json_schema", schema: SCHEMA },
-        ...(cfg.effort ? { effort: cfg.effort } : {}),
-      },
-      ...(cfg.fallbacks ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" } : {}),
-    } as Anthropic.Beta.Messages.MessageCreateParamsNonStreaming);
+  /* ── الجواب يبدي فوراً ──
+     تحليل Opus ممكن ياخذ دقيقة أو أكثر، والطريق بين المتصفح والفنكشن
+     (Cloudflare) يكطع الاتصال إذا ما وصل شي خلال ~١٠٠ ثانية. فنرجّع
+     الهيدرات هسه، وندز مسافة كل ٥ ثواني لحد ما يخلص التحليل، وبالأخير
+     الـ JSON. المسافات قبل الـ JSON مقبولة بـ JSON.parse. الأخطاء هنا
+     ترجع بـ 200 وحقل error، واللوحة تقراها من الجسم */
+  const t0 = Date.now();
+  console.log(`start model=${model} bytes=${image.length}`);
+  const analyze = async (): Promise<Record<string, unknown>> => {
+    try {
+      const res = await client.beta.messages.create({
+        model,
+        max_tokens: 16000,
+        system: SYSTEM,
+        messages: [{
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: media_type as "image/jpeg", data: image } },
+            { type: "text", text },
+          ],
+        }],
+        output_config: {
+          format: { type: "json_schema", schema: SCHEMA },
+          ...(cfg.effort ? { effort: cfg.effort } : {}),
+        },
+        ...(cfg.fallbacks ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" } : {}),
+      } as Anthropic.Beta.Messages.MessageCreateParamsNonStreaming);
 
-    if (res.stop_reason === "refusal") return json({ error: "refusal" }, 422);
-    if (res.stop_reason === "max_tokens") return json({ error: "too_long" }, 502);
+      if (res.stop_reason === "refusal") return { error: "refusal" };
+      if (res.stop_reason === "max_tokens") return { error: "too_long" };
 
-    const out = res.content.find((b) => b.type === "text");
-    if (!out || out.type !== "text") return json({ error: "empty" }, 502);
-    const recipe = JSON.parse(out.text);
-    if (!recipe.is_food) return json({ error: "not_food" }, 422);
+      const out = res.content.find((b) => b.type === "text");
+      if (!out || out.type !== "text") return { error: "empty" };
+      const recipe = JSON.parse(out.text);
+      if (!recipe.is_food) return { error: "not_food" };
 
-    return json({ recipe, model: res.model, usage: res.usage });
-  } catch (e) {
-    if (e instanceof Anthropic.RateLimitError) return json({ error: "rate_limit" }, 429);
-    if (e instanceof Anthropic.AuthenticationError) return json({ error: "bad_key" }, 500);
-    if (e instanceof Anthropic.APIError) {
-      // رسالة Anthropic نفسها — مثلاً «رصيدك خلص» — حتى يبين السبب الحقيقي باللوحة
-      return json({ error: "api", status: e.status, message: e.message }, 502);
+      return { recipe, model: res.model, usage: res.usage };
+    } catch (e) {
+      if (e instanceof Anthropic.RateLimitError) return { error: "rate_limit" };
+      if (e instanceof Anthropic.AuthenticationError) return { error: "bad_key" };
+      if (e instanceof Anthropic.APIError) {
+        // رسالة Anthropic نفسها — مثلاً «رصيدك خلص» — حتى يبين السبب الحقيقي باللوحة
+        return { error: "api", status: e.status, message: e.message };
+      }
+      return { error: "server", message: String(e) };
     }
-    return json({ error: "server", message: String(e) }, 500);
-  }
+  };
+
+  const enc = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(ctl) {
+      ctl.enqueue(enc.encode(" "));
+      const tick = setInterval(() => { try { ctl.enqueue(enc.encode(" ")); } catch { /* انسد */ } }, 5000);
+      const result = await analyze();
+      clearInterval(tick);
+      console.log(`done in ${((Date.now() - t0) / 1000).toFixed(1)}s`, result.error ? `error=${result.error} ${result.message ?? ""}` : "ok");
+      ctl.enqueue(enc.encode(JSON.stringify(result)));
+      ctl.close();
+    },
+  });
+  return new Response(stream, { headers: { ...CORS, "Content-Type": "application/json" } });
 });

@@ -2322,7 +2322,7 @@ const T = {
     "ai.done":"تعبّت الوصفة — راجعيها. انحفظت كمخفية لحد ما تفعّلين النشر.",
     "ai.assume":"الافتراضات:",
     "ai.e.forbidden":"لازم تكونين مسجّلة كأدمن.",
-    "ai.e.not_found":"الفنكشن recipe-from-photo بعدها مو منشورة بـ Supabase.",
+    "ai.e.not_found":"الفنكشن smart-processor مو منشورة بـ Supabase.",
     "ai.e.no_key":"ANTHROPIC_API_KEY مو موجود بـ Secrets.",
     "ai.e.bad_key":"مفتاح Anthropic غلط أو ملغي.",
     "ai.e.not_food":"الصورة ما بيها أكل واضح.",
@@ -2775,7 +2775,7 @@ const T = {
     "ai.done":"Recipe filled in — review it. Saved as hidden until you turn publishing on.",
     "ai.assume":"Assumptions:",
     "ai.e.forbidden":"You need to be signed in as an admin.",
-    "ai.e.not_found":"The recipe-from-photo function isn't deployed on Supabase yet.",
+    "ai.e.not_found":"The smart-processor function isn't deployed on Supabase.",
     "ai.e.no_key":"ANTHROPIC_API_KEY is missing from Secrets.",
     "ai.e.bad_key":"The Anthropic key is wrong or revoked.",
     "ai.e.not_food":"No clear food in this photo.",
@@ -3788,6 +3788,8 @@ function setPreview(box, url){
    Claude بمفتاح محفوظ بـ Secrets. اللي يرجع يعبّي الفورم بس — الحفظ
    يبقى بزر الحفظ العادي، والوصفة تطلع مخفية لحد ما تراجعها زهراء.
    إذا ماكو غلاف، نفس الصورة تنرفع كغلاف بالتوازي. */
+/* اسم الفنكشن مثل ما انتشرت بـ Supabase (الاسم انحط تلقائياً وقت النشر من المحرر) */
+const AI_FN = 'smart-processor';
 const AI_MODELS = [['claude-opus-5-5','ai.opus'], ['claude-sonnet-5-5','ai.sonnet'], ['claude-haiku-4-5','ai.haiku']];
 function aiModel(){
   let m = '';
@@ -3847,7 +3849,7 @@ async function runAi(file){
   let res, note;
   try {
     const image = await toAiBase64(file);
-    const { data, error } = await sb.functions.invoke('recipe-from-photo',
+    const { data, error } = await sb.functions.invoke(AI_FN,
       { body: { image, media_type: 'image/jpeg', model, hint } });
     if (error){
       /* FunctionsHttpError: الفنكشن ردّت — context هو الـ Response.
@@ -3865,6 +3867,12 @@ async function runAi(file){
       else if (code === 'generic' && st) msg = st + ' — ' + msg;
       const k = 'ai.e.' + code;
       note = { bad:true, text: (t(k) !== k ? t(k) : t('ai.e.generic')) + (msg ? ' — ' + msg : '') };
+    } else if (data?.error){
+      /* الفنكشن تبدي الجواب فوراً (حتى ما ينكطع الاتصال بالتحليل الطويل)،
+         فأخطاء التحليل توصل بـ 200 وحقل error بالجسم */
+      const k = 'ai.e.' + data.error;
+      note = { bad:true, text: (t(k) !== k ? t(k) : t('ai.e.generic')) +
+                               (data.message ? ' — ' + data.message : (t(k) !== k ? '' : ' — ' + data.error)) };
     } else {
       res = data.recipe;
     }
