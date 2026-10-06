@@ -349,14 +349,28 @@ p{margin:0}
    والضباب. ماكو مكتبة حركة بالمشروع، فالانتقال CSS صافي */
 .ico-swap{position:relative;display:grid;place-items:center;width:1em;height:1em}
 .ico-swap .icon{
-  grid-area:1/1;opacity:0;scale:.25;filter:blur(4px);
-  transition:opacity .3s cubic-bezier(.2,0,0,1),scale .3s cubic-bezier(.2,0,0,1),
-             filter .3s cubic-bezier(.2,0,0,1);
+  grid-area:1/1;opacity:0;scale:.25;filter:blur(4px);rotate:-120deg;
+  transition:opacity .45s cubic-bezier(.2,0,0,1),scale .45s cubic-bezier(.2,0,0,1),
+             filter .45s cubic-bezier(.2,0,0,1),rotate .6s cubic-bezier(.34,1.4,.64,1);
 }
 #themeBtn[data-now="light"] .icon[data-when="light"],
-#themeBtn[data-now="dark"]  .icon[data-when="dark"]{opacity:1;scale:1;filter:blur(0)}
+#themeBtn[data-now="dark"]  .icon[data-when="dark"]{opacity:1;scale:1;filter:blur(0);rotate:0deg}
 /* أول رسم ما يتحرّك — الحركة للتبديل الفعلي مو لفتح الصفحة */
 #themeBtn.no-anim .icon{transition:none}
+/* انتقال الثيم الدائري — نطفّي التلاشي الافتراضي بين اللقطتين، الدائرة
+   (clip-path من toggleTheme) هي الحركة الوحيدة */
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+/* نجوم الليل ووهج الشمس فوك الدائرة — تنضاف وتنشال من skyFx() */
+.sky-fx{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden}
+.sky-star{
+  position:absolute;translate:-50% -50%;opacity:0;
+  background:#FFE7A8;filter:drop-shadow(0 0 4px rgba(255,220,140,.9));
+  clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);
+}
+.sky-sun{
+  position:absolute;width:120vmax;height:120vmax;translate:-50% -50%;border-radius:50%;opacity:0;
+  background:radial-gradient(circle,rgba(255,196,110,.55) 0,rgba(255,170,90,.22) 25%,rgba(255,170,90,0) 60%);
+}
 
 .icon-btn.lang-btn{width:auto;padding-inline:13px;gap:6px;font-family:var(--f-head);font-weight:700;font-size:var(--t-13)}
 .icon-btn.lang-btn .icon{font-size:var(--t-17)}
@@ -4230,7 +4244,79 @@ function syncThemeIcon(){
   if (!themeIconLive){ void b.offsetWidth; b.classList.remove('no-anim'); themeIconLive = true; }
 }
 
+/* ── انتقال تليكرام ──
+   دائرة تطلع من مركز زر الثيم وتكبر لحد ما تغطي الشاشة بالثيم الجديد.
+   startViewTransition ياخذ لقطة للصفحة القديمة ويحط الجديدة فوكها، وإحنا
+   نقص الجديدة بـ clip-path دائري يكبر. نصف القطر النهائي = المسافة من الزر
+   لأبعد زاوية، حتى الدائرة تغطي كلشي. المتصفح اللي ما يدعمها، أو تقليل
+   الحركة، يرجع للقصّة النظيفة القديمة */
 function toggleTheme(){
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!document.startViewTransition || reduce){ applyTheme(); return; }
+
+  const r = $('#themeBtn').getBoundingClientRect();
+  const x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+
+  const toDark = currentTheme() !== 'dark';
+  const vt = document.startViewTransition(applyTheme);
+  vt.ready.then(() => {
+    document.documentElement.animate(
+      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+      { duration: THEME_MS, easing: 'cubic-bezier(.65,0,.35,1)', pseudoElement: '::view-transition-new(root)' }
+    );
+    skyFx(toDark, x, y, end);
+  }).catch(() => {});
+}
+
+/* ── سما ليل ونهار ──
+   فوك الدائرة: للّيل نجوم تلمع وحدة وحدة لحظة ما توصلها حافة الدائرة
+   (تأخير كل نجمة = بعدها عن الزر ÷ نصف القطر النهائي)، وللنهار وهج شمس
+   دافي يطلع من الزر وينتشر. العناصر تنضاف بعد vt.ready، فتطلع جوّا لقطة
+   الثيم الجديد الحيّة وتنقص ويّا الدائرة — يعني النجوم ما تبين إلا بالليل */
+const THEME_MS = 650;
+function skyFx(toDark, x, y, end){
+  const layer = document.createElement('div');
+  layer.className = 'sky-fx';
+  layer.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(layer);
+  let last = 0;
+
+  if (toDark){
+    const n = Math.round(Math.min(26, 10 + innerWidth / 60));
+    for (let i = 0; i < n; i++){
+      const sx = Math.random() * innerWidth, sy = Math.random() * innerHeight * .9;
+      const s = document.createElement('i');
+      s.className = 'sky-star';
+      const size = 4 + Math.random() * 7;
+      s.style.cssText = `left:${sx}px;top:${sy}px;width:${size}px;height:${size}px`;
+      layer.appendChild(s);
+      const delay = Math.hypot(sx - x, sy - y) / end * THEME_MS * .8;
+      const dur = 900 + Math.random() * 500;
+      s.animate(
+        [{ opacity:0, scale:0, rotate:'0deg' },
+         { opacity:1, scale:1.25, rotate:'45deg', offset:.25 },
+         { opacity:.85, scale:.9, rotate:'90deg', offset:.6 },
+         { opacity:0, scale:.4, rotate:'120deg' }],
+        { duration: dur, delay, easing:'ease-out', fill:'both' }
+      );
+      last = Math.max(last, delay + dur);
+    }
+  } else {
+    const glow = document.createElement('i');
+    glow.className = 'sky-sun';
+    glow.style.cssText = `left:${x}px;top:${y}px`;
+    layer.appendChild(glow);
+    glow.animate(
+      [{ opacity:.9, scale:.1 }, { opacity:.55, scale:1, offset:.55 }, { opacity:0, scale:1.4 }],
+      { duration: THEME_MS + 450, easing:'cubic-bezier(.2,0,0,1)', fill:'both' }
+    );
+    last = THEME_MS + 450;
+  }
+  setTimeout(() => layer.remove(), last + 50);
+}
+
+function applyTheme(){
   const next = currentTheme() === 'dark' ? 'light' : 'dark';
 
   /* ── قفل الانتقالات لحظة التبديل ──
@@ -4246,8 +4332,9 @@ function toggleTheme(){
   kill.textContent =
     '*,*::before,*::after{transition:none!important}' +
     '@media (prefers-reduced-motion:no-preference){' +
-    '.ico-swap .icon{transition:opacity .3s cubic-bezier(.2,0,0,1),' +
-    'scale .3s cubic-bezier(.2,0,0,1),filter .3s cubic-bezier(.2,0,0,1)!important}}';
+    '.ico-swap .icon{transition:opacity .45s cubic-bezier(.2,0,0,1),' +
+    'scale .45s cubic-bezier(.2,0,0,1),filter .45s cubic-bezier(.2,0,0,1),' +
+    'rotate .6s cubic-bezier(.34,1.4,.64,1)!important}}';
   document.head.appendChild(kill);
 
   document.documentElement.dataset.theme = next;
