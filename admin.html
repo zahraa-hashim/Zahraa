@@ -927,504 +927,6 @@ select.inp{cursor:pointer;
   .btn-ghost,.icon-btn,.chip,.row,.mcard{border-width:1.5px}
   :where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{outline-width:3px}
 }
-
-/* ══════════════════════════════════════════════════════════
-   كتابة كورسات — محرر البرامج
-   ══════════════════════════════════════════════════════════ */
-
-/* بطاقتا اختيار النوع بأول برنامج جديد */
-.kind-card{
-  display:flex;align-items:center;gap:var(--s-3);text-align:start;width:100%;
-  padding:var(--s-4);border:1.5px solid var(--line);border-radius:var(--r-lg);
-  background:var(--surface);box-shadow:var(--shadow-1);
-  transition:border-color .18s var(--ease),box-shadow .18s var(--ease),background-color .18s var(--ease);
-}
-@media (hover:hover) and (pointer:fine){
-  .kind-card:hover{border-color:var(--brand);background:var(--brand-wash);box-shadow:var(--shadow-2)}
-}
-.kind-card:active{transform:scale(.98)}
-.kind-card .kc-ico{
-  width:46px;height:46px;border-radius:14px;flex:none;display:grid;place-items:center;
-  background:var(--brand-wash);color:var(--brand-ink);font-size:var(--t-21);
-}
-.kind-card .kc-txt{display:grid;gap:3px;min-width:0}
-.kind-card .kc-txt b{font-family:var(--f-head);font-size:var(--t-16);color:var(--ink)}
-.kind-card .kc-txt span{font-size:var(--t-13);color:var(--soft);line-height:1.6}
-
-/* صفوف التمارين داخل اليوم — الموبايل عمود واحد، الديسكتوب جدول */
-.erow.pgex{grid-template-columns:1fr 44px}
-.erow.pgex .n-in{grid-column:1/2}
-.erow.pgex .en-in{grid-column:1/-1;font-family:var(--f-num);font-size:var(--t-13)}
-.erow.pgex .m-in,.erow.pgex .v-in{grid-column:1/-1}
-.erow.pgex .sets-in,.erow.pgex .reps-in{font-family:var(--f-num);text-align:center}
-.erow.pgex .v-in{font-family:var(--f-num);font-size:var(--t-13);border-style:dashed;background:transparent}
-@media(min-width:720px){
-  .erow.pgex{grid-template-columns:1.4fr 1.2fr .9fr 62px 62px 44px}
-  .erow.pgex .n-in,.erow.pgex .en-in,.erow.pgex .m-in{grid-column:auto}
-  .erow.pgex .v-in{grid-column:1/-1}
-}
-/* يوم الكارديو: أعمدة أقل ومسمّيات مختلفة */
-.erow.pgcar{grid-template-columns:1fr 44px}
-.erow.pgcar .en-in{grid-column:1/-1;font-family:var(--f-num);font-size:var(--t-13)}
-.erow.pgcar .m-in,.erow.pgcar .reps-in{grid-column:1/-1}
-@media(min-width:720px){
-  .erow.pgcar{grid-template-columns:1.1fr 1fr 1.3fr 120px 44px}
-  .erow.pgcar .en-in,.erow.pgcar .m-in,.erow.pgcar .reps-in{grid-column:auto}
-}
-/* صف مكوّن بالبرنامج الغذائي */
-.erow.pgmeal{grid-template-columns:1fr 44px}
-.erow.pgmeal .m-in,.erow.pgmeal .reps-in{grid-column:1/-1}
-@media(min-width:720px){
-  .erow.pgmeal{grid-template-columns:1.6fr .9fr .9fr 44px}
-  .erow.pgmeal .m-in,.erow.pgmeal .reps-in{grid-column:auto}
-}
-.erow.pghabit{grid-template-columns:auto 1fr 44px}
-
-/* رأس اليوم داخل المحرر */
-.pgday-head{display:grid;gap:var(--s-3);grid-template-columns:1fr;margin-bottom:var(--s-2)}
-@media(min-width:560px){ .pgday-head{grid-template-columns:120px 1fr 170px} }
-
-/* ══ تقسيم المحرر: تحرير | معاينة ══
-   بالموبايل عمود واحد ونبدّل بينهم بشريط. بالشاشة العريضة الاثنين
-   جنب بعض، فالتعديل والنتيجة بنفس النظرة. */
-/* ⚠️ minmax(0,1fr) و min-width:0 ضروريتان مو تزيين.
-   عناصر الـgrid افتراضياً min-width:auto، يعني ما تنضغط تحت عرض
-   محتواها الأدنى. والورقة جوّا المعاينة عرضها ٢١٠مم ثابت (٧٩٤px)،
-   فچانت تدفع العمود لـ٦٧٤px داخل شاشة موبايل ٣٧٥px وتطلع اللوحة
-   بره الشاشة. */
-.pg-split{display:grid;grid-template-columns:minmax(0,1fr);min-height:0;overflow:hidden}
-.pg-split > #pgBody,.pg-split > .pg-prev{min-width:0;min-height:0}
-.pg-prev{
-  display:none;min-height:0;flex-direction:column;
-  background:#e9e9e7;border-inline-start:1px solid var(--line);
-}
-:root[data-theme="dark"] .pg-prev{background:#191d1b}
-@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .pg-prev{background:#191d1b} }
-.pg-prev-bar{
-  flex:none;display:flex;align-items:center;gap:var(--s-2);
-  padding:10px var(--s-4);border-bottom:1px solid var(--line);
-  background:var(--surface);font-family:var(--f-head);font-weight:600;font-size:var(--t-13);color:var(--soft);
-}
-.pg-prev-bar .pgcount{margin-inline-start:auto;font-family:var(--f-num);font-size:var(--t-12)}
-/* ⚠️ scrollbar-gutter:stable ضرورية مو تزيين — بدونها حلقة اهتزاز:
-   المحتوى يطول ⇒ يطلع شريط تمرير ⇒ العرض ينقص ١٥px ⇒ نعيد حساب
-   التصغير ⇒ الورقة تقصر ⇒ الشريط يختفي ⇒ العرض يرجع ⇒ … بلا توقف.
-   نفس علة لوحة الفلترة الموثّقة بـ index.html. */
-.pg-prev-scroll{
-  flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;
-  overscroll-behavior:contain;padding:var(--s-3);
-}
-/* direction:ltr مقصودة — تخلي الورقة تبدي من حافة الحاوية اليسرى حتى
-   transform-origin:top left يصغّرها بمكانها بالضبط. الورقة نفسها
-   تبقى rtl من كلاس .pdfsheet، فالمحتوى ما ينقلب. */
-.pg-prev-fit{direction:ltr;margin:0 auto;overflow:hidden}
-
-/* الشريط اللي يبدّل بين تحرير ومعاينة — موبايل فقط */
-.pg-seg{display:flex;gap:4px;background:var(--sunken);border-radius:var(--r-sm);padding:4px;margin:0 var(--s-5)}
-.pg-seg button{
-  flex:1;min-height:38px;border-radius:8px;font-family:var(--f-head);font-weight:600;
-  font-size:var(--t-14);color:var(--soft);display:flex;align-items:center;justify-content:center;gap:6px;
-  transition:background-color .18s var(--ease),color .18s var(--ease);
-}
-.pg-seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-1)}
-
-/* الموبايل: اللي مو مختار ينخفي */
-.pg-split[data-view="edit"] .pg-prev{display:none}
-.pg-split[data-view="prev"] > #pgBody{display:none}
-.pg-split[data-view="prev"] .pg-prev{display:flex}
-
-@media(min-width:1080px){
-  /* الشاشة العريضة: الاثنين سوا دائماً والشريط ينخفي */
-  .pg-seg{display:none}
-  .pg-split{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-  .pg-split[data-view] > #pgBody{display:grid}
-  .pg-split[data-view] .pg-prev{display:flex}
-  .modal-card.pg-card{max-width:1380px}
-}
-
-/* زرّان جنب بعض: «إضافة» و«من الموقع» */
-.add-row-pair{display:grid;gap:var(--s-2);grid-template-columns:1fr}
-@media(min-width:520px){ .add-row-pair{grid-template-columns:1fr 1fr} }
-
-/* عنوان فرعي داخل صندوق الإطالات */
-.sub-h{
-  font-family:var(--f-head);font-size:var(--t-13);font-weight:700;color:var(--soft);
-  margin:var(--s-2) 0 0;
-}
-.erow.pgstr{grid-template-columns:1fr 44px}
-.erow.pgstr .en-in{grid-column:1/-1;font-family:var(--f-num);font-size:var(--t-13)}
-.erow.pgstr .d-in{grid-column:1/-1}
-@media(min-width:720px){
-  .erow.pgstr{grid-template-columns:1.3fr 1.1fr 130px 44px}
-  .erow.pgstr .en-in,.erow.pgstr .d-in{grid-column:auto}
-}
-
-/* صفوف نافذة الاستيراد — زر بشكل صف قائمة */
-.imp-row{text-align:start;width:100%;cursor:pointer}
-@media (hover:hover) and (pointer:fine){ .imp-row:hover{border-color:var(--brand)} }
-.imp-row:active{transform:scale(.99)}
-
-/* ── مختار قالب الورقة ── */
-.th-row{display:grid;gap:var(--s-2);grid-template-columns:repeat(3,1fr)}
-.th-opt input{position:absolute;opacity:0;width:0;height:0}
-.th-card{
-  display:grid;gap:3px;padding:var(--s-2);cursor:pointer;text-align:center;
-  border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface);
-  transition:border-color .18s var(--ease),background-color .18s var(--ease);
-}
-.th-card b{font-family:var(--f-head);font-size:var(--t-13);color:var(--ink)}
-.th-card span:last-child{font-size:var(--t-11);color:var(--soft);line-height:1.45}
-.th-opt input:checked + .th-card{border-color:var(--brand);background:var(--brand-wash)}
-.th-opt input:focus-visible + .th-card{outline:2.5px solid var(--ring);outline-offset:2px}
-/* مصغّرة تبيّن شكل القالب بلمحة بدل ما تجرّبيه */
-.th-mini{
-  height:38px;border-radius:5px;background:#fff;border:1px solid var(--line);
-  position:relative;overflow:hidden;margin-bottom:2px;
-}
-.th-mini::before{content:"";position:absolute;inset:6px 6px auto 6px;height:3px;background:#d8d3cd;border-radius:2px}
-.th-mini::after{content:"";position:absolute;inset:14px 6px 6px 6px;background:
-  repeating-linear-gradient(#eae7e2 0 3px,transparent 3px 6px)}
-.th-mini-energy{background:linear-gradient(150deg,rgba(194,65,12,.14),transparent 55%)}
-.th-mini-energy::before{background:var(--brand)}
-.th-mini-bold::before{content:"";inset:0 0 auto 0;height:13px;background:var(--brand);border-radius:0}
-.th-mini-bold::after{inset:17px 6px 6px 6px}
-
-/* شرائح لون التمييز */
-.sw-row{display:flex;flex-wrap:wrap;gap:9px}
-.sw{
-  width:38px;height:38px;border-radius:11px;border:2px solid transparent;
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,.14);
-  transition:transform .15s var(--ease),border-color .15s var(--ease);
-}
-.sw[aria-pressed="true"]{border-color:var(--ink);transform:scale(1.06)}
-.sw:active{transform:scale(.94)}
-
-/* ══════════════════════════════════════════════════════════
-   ورقة A4 ثنائية اللغة — الطباعة والمعاينة
-   ══════════════════════════════════════════════════════════
-
-   ⚠️⚠️ **القواعد هنا مشتركة بين المعاينة بالشاشة وورقة الطباعة.**
-   كلها مربوطة بكلاس `.pdfsheet`، وياخذه عنصران: `#pdfArea` (اللي
-   ينطبع) و`#pgPreviewSheet` (اللي ينعرض داخل المحرر). فاللي تشوفه
-   الكوتش بالمعاينة هو **بالضبط** اللي ينطلع بالـPDF.
-
-   لا تنقل أي قاعدة من هنا لداخل @media print. لو انفصلت المعاينة عن
-   الورقة، أول تعديل بوحدة يخرّب الثانية بصمت، وتطلع الـPDF مختلفة عن
-   اللي شافتها.
-
-   @media print تحت ما بيها إلا شغلتين: إخفاء اللوحة، وفواصل الصفحات.
-
-   وثلاث قواعد لا تنكسر (نفس دروس ورقة السوق بـ index.html):
-
-   ① كل الألوان هنا **صريحة** مو متغيّرات CSS. متغيّرات الثيم تتبدّل
-      بالوضع الليلي، والنتيجة ورقة بخلفية سوداء تاكل حبر الطابعة.
-      الاستثناء الوحيد --pa (لون التمييز) وهو ينحط inline من التصميم
-      مو من الثيم.
-
-   ② #pdfArea مخفي بالشاشة تماماً وما ينعرض إلا بالطباعة. لو خليناه
-      ظاهر، اللوحة كلها تصير مقلوبة. (المعاينة عنصر ثاني.)
-
-   ③ print-color-adjust:exact ضرورية — بدونها المتصفح يشيل خلفيات
-      رؤوس الجداول «توفيراً للحبر» فتضيع كل الهيكلة البصرية.
-   ══════════════════════════════════════════════════════════ */
-
-#pdfArea{display:none}
-
-.pdfsheet{
-  font-family:"Noto Sans Arabic","Cairo",sans-serif;
-  color:#141414;background:#fff;line-height:1.6;
-  direction:rtl;text-align:start;
-  -webkit-print-color-adjust:exact;print-color-adjust:exact;
-}
-.pdfsheet *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-
-/* ── الصفحة ──
-   الارتفاع من min-height مو من المحتوى، حتى التذييل ينزل للأسفل
-   بـ margin-top:auto. 263mm مو 269mm: هامش أمان حتى الكسور
-   العشرية ما تدفع صفحة بيضاء زايدة بالآخر. */
-.pdfsheet .pp{
-  min-height:263mm;display:flex;flex-direction:column;
-}
-.pdfsheet .pp-body{flex:1}
-
-/* ── الترويسة ── */
-.pdfsheet .pp-head{
-  display:flex;align-items:center;gap:5mm;
-  padding-bottom:3mm;margin-bottom:5mm;border-bottom:1.6pt solid var(--pa,#B07D62);
-}
-.pdfsheet .pp-head.c{justify-content:center;text-align:center}
-.pdfsheet .pp-head.l{flex-direction:row-reverse}
-.pdfsheet .pp-logo{
-  width:17mm;height:17mm;object-fit:cover;border-radius:2.4mm;flex:none;
-  box-shadow:inset 0 0 0 .4pt rgba(0,0,0,.16);
-}
-.pdfsheet .pp-htxt{flex:1;min-width:0}
-.pdfsheet .pp-htxt h2{
-  font-family:"Cairo","Noto Sans Arabic",sans-serif;
-  font-size:14pt;font-weight:700;margin:0;line-height:1.25;color:#141414;
-  text-wrap:balance;
-}
-.pdfsheet .pp-htxt .sub{font-size:9.5pt;color:#5A5A5A;margin-top:.8mm;line-height:1.5}
-
-/* ── الغلاف ── */
-.pdfsheet .pp-cover{justify-content:center;text-align:center}
-.pdfsheet .pp-cover .cv-logo{
-  width:34mm;height:34mm;object-fit:cover;border-radius:5mm;margin:0 auto 8mm;
-  display:block;box-shadow:inset 0 0 0 .4pt rgba(0,0,0,.16);
-}
-.pdfsheet .pp-cover .cv-kicker{
-  font-family:"IBM Plex Mono",monospace;font-size:9pt;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--pa,#B07D62);margin-bottom:3mm;
-}
-.pdfsheet .pp-cover h1{
-  font-family:"Cairo","Noto Sans Arabic",sans-serif;
-  font-size:27pt;font-weight:800;line-height:1.25;margin:0 0 4mm;color:#111;
-  text-wrap:balance;
-}
-.pdfsheet .pp-cover .cv-name{font-size:15pt;font-weight:600;color:#333;margin-bottom:9mm}
-.pdfsheet .pp-cover .cv-rule{
-  width:26mm;height:2.4pt;background:var(--pa,#B07D62);margin:0 auto 9mm;border-radius:2pt;
-}
-
-/* ── الجداول ── */
-.pdfsheet h3{
-  font-family:"Cairo","Noto Sans Arabic",sans-serif;
-  font-size:11.5pt;font-weight:700;margin:0 0 2.5mm;color:#141414;
-}
-.pdfsheet .tbl{
-  width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:6mm;
-}
-.pdfsheet .tbl th{
-  background:var(--pa,#B07D62);color:#fff;font-family:"Cairo","Noto Sans Arabic",sans-serif;
-  font-weight:700;font-size:9.5pt;padding:2.4mm 2.6mm;text-align:start;
-  border:.4pt solid var(--pa,#B07D62);
-}
-.pdfsheet .tbl td{
-  padding:2.4mm 2.6mm;border:.4pt solid #D2D2D2;vertical-align:middle;line-height:1.45;
-}
-.pdfsheet .tbl tbody tr:nth-child(even) td{background:#F5F4F1}
-
-/* ── الأرقام بعرض ثابت ──
-   ⚠️ الترتيب مقصود: IBM Plex Mono ماكو بيها عربي، والاحتياط بعدها
-   **لازم** يكون خط عربي حقيقي مو `monospace` المجرّد. الاحتياط
-   العام يعطي كل حرف عربي عرض ثابت فينكسر وصل الحروف، و«الفيديو»
-   تنطبع «الـفـيـديـو». المتصفح يختار الخط **لكل حرف**، فالأرقام
-   اللاتينية تاخذ Plex Mono والعربي ياخذ Noto — وهذا اللي نريده. */
-.pdfsheet .num,.pdfsheet .tbl td.num{
-  font-family:"IBM Plex Mono","Noto Sans Arabic","Cairo",monospace;
-  font-variant-numeric:tabular-nums;
-  text-align:center;white-space:nowrap;
-}
-/* رؤوس الأعمدة نصوص عربية مو أرقام — تاخذ خط العناوين كامل */
-.pdfsheet .tbl th.num{
-  font-family:"Cairo","Noto Sans Arabic",sans-serif;
-  text-align:center;white-space:nowrap;
-}
-/* الاسم الإنكليزي تحت العربي — سطر ثاني أصغر بمسافة حروف خفيفة */
-.pdfsheet .en{
-  display:block;font-family:"IBM Plex Mono","Noto Sans Arabic",monospace;font-size:8.5pt;
-  letter-spacing:.03em;color:#6A6A6A;margin-top:.6mm;line-height:1.35;
-}
-/* خانات تسجيل الوزن — فاضية تنكتب بالقلم بالنادي */
-.pdfsheet .tbl td.log{background:#FCFCFB;min-width:14mm}
-.pdfsheet .tbl th.log{font-size:8.5pt}
-.pdfsheet a.watch{
-  color:var(--pa,#B07D62);font-weight:700;font-size:9.5pt;text-decoration:none;
-  white-space:nowrap;
-}
-
-/* ── رمز QR للفيديو ──
-   vector مو صورة نقطية، فينطبع حاد بأي دقة طابعة. */
-.pdfsheet .tbl td.qrcell{padding:1.4mm;text-align:center}
-.pdfsheet .qr{display:inline-block;width:14mm;height:14mm;line-height:0}
-.pdfsheet .qr svg{width:100%;height:100%;display:block}
-.pdfsheet .qr-none{color:#B0B0B0}
-
-/* ── مربع الملاحظات ── */
-.pdfsheet .notes{
-  border:.5pt solid #CFCFCF;border-radius:2mm;padding:3mm 3.4mm;background:#FAFAF8;
-}
-.pdfsheet .notes b{
-  font-family:"Cairo","Noto Sans Arabic",sans-serif;font-size:9.5pt;display:block;margin-bottom:2mm;
-}
-.pdfsheet .notes .ln{border-bottom:.5pt solid #D8D8D8;height:6.6mm}
-.pdfsheet .notes .ln:last-child{border-bottom:none}
-
-/* ── مربعات التعليم بجدول المتابعة ── */
-.pdfsheet .box{
-  display:inline-block;width:4.4mm;height:4.4mm;border:.6pt solid #999;border-radius:.8mm;
-}
-.pdfsheet .tbl td.tick{text-align:center;padding:2mm}
-
-/* ── قوائم نصية ── */
-.pdfsheet ul.plist{margin:0 0 5mm;padding-inline-start:5mm}
-.pdfsheet ul.plist li{margin-bottom:1.6mm;line-height:1.7;font-size:10.5pt}
-.pdfsheet .lead{font-size:10.5pt;line-height:1.75;color:#333;margin:0 0 5mm}
-
-/* ── التذييل ── */
-.pdfsheet .pp-foot{
-  margin-top:auto;padding-top:3mm;border-top:.5pt solid #DDD;
-  display:flex;justify-content:space-between;align-items:center;gap:4mm;
-  font-size:8.5pt;color:#8A8A8A;
-}
-.pdfsheet .pp-foot .pno{font-family:"IBM Plex Mono","Noto Sans Arabic",monospace;font-variant-numeric:tabular-nums}
-
-/* ── صورة الوجبة ── */
-.pdfsheet .meal-img{
-  display:block;width:100%;max-height:62mm;object-fit:cover;
-  border-radius:2.5mm;margin:0 0 5mm;
-  box-shadow:inset 0 0 0 .4pt rgba(0,0,0,.14);
-}
-
-/* ══════════════════════════════════════════════════════════
-   قوالب الورقة
-   ══════════════════════════════════════════════════════════
-
-   ⚠️ كلها CSS خالص — ماكو صور خلفية. السبب:
-   ① الصورة النقطية تطلع مشوّشة بالطابعة، والتدرّجات والأشكال
-      المرسومة بالـCSS vector فتبقى حادة بأي دقة
-   ② ماكو ملف زايد ينرفع ولا رابط ينكسر
-   ③ لون التمييز --pa ينسحب عليها تلقائياً
-
-   ⚠️ **الحبر**: الأشكال محصورة بالحواف والغلاف. جسم الصفحة يبقى
-   أبيض دائماً — خلفية ملوّنة تحت جدول فيه خانات تنكتب بالقلم يعني
-   ورقة ما تنكتب عليها، وطابعة تخلص حبر بعشر أوراق.
-
-   ⚠️ الوضع الأبيض والأسود يطفّي كل هذا (قواعد .mono تحت). */
-
-/* ── قالب «الطاقة»: أشرطة مائلة ── */
-.pdfsheet.th-energy .pp{position:relative}
-/* شريط مائل بالزاوية العليا — clip-path مو صورة، فينطبع حاد */
-.pdfsheet.th-energy .pp::before{
-  content:"";position:absolute;top:0;inset-inline-start:0;
-  width:38mm;height:10mm;background:var(--pa,#B07D62);opacity:.13;
-  clip-path:polygon(0 0,100% 0,72% 100%,0 100%);
-  pointer-events:none;
-}
-.pdfsheet.th-energy .pp-head{
-  border-bottom-width:2.4pt;
-  border-image:linear-gradient(to left,var(--pa,#B07D62),rgba(0,0,0,0)) 1;
-}
-.pdfsheet.th-energy .pp-cover{
-  background:linear-gradient(160deg,rgba(0,0,0,.045) 0%,rgba(0,0,0,0) 46%);
-}
-.pdfsheet.th-energy .pp-cover::after{
-  content:"";position:absolute;bottom:0;inset-inline-end:0;
-  width:100%;height:52mm;background:var(--pa,#B07D62);opacity:.16;
-  clip-path:polygon(0 100%,100% 34%,100% 100%);
-  pointer-events:none;
-}
-.pdfsheet.th-energy h3{
-  padding-inline-start:3.4mm;border-inline-start:2.6pt solid var(--pa,#B07D62);
-}
-
-/* ── قالب «جريء»: غلاف ملوّن كامل ورؤوس سميكة ── */
-.pdfsheet.th-bold .pp-cover{
-  background:var(--pa,#B07D62);color:#fff;
-  margin:-14mm;padding:14mm;   /* يمد اللون لحافة الورقة بدل هامش @page */
-}
-.pdfsheet.th-bold .pp-cover h1,
-.pdfsheet.th-bold .pp-cover .cv-name{color:#fff}
-.pdfsheet.th-bold .pp-cover .cv-kicker{color:rgba(255,255,255,.82)}
-.pdfsheet.th-bold .pp-cover .cv-rule{background:#fff}
-.pdfsheet.th-bold .pp-cover .sub{color:rgba(255,255,255,.86)!important}
-/* شرائح بيانات المتمرن على غلاف ملوّن — نص داكن على بني غامق ما
-   ينقرأ، فنقلبها لحدود وخط أبيض شفافين */
-.pdfsheet.th-bold .pp-cover .cv-meta{color:rgba(255,255,255,.9)}
-.pdfsheet.th-bold .pp-cover .cv-meta span{border-color:rgba(255,255,255,.45)}
-.pdfsheet.th-bold .pp-cover .cv-logo{box-shadow:0 0 0 1.2pt rgba(255,255,255,.5)}
-.pdfsheet.th-bold .pp-head{
-  background:var(--pa,#B07D62);color:#fff;
-  margin:-14mm -14mm 5mm;padding:6mm 14mm 5mm;border-bottom:none;
-}
-.pdfsheet.th-bold .pp-head h2{color:#fff}
-.pdfsheet.th-bold .pp-head .sub{color:rgba(255,255,255,.85)}
-.pdfsheet.th-bold h3{
-  padding-inline-start:3.4mm;border-inline-start:3pt solid var(--pa,#B07D62);
-}
-
-/* ── الوضع الأبيض والأسود ──
-   يشيل لون التمييز من كل مكان بدل ما ينطبع رمادي عشوائي */
-.pdfsheet.mono .pp-head{border-bottom-color:#333}
-.pdfsheet.mono .tbl th{background:#3A3A3A;border-color:#3A3A3A}
-.pdfsheet.mono .cv-kicker,.pdfsheet.mono a.watch{color:#333}
-.pdfsheet.mono .cv-rule{background:#333}
-/* الأبيض والأسود يغلب القالب — الأشكال الملوّنة تنطبع رمادي ثقيل
-   وتاكل الحبر بلا فايدة، فنشيلها كلها */
-.pdfsheet.mono.th-energy .pp::before,
-.pdfsheet.mono.th-energy .pp-cover::after,
-.pdfsheet.mono.th-energy .pp-cover{background:none;opacity:1;content:none}
-.pdfsheet.mono.th-energy .pp-head{border-image:none;border-bottom:1.8pt solid #333}
-.pdfsheet.mono.th-bold .pp-cover{background:#fff;color:#141414;margin:0;padding:0}
-.pdfsheet.mono.th-bold .pp-cover h1,
-.pdfsheet.mono.th-bold .pp-cover .cv-name{color:#111}
-.pdfsheet.mono.th-bold .pp-cover .cv-kicker{color:#333}
-.pdfsheet.mono.th-bold .pp-cover .cv-meta{color:#555}
-.pdfsheet.mono.th-bold .pp-cover .cv-meta span{border-color:#ddd}
-.pdfsheet.mono.th-bold .pp-head{background:none;color:#141414;margin:0 0 5mm;padding:0 0 3mm;border-bottom:1.8pt solid #333}
-.pdfsheet.mono.th-bold .pp-head h2{color:#141414}
-.pdfsheet.mono.th-bold .pp-head .sub{color:#5A5A5A}
-.pdfsheet.mono.th-energy h3,
-.pdfsheet.mono.th-bold h3{border-inline-start-color:#333}
-
-/* ══ المعاينة الحيّة داخل المحرر ══
-   الورقة عرضها 210mm ثابت، وتنصغّر بـ transform حتى تدخل بالعمود.
-   transform ما يأثر على التخطيط، فالحاوية تاخذ الارتفاع المصغّر
-   يدوياً من fitPreview() وإلا يبقى فراغ بطول الورقة الكاملة. */
-.pg-prev-page{
-  width:210mm;padding:14mm;box-sizing:border-box;background:#fff;
-  transform-origin:top left;
-}
-.pg-prev-page .pp{box-shadow:0 0 0 1px #d8d8d8;background:#fff}
-.pg-prev-page .pp + .pp{margin-top:10mm}
-
-@media print{
-  /* بالطباعة نخفي اللوحة كلها ونعرض الورقة بس */
-  body.printing > *:not(#pdfArea){display:none!important}
-  body.printing{background:#fff!important;margin:0;padding:0}
-  body.printing #pdfArea{display:block!important}
-
-  @page{size:A4;margin:14mm}
-
-  /* فواصل الصفحات — الشغلة الوحيدة اللي تخص الطباعة دون المعاينة */
-  #pdfArea .pp{break-after:page;page-break-after:always}
-  #pdfArea .pp:last-child{break-after:auto;page-break-after:auto}
-  #pdfArea .tbl tr{break-inside:avoid;page-break-inside:avoid}
-  #pdfArea .notes{break-inside:avoid;page-break-inside:avoid}
-}
-/* Program editor and document refinements */
-.pg-tools{display:flex;flex-wrap:wrap;gap:8px;grid-column:1/-1;margin-block:8px}
-.pg-tools .btn{min-height:44px}
-.pg-drag{touch-action:none;cursor:grab}.pg-drag.dragging{cursor:grabbing;background:var(--brand-wash)}
-.pg-field{display:flex;flex-direction:column;gap:6px;min-width:0;font-size:var(--t-12);color:var(--soft)}
-.pg-field .inp{width:100%;font-size:1rem}
-.erow.pgex,.erow.pgcar{grid-template-columns:repeat(2,minmax(0,1fr));padding:16px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);margin-bottom:12px}
-.erow .pg-field.field-n-in{grid-column:1/-1}
-.erow.pgex .del-row,.erow.pgcar .del-row{grid-column:1/-1;grid-row:auto;justify-self:end}
-.erow .pg-field.field-rest-in,.erow .pg-field.field-note-in,.erow .pg-field.field-v-in{grid-column:1/-1}
-.erow .pg-field.field-en-in,.erow .pg-field.field-m-in{grid-column:1/-1}
-#pgModal .modal-foot{flex-wrap:wrap}
-#pgDraftStatus{flex-basis:100%;order:2;margin:0;line-height:1.5;font-size:var(--t-12)}
-#pgDraftStatus:empty{display:none}
-@media(min-width:700px){.erow .pg-field.field-en-in,.erow .pg-field.field-m-in{grid-column:1/-1}}
-.pdfsheet .pp{overflow-wrap:anywhere}
-.pdfsheet .pp-head{padding-bottom:5mm;margin-bottom:7mm}
-.pdfsheet .pp-logo,.pdfsheet .pp-cover .cv-logo{object-fit:contain}
-.pdfsheet .tbl{table-layout:auto;font-size:10pt}
-.pdfsheet .tbl thead{display:table-header-group}
-.pdfsheet .tbl th{background:#F1EFEB;color:#222;border-color:#D8D5CE;border-top:1.5pt solid var(--pa)}
-.pdfsheet .tbl td{padding:3mm 2mm;border-color:#E0DED8}
-.pdfsheet .tbl .num{white-space:normal;overflow-wrap:anywhere}
-.pdfsheet .tbl td.log{min-width:8mm}
-.pdfsheet .ex-detail{display:block;font-size:8.5pt;color:#555;margin-top:1.4mm;line-height:1.6}
-.pdfsheet .pp-cover{border-top:3mm solid var(--pa);border-bottom:.5pt solid #ddd;padding-block:14mm}
-.pdfsheet .cv-meta{display:flex;justify-content:center;flex-wrap:wrap;gap:4mm;margin:0 0 9mm;font-size:10pt;color:#555}
-.pdfsheet .cv-meta span{padding:2mm 4mm;border:1px solid #ddd;border-radius:2mm}
-.pdfsheet .pp-foot{color:#555;margin-top:6mm}
-.pdfsheet .pp-body{padding-bottom:5mm}
-.pdfsheet.mono .tbl th{color:#111;background:#eee}
-.pg-measure{position:fixed;left:-10000px;top:0;width:182mm;visibility:hidden;pointer-events:none}
-@media print{.pdfsheet .tbl tr{break-inside:avoid}.pdfsheet h3{break-after:avoid}body.printing{overflow:visible!important}}
 </style>
 </head>
 <body>
@@ -1469,6 +971,20 @@ select.inp{cursor:pointer;
     <!-- كتابة الكورسات: ورقة على حمّالة -->
     <symbol id="i-clipboard" viewBox="0 0 24 24"><path d="M9.4 4.6H7.2a2 2 0 0 0-2 2v11.8a2 2 0 0 0 2 2h9.6a2 2 0 0 0 2-2V6.6a2 2 0 0 0-2-2h-2.2"/><rect x="9.4" y="2.8" width="5.2" height="3.6" rx="1.2"/><path d="M8.6 11.4h6.8M8.6 15h4.4"/></symbol>
     <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V4.4h10V9"/><path d="M7 17.4H5.4A1.8 1.8 0 0 1 3.6 15.6v-4.4A2.2 2.2 0 0 1 5.8 9h12.4a2.2 2.2 0 0 1 2.2 2.2v4.4a1.8 1.8 0 0 1-1.8 1.8H17"/><rect x="7" y="14.2" width="10" height="5.4" rx="1"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 1.9 5.3L19.2 10l-5.3 1.9L12 17.2l-1.9-5.3L4.8 10l5.3-1.7Z"/><path d="M18.6 15.6 19.4 18l2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.2 2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.7l6.1-.9Z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 21s7-3.2 7-8.6V5.9l-7-2.9-7 2.9v6.5C5 17.8 12 21 12 21Z"/><path d="m9 12.2 2.1 2.1L15.2 10"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4.8A1.8 1.8 0 0 1 5.8 3H19v18H5.8A1.8 1.8 0 0 1 4 19.2Z"/><path d="M4 17.2h15"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16.5 20v-1.8a3.6 3.6 0 0 0-3.6-3.6H6.6A3.6 3.6 0 0 0 3 18.2V20"/><circle cx="9.7" cy="7.3" r="3.6"/><path d="M21.5 20v-1.8a3.6 3.6 0 0 0-2.7-3.5M15.6 4a3.6 3.6 0 0 1 0 6.9"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="3"/><path d="M3.5 10h17M8.5 3v4M15.5 3v4"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2.7s5.4 3.9 5.4 9a5.4 5.4 0 0 1-10.8 0c0-2 1-3.6 2-4.8.3 1 1 1.9 1.9 2.2.6-2.6-.2-5-1.5-6.4"/><path d="M12 21.3a2.7 2.7 0 0 0 2.7-2.7c0-1.6-1.4-2.7-2.7-4.4-1.3 1.7-2.7 2.8-2.7 4.4A2.7 2.7 0 0 0 12 21.3Z"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.3s-7.6-4.6-7.6-9.7a4.3 4.3 0 0 1 7.6-2.8 4.3 4.3 0 0 1 7.6 2.8c0 5.1-7.6 9.7-7.6 9.7Z"/></symbol>
+    <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M20.5 11.6a8.5 8.5 0 0 1-12.6 7.5L3.5 20.5l1.5-4.3A8.5 8.5 0 1 1 20.5 11.6Z"/><path d="M8.9 8.4c.2-.5.4-.5.6-.5h.5c.2 0 .4 0 .6.5l.7 1.7c.1.2 0 .4-.1.5l-.4.5c-.1.2-.2.3-.1.5a5.4 5.4 0 0 0 2.6 2.3c.2.1.4 0 .5-.1l.5-.6c.2-.2.3-.2.5-.1l1.6.8c.2.1.4.2.4.4a1.8 1.8 0 0 1-1.3 1.6c-.5.1-1.2.2-3.4-.8a7.7 7.7 0 0 1-3.2-3.4c-.6-1.2-.4-2.2 0-2.8Z"/></symbol>
+    <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.6" y="10.4" width="14.8" height="9.6" rx="2.4"/><path d="M8.2 10.4V7.6a3.8 3.8 0 0 1 7.6 0v2.8"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 1.9"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6M9 16h3"/></symbol>
   </defs>
 </svg>
 
@@ -1593,10 +1109,8 @@ select.inp{cursor:pointer;
         <span class="t-txt t-long" data-t="tab.content">محتوى الصفحة</span>
         <span class="t-txt t-short" data-t="tab.contentShort">المحتوى</span>
       </button>
-      <button class="tab" role="tab" id="tab-programs" aria-selected="false" type="button">
-        <svg class="icon"><use href="#i-clipboard"></use></svg>
-        <span class="t-txt t-long" data-t="tab.programs">كتابة كورسات</span>
-        <span class="t-txt t-short" data-t="tab.programsShort">كورسات</span>
+      <button class="tab" role="tab" id="tab-orders" aria-selected="false" type="button">
+        <svg class="icon"><use href="#i-receipt"></use></svg><span class="t-txt" data-t="tab.orders">الطلبات</span>
       </button>
       <button class="tab" role="tab" id="tab-info" aria-selected="false" type="button">
         <svg class="icon"><use href="#i-info"></use></svg>
@@ -1644,6 +1158,23 @@ select.inp{cursor:pointer;
       <div class="chips" id="mediaChips" role="group" data-t-aria="media.folders"></div>
       <div class="up-bar" id="mediaBar" hidden style="margin-top:12px"><i></i></div>
       <div class="media-grid" id="mediaGrid"></div>
+    </section>
+
+    <!-- الطلبات — اشتراكات الدفع عن طريق Wayl -->
+    <section id="ordersPane" hidden>
+      <div class="toolbar">
+        <p style="color:var(--soft);font-size:var(--t-14);line-height:1.7;margin:0" data-t="ord.intro">
+          كل اشتراك يدخل من زر الدفع بالصفحة. «مدفوع» يعني Wayl نفسه أكّد الدفع.
+        </p>
+        <div class="tool-end">
+          <span class="count" id="ordCount"></span>
+          <button class="btn btn-ghost" id="ordRefresh" type="button">
+            <svg class="icon"><use href="#i-refresh"></use></svg><span data-t="media.refresh">تحديث</span>
+          </button>
+        </div>
+      </div>
+      <div class="chips" id="ordChips" role="group"></div>
+      <div class="list" id="ordList"></div>
     </section>
 
     <!-- محتوى الصفحة الرئيسية -->
@@ -1742,123 +1273,7 @@ select.inp{cursor:pointer;
         </div>
       </form>
     </section>
-
-    <!-- كتابة كورسات — برامج المتمرنين اللي تنطبع PDF -->
-    <section id="programsPane" hidden>
-      <div class="toolbar">
-        <div class="search">
-          <svg class="icon s-ico"><use href="#i-search"></use></svg>
-          <label class="sr-only" for="pgQ" data-t="app.search">بحث</label>
-          <input class="inp" id="pgQ" type="search" autocomplete="off">
-        </div>
-        <div class="tool-end">
-          <span class="count" id="pgCount"></span>
-          <button class="btn btn-primary" id="pgNewBtn" type="button">
-            <svg class="icon"><use href="#i-plus"></use></svg><span data-t="pg.new">برنامج جديد</span>
-          </button>
-        </div>
-      </div>
-      <div class="list" id="pgList"></div>
-    </section>
   </main>
-</div>
-
-<!-- ══ مودال اختيار نوع البرنامج ══ -->
-<div class="modal" id="pgPick" role="dialog" aria-modal="true" aria-labelledby="pgPickTitle" hidden>
-  <div class="modal-card confirm-card">
-    <div class="modal-head">
-      <h2 id="pgPickTitle" data-t="pg.pick">شنو نوع الكورس؟</h2>
-      <button class="icon-btn sq" type="button" data-pgpick="cancel" data-t-aria="app.close">
-        <svg class="icon"><use href="#i-close"></use></svg>
-      </button>
-    </div>
-    <div class="modal-body" style="gap:var(--s-3)">
-      <button class="kind-card" type="button" data-pgpick="training">
-        <span class="kc-ico"><svg class="icon"><use href="#i-dumbbell"></use></svg></span>
-        <span class="kc-txt">
-          <b data-t="pg.newTraining">كورس تمارين</b>
-          <span data-t="pg.newTrainingSub">أيام وجداول تمارين مع الجولات والعدات وروابط الفيديو</span>
-        </span>
-      </button>
-      <button class="kind-card" type="button" data-pgpick="nutrition">
-        <span class="kc-ico"><svg class="icon"><use href="#i-salad"></use></svg></span>
-        <span class="kc-txt">
-          <b data-t="pg.newNutrition">كورس غذائي</b>
-          <span data-t="pg.newNutritionSub">وجبات وكميات وعادات صحية وجدول متابعة أسبوعية</span>
-        </span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ استيراد كورس أو وصفة من الموقع ══ -->
-<div class="modal" id="pgImport" role="dialog" aria-modal="true" aria-labelledby="pgImportTitle" hidden>
-  <div class="modal-card">
-    <div class="modal-head">
-      <h2 id="pgImportTitle"></h2>
-      <button class="icon-btn sq" type="button" id="pgImportClose" data-t-aria="app.close">
-        <svg class="icon"><use href="#i-close"></use></svg>
-      </button>
-    </div>
-    <div class="modal-body" style="gap:var(--s-3)">
-      <p class="hint" id="pgImportSub"></p>
-      <div class="search">
-        <svg class="icon s-ico"><use href="#i-search"></use></svg>
-        <label class="sr-only" for="pgImportQ" data-t="app.search">بحث</label>
-        <input class="inp" id="pgImportQ" type="search" autocomplete="off">
-      </div>
-      <div class="list" id="pgImportList" style="margin-top:0"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ محرر البرنامج ══ -->
-<div class="modal" id="pgModal" role="dialog" aria-modal="true" aria-labelledby="pgTitle" hidden>
-  <div class="modal-card pg-card">
-    <div class="modal-head">
-      <h2 id="pgTitle"></h2>
-      <button class="icon-btn sq" type="button" data-pgact="cancel" data-t-aria="app.close">
-        <svg class="icon"><use href="#i-close"></use></svg>
-      </button>
-    </div>
-
-    <!-- الشريط يبين بالموبايل بس — بالشاشة العريضة العمودان سوا -->
-    <div class="pg-seg" role="group" data-t-aria="pg.viewSwitch">
-      <button type="button" data-pgview="edit" aria-pressed="true">
-        <svg class="icon"><use href="#i-edit"></use></svg><span data-t="pg.vEdit">تحرير</span>
-      </button>
-      <button type="button" data-pgview="prev" aria-pressed="false">
-        <svg class="icon"><use href="#i-eye"></use></svg><span data-t="pg.vPreview">معاينة</span>
-      </button>
-    </div>
-
-    <div class="pg-split" id="pgSplit" data-view="edit">
-      <div class="modal-body" id="pgBody"></div>
-      <aside class="pg-prev" id="pgPreview">
-        <div class="pg-prev-bar">
-          <svg class="icon"><use href="#i-print"></use></svg>
-          <span data-t="pg.previewTitle">معاينة الورقة</span>
-          <span class="pgcount" id="pgPrevCount"></span>
-        </div>
-        <div class="pg-prev-scroll" id="pgPrevScroll">
-          <!-- الحاوية تاخذ المقاس **بعد** التصغير، والورقة جوّاها تنصغّر
-               بـ transform. بدونها الورقة تبقى ٢١٠مم بالتخطيط ويطلع
-               شريط تمرير أفقي وفراغ بطول الورقة الكاملة تحتها. -->
-          <div class="pg-prev-fit" id="pgPrevFit">
-            <div class="pdfsheet pg-prev-page" id="pgPreviewSheet"></div>
-          </div>
-        </div>
-      </aside>
-    </div>
-
-    <div class="modal-foot">
-      <button class="btn btn-ghost" type="button" data-pgact="cancel" data-t="app.cancel">إلغاء</button>
-      <button class="btn btn-ghost" type="button" id="pgPrintBtn">
-        <svg class="icon"><use href="#i-print"></use></svg><span data-t="pg.print">طباعة / PDF</span>
-      </button>
-      <span id="pgDraftStatus" role="status" class="hint"></span><button class="btn btn-primary" id="pgSaveBtn" type="button" data-t="app.save">حفظ</button>
-    </div>
-  </div>
 </div>
 
 <!-- ══ مودال الفورم ══ -->
@@ -1916,24 +1331,15 @@ select.inp{cursor:pointer;
   </div>
 </div>
 
-<!-- ورقة الطباعة تنبنى هنا وتنعرض بـ body.printing تحت @media print فقط.
-     نفس مبدأ #printArea مال ورقة السوق بـ index.html. -->
-<div id="pdfArea" aria-hidden="true"></div>
-
-<!-- مكتبة التمارين — تنبني بالذاكرة من البذرة + برامج الكوتش السابقة -->
-<datalist id="pg-exlist"></datalist>
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <!-- مكتبة Supabase محفوظة بالريبو، مو من CDN — هاي الصفحة تنكتب بيها كلمة السر،
      وسكربت من طرف ثالث يعني حساب مكشوف إذا انخرق المصدر. -->
+<!-- نصوص الصفحة التعريفية الافتراضية + مخطط حقولها — نفس الملف اللي يحمّله index.html -->
+<script src="landing-defaults.js"></script>
 <script src="vendor/supabase-2.58.0.js"></script>
 
-<!-- مولّد رموز QR — Kazuhiko Arase، رخصة MIT، محفوظ بالريبو مثل مكتبة
-     Supabase مو من CDN. حساب رياضي بحت: ماكو طلبات شبكة ولا eval ولا
-     وصول لتخزين. نستعمل createSvgTag() حتى الرمز يطلع vector وينطبع
-     حاد بأي دقة — الصورة النقطية تطلع مشوّشة بالطابعة. -->
-<script src="vendor/qrcode-generator-1.4.4.js"></script>
 <script>
 (function(){
 "use strict";
@@ -2019,174 +1425,51 @@ const T = {
     "tab.media":"الصور",
     "tab.content":"محتوى الصفحة",
     "tab.info":"معلومات الموقع",
-    "tab.programs":"كتابة كورسات",
-    "tab.programsShort":"كورسات",
 
-    "pg.new":"برنامج جديد",
-    "pg.newTraining":"كورس تمارين",
-    "pg.newTrainingSub":"أيام وجداول تمارين مع الجولات والعدات وروابط الفيديو",
-    "pg.newNutrition":"كورس غذائي",
-    "pg.newNutritionSub":"وجبات وكميات وعادات صحية وجدول متابعة أسبوعية",
-    "pg.pick":"شنو نوع الكورس؟",
-    "pg.count":"برنامج",
-    "pg.empty":"ماكو برامج بعد",
-    "pg.emptySub":"اضغطي «برنامج جديد» واكتبي أول برنامج لمتمرن.",
-    "pg.editTitle":"تعديل البرنامج",
-    "pg.newTitle":"برنامج جديد",
-    "pg.template":"قالب",
-    "pg.isTemplate":"قالب جاهز",
-    "pg.isTemplateHint":"القوالب تبقى فوق بالقائمة، وتنسخينها لكل متمرن جديد.",
-    "pg.dupTrainee":"نسخة لمتمرن جديد",
-    "pg.duped":"انتنسخ — بدّلي بيانات المتمرن واحفظي.",
-    "pg.print":"طباعة / PDF",
-    "pg.printHint":"تنفتح نافذة الطباعة — اختاري «حفظ كـ PDF».",
 
-    "pg.title":"عنوان البرنامج",
-    "pg.titlePh":"برنامج تدريب المقاومة",
-    "pg.trainee":"بيانات المتمرن",
-    "pg.tName":"الاسم",
-    "pg.tHeight":"الطول",
-    "pg.tWeight":"الوزن عند البداية",
-    "pg.tStart":"تاريخ البدء",
-    "pg.tDays":"أيام التدريب بالأسبوع",
-    "pg.tWeeks":"مدة البرنامج بالأسابيع",
-    "pg.tCoach":"المدرب",
 
-    "pg.days":"الأيام",
-    "pg.addDay":"إضافة يوم",
-    "pg.dayLabel":"رقم اليوم",
-    "pg.dayTitle":"عنوان اليوم",
-    "pg.dayTitlePh":"الجزء العلوي",
-    "pg.dayKind":"نوع اليوم",
-    "pg.kGym":"مقاومة بالأجهزة",
-    "pg.kBody":"وزن الجسم",
-    "pg.kCardio":"كارديو",
-    "pg.muscles":"العضلات المستهدفة",
-    "pg.musclesPh":"صدر، ظهر، كتف — مفصولة بفاصلة",
-    "pg.dayNote":"ملاحظات اليوم",
-    "pg.dayNotePh":"الراحة بين الجولات…",
-    "pg.rows":"التمارين",
-    "pg.addRow":"إضافة تمرين",
-    "pg.removeDay":"حذف اليوم",
-    "pg.removeRow":"حذف السطر",
-    "pg.rowN":"التمرين بالعربي",
-    "pg.rowEn":"الاسم الإنكليزي",
-    "pg.rowM":"العضلة",
-    "pg.rowSets":"جولات",
-    "pg.rowReps":"عدات",
-    "pg.rowV":"رابط الفيديو",
-    "pg.cardioM":"العدادات",
-    "pg.cardioReps":"المدة",
 
-    "pg.meals":"الوجبات",
-    "pg.addMeal":"إضافة وجبة",
-    "pg.mealTitle":"اسم الوجبة",
-    "pg.mealSub":"وصف مختصر",
-    "pg.mealRows":"المكوّنات",
-    "pg.addMealRow":"إضافة مكوّن",
-    "pg.rowGroup":"المجموعة",
-    "pg.rowQty":"الكمية",
-    "pg.habits":"العادات الصحية",
-    "pg.addHabit":"إضافة عادة",
-    "pg.tracker":"جدول المتابعة الأسبوعية",
-    "pg.trackerHint":"جدول فاضي بآخر الورقة تتعلّم عليه العادات كل يوم.",
 
-    "pg.stretch":"صفحات الإطالات",
-    "pg.stretchHint":"إطالات متحركة قبل التمرين وثابتة بعده — جاهزة، تنضاف بآخر البرنامج.",
 
-    "pg.design":"تصميم الورقة",
-    "pg.dLogo":"الشعار أو صورة الكوتش",
-    "pg.dLogoPos":"مكان الشعار",
-    "pg.posRight":"يمين",
-    "pg.posCenter":"وسط",
-    "pg.posLeft":"يسار",
-    "pg.dCover":"صفحة غلاف",
-    "pg.dAccent":"لون التمييز",
-    "pg.dMono":"طباعة بالأبيض والأسود",
-    "pg.dMonoHint":"يوفّر حبر الطابعة الملونة — الجداول تنطبع رمادي.",
-    "pg.dFooter":"نص التذييل",
-    "pg.dPageNum":"ترقيم الصفحات",
-    "pg.dLogCols":"أعمدة تسجيل الوزن",
-    "pg.dShowEn":"إظهار الاسم الإنكليزي",
-    "pg.dShowVideo":"إظهار عمود الفيديو",
-    "pg.dQr":"رمز QR بدل كلمة «شاهد»",
-    "pg.dQrHint":"للطباعة على ورق — المتمرن يصوّر الرمز بكاميرا التلفون ويفتح الفيديو. بالـPDF كلمة «شاهد» تنضغط مباشرة فما تحتاجينه.",
 
-    "pg.strEdit":"تعديل الإطالات",
-    "pg.strUpper":"الجزء العلوي",
-    "pg.strLower":"الجزء السفلي",
-    "pg.strBefore":"قبل التمرين — متحركة",
-    "pg.strAfter":"بعد التمرين — ثابتة",
-    "pg.strAdd":"إضافة إطالة",
-    "pg.strDur":"التكرار / المدة",
-    "pg.strReset":"استرجاع الإطالات الافتراضية",
-    "pg.strResetDone":"رجعت الإطالات الافتراضية.",
 
-    "pg.mealImg":"صورة الوجبة",
-    "pg.mealImgHint":"تظهر بأعلى صفحة الوجبة بالورقة.",
 
-    "pg.fromSite":"من الموقع",
-    "pg.importCourse":"جيبي كورس من الموقع",
-    "pg.importRecipe":"جيبي وصفة من الموقع",
-    "pg.importCourseSub":"الكورس ينضاف كيوم كامل بتمارينه.",
-    "pg.importRecipeSub":"الوصفة تنضاف كوجبة بمكوّناتها وصورتها.",
-    "pg.importEmpty":"ماكو شي بالموقع بعد",
-    "pg.imported":"انضاف — عدّليه براحتك.",
-    "pg.importSearch":"دوّري بالعنوان…",
 
-    "pg.theme":"قالب الورقة",
-    "pg.thClean":"هادئ",
-    "pg.thCleanSub":"أبيض ونظيف — أقل حبر",
-    "pg.thEnergy":"طاقة",
-    "pg.thEnergySub":"أشرطة مائلة وغلاف حيوي",
-    "pg.thBold":"جريء",
-    "pg.thBoldSub":"غلاف ملوّن كامل ورؤوس سميكة",
-    "pg.setDefault":"اجعليه التصميم الافتراضي",
-    "pg.defaultSaved":"انحفظ كتصميم افتراضي لكل برنامج جديد.",
 
-    "pg.sheetWatch":"شاهد",
-    "pg.sheetWeight":"وزن",
-    "pg.sheetNum":"#",
-    "pg.sheetEx":"التمرين",
-    "pg.sheetMuscle":"العضلة",
-    "pg.sheetSets":"جولات",
-    "pg.sheetReps":"عدات",
-    "pg.sheetVideo":"الفيديو",
-    "pg.sheetPage":"صفحة",
-    "pg.sheetHow":"كيف تستخدم هذا البرنامج",
-    "pg.sheetWeek":"توزيع الأسبوع",
-    "pg.sheetDayCol":"اليوم",
-    "pg.sheetContent":"المحتوى",
-    "pg.sheetTargets":"العضلات المستهدفة",
-    "pg.sheetExCount":"عدد التمارين",
-    "pg.sheetExUnit":"تمارين",
-    "pg.sheetNotes":"ملاحظات اليوم",
-    "pg.sheetTrackTitle":"متابعة أسبوعية",
-    "pg.sheetWeekN":"الأسبوع",
-    "pg.sheetHabit":"العادة",
-    "pg.sheetGroup":"المكوّن",
-    "pg.sheetQty":"الكمية",
-    "pg.sheetMeta":"بيانات المتمرن",
-    "pg.sheetStretchTitle":"الإطالات المتحركة والثابتة",
-    "pg.sheetStretchBefore":"قبل التمرين — إطالات متحركة",
-    "pg.sheetStretchAfter":"بعد التمرين — إطالات ثابتة",
-    "pg.sheetStretchUpper":"الجزء العلوي",
-    "pg.sheetStretchLower":"الجزء السفلي",
-    "pg.sheetStretchDur":"التكرار / المدة",
 
-    "pg.errTitle":"اكتبي عنوان البرنامج.",
-    "pg.saved":"انحفظ",
-    "pg.delTitle":"متأكدة من حذف البرنامج؟",
 
-    "pg.viewSwitch":"تبديل العرض",
-    "pg.vEdit":"تحرير",
-    "pg.vPreview":"معاينة",
-    "pg.previewTitle":"معاينة الورقة",
-    "pg.prevPages":"{n} صفحة",
-    "pg.exPick":"من مكتبة التمارين",
-    "pg.exPickHint":"اكتبي أول حروف التمرين وتنكمل لحالها مع الاسم الإنكليزي والعضلة والفيديو.",
 
-    "ct.intro":"كل النصوص اللي تظهر بالصفحة الرئيسية. اكتبي النص بالعربي وبالإنكليزي — الزائر يشوف حسب اللغة اللي يختارها.",
+    "ct.intro":"كل نص يبين بالصفحة الرئيسية ينكتب من هنا — بالعربي وبالإنكليزي. الحقل الفاضي يبين فاضي بالصفحة.",
+    "tab.orders":"الطلبات",
+    "ord.intro":"كل اشتراك يدخل من زر الدفع بالصفحة. «مدفوع» يعني Wayl نفسه أكّد الدفع — مو بس إن الزبونة رجعت للموقع.",
+    "ord.all":"الكل",
+    "ord.paid":"مدفوع",
+    "ord.pending":"معلّق",
+    "ord.failed":"ما كمل",
+    "ord.cancelled":"ملغي",
+    "ord.empty":"ماكو طلبات بعد",
+    "ord.emptySub":"أول ما زبونة تدفع من الصفحة، يطلع طلبها هنا.",
+    "ord.missing":"جدول الطلبات مو موجود بعد — نفّذي ملف landing.sql على Supabase.",
+    "ord.contacted":"تواصلت وياها",
+    "ord.notContacted":"ما تواصلت بعد",
+    "ord.wa":"واتساب",
+    "ord.count":"{n} طلب · مجموع المدفوع {sum} د.ع",
+    "ord.delTitle":"تحذفين هذا الطلب؟",
+    "ord.delText":"طلب {x} ينحذف من السجل نهائياً. إذا مدفوع، يبقى مسجّل بحساب Wayl.",
+    "ct.pages":"الصفحات والدفع",
+    "ct.pagesSub":"صفحة الأكل · صفحة التمارين · الدفع الإلكتروني",
+    "ct.pagesHint":"صفحتا الأكل والتمارين مطفيات — الموقع صفحة تعريفية وحدة. إذا شغّلتي وحدة، يطلع رابطها بالتنقل والوصفات والكورسات مالتها ترجع تبين. الدفع الإلكتروني: إذا مطفي، زر «اشتركي» يفتح واتساب برسالة جاهزة؛ إذا شغّال، يفتح نافذة الدفع عن طريق Wayl (شغّليه بس بعد ما يتفعّل حساب Wayl — شوف PROJECT.md).",
+    "page.food":"صفحة الأكل (الوصفات)",
+    "page.courses":"صفحة التمارين (الكورسات)",
+    "page.pay":"الدفع الإلكتروني عن طريق Wayl",
+    "sec.services":"الخدمات",
+    "ct.planAmount":"المبلغ بالدينار (رقم فقط — هذا اللي ينسحب بالدفع)",
+    "ct.planAmountHint":"مثال: 60000. إذا تركتيه فاضي ينحسب من السعر المكتوب فوق.",
+    "ct.titleHint2":"لتلوين كلمة بالذهبي حطّيها بين نجمتين: *كلمة*",
+    "ct.linesHint":"كل سطر = عنصر واحد",
+    "ct.bioHint":"النبذة نفسها تنكتب من تبويب «معلومات الموقع».",
+    "ct.quotesHint":"أول رأي يظهر بقسم «تعرّفي عليّ»، وكلهن يتقلبن بقسم الآراء.",
+    "ct.fallbackHint":"هاي قائمة مقترحة لأن القائمة بالداتابيس فاضية — عدّليها واحفظي حتى تصير مالتچ.",
     "ct.emptyList":"ماكو عناصر — ضيفي أول واحد.",
     "ct.hero":"نصوص الواجهة",
     "ct.heroSub":"العنوان الكبير والنص اللي تحته",
@@ -2194,16 +1477,16 @@ const T = {
     "ct.title":"العنوان الكبير",
     "ct.titleHint":"تكدرين تلوّنين كلمة بوضعها بين <span class='hl'>و</span>",
     "ct.sub":"النص تحت العنوان",
-    "ct.heroImgs":"صور الواجهة المتحركة",
-    "ct.heroImgsSub":"الصور اللي تتقلب بأعلى الصفحة",
-    "ct.heroImgsHint":"تنقلب تلقائياً كل ٥ ثواني بترتيبهن. صورة وحدة بس؟ تبقى ثابتة بدون حركة.",
+    "ct.heroImgs":"صور الصفحة",
+    "ct.heroImgsSub":"صورة بطاقة البداية وصورة قسم الأسئلة",
+    "ct.heroImgsHint":"الصورة الأولى = بطاقة البداية (وصورة المشاركة بالسوشيال). الثانية = قسم الأسئلة. رتّبيهن بالأسهم.",
     "ct.addHeroImg":"إضافة صورة",
     "ct.aboutImg":"صورة «عن الكوتش»",
     "ct.aboutImgSub":"الصورة الكبيرة بقسم التعريف",
     "ct.stats":"الأرقام",
-    "ct.statsSub":"الأرقام الصغيرة تحت الواجهة",
-    "ct.creds":"الشهادات والخبرات",
-    "ct.credsSub":"تظهر بقسم «عن الكوتش»",
+    "ct.statsSub":"أول ٣ أرقام تبين ببطاقة البداية وتعدّ من الصفر",
+    "ct.creds":"بطاقات الخدمات",
+    "ct.credsSub":"البطاقات اللي تبين بقسم الخدمات",
     "ct.plans":"الباقات والأسعار",
     "ct.plansSub":"أسماء الباقات وأسعارها ومزاياها",
     "ct.quotes":"آراء المشتركات",
@@ -2244,13 +1527,13 @@ const T = {
     "ct.sections":"أقسام الصفحة",
     "ct.sectionsSub":"شنو يظهر للزائرة وشنو ينخفي",
     "ct.sectionsHint":"طفّي أي قسم ما تريدين يبين بالصفحة الرئيسية. القسم المطفي يختفي هو وروابط التنقل اللي تشير له — والمحتوى مالته يبقى محفوظ، ترجعينه وقت ما تريدين.",
-    "sec.trust":"شريط المميزات تحت الواجهة",
+    "sec.trust":"الشريط المتحرك",
     "sec.plans":"الباقات والأسعار",
-    "sec.about":"عن الكوتش",
+    "sec.about":"تعرّفي عليّ",
     "sec.reviews":"آراء المشتركات",
     "sec.faq":"الأسئلة الشائعة",
     "sec.peek":"أحدث الوصفات والكورسات",
-    "sec.cta":"شريط «جاهزة تبدين؟» بالأسفل",
+    "sec.cta":"قسم التواصل بالأسفل",
     "sec.on":"ظاهر",
     "sec.off":"مخفي",
 
@@ -2472,174 +1755,51 @@ const T = {
     "tab.media":"Images",
     "tab.content":"Page content",
     "tab.info":"Site info",
-    "tab.programs":"Write programs",
-    "tab.programsShort":"Programs",
 
-    "pg.new":"New program",
-    "pg.newTraining":"Training program",
-    "pg.newTrainingSub":"Days and exercise tables with sets, reps and video links",
-    "pg.newNutrition":"Nutrition program",
-    "pg.newNutritionSub":"Meals, portions, healthy habits and a weekly tracker",
-    "pg.pick":"What kind of program?",
-    "pg.count":"program",
-    "pg.empty":"No programs yet",
-    "pg.emptySub":"Press “New program” to write your first one.",
-    "pg.editTitle":"Edit program",
-    "pg.newTitle":"New program",
-    "pg.template":"Template",
-    "pg.isTemplate":"Reusable template",
-    "pg.isTemplateHint":"Templates stay at the top of the list, ready to copy for each new trainee.",
-    "pg.dupTrainee":"Copy for a new trainee",
-    "pg.duped":"Copied — change the trainee details and save.",
-    "pg.print":"Print / PDF",
-    "pg.printHint":"Opens the print dialog — choose “Save as PDF”.",
 
-    "pg.title":"Program title",
-    "pg.titlePh":"Resistance training program",
-    "pg.trainee":"Trainee details",
-    "pg.tName":"Name",
-    "pg.tHeight":"Height",
-    "pg.tWeight":"Starting weight",
-    "pg.tStart":"Start date",
-    "pg.tDays":"Training days per week",
-    "pg.tWeeks":"Program length in weeks",
-    "pg.tCoach":"Coach",
 
-    "pg.days":"Days",
-    "pg.addDay":"Add day",
-    "pg.dayLabel":"Day label",
-    "pg.dayTitle":"Day title",
-    "pg.dayTitlePh":"Upper body",
-    "pg.dayKind":"Day type",
-    "pg.kGym":"Machine resistance",
-    "pg.kBody":"Bodyweight",
-    "pg.kCardio":"Cardio",
-    "pg.muscles":"Target muscles",
-    "pg.musclesPh":"Chest, back, shoulders — comma separated",
-    "pg.dayNote":"Day notes",
-    "pg.dayNotePh":"Rest between sets…",
-    "pg.rows":"Exercises",
-    "pg.addRow":"Add exercise",
-    "pg.removeDay":"Remove day",
-    "pg.removeRow":"Remove row",
-    "pg.rowN":"Exercise in Arabic",
-    "pg.rowEn":"English name",
-    "pg.rowM":"Muscle",
-    "pg.rowSets":"Sets",
-    "pg.rowReps":"Reps",
-    "pg.rowV":"Video link",
-    "pg.cardioM":"Settings",
-    "pg.cardioReps":"Duration",
 
-    "pg.meals":"Meals",
-    "pg.addMeal":"Add meal",
-    "pg.mealTitle":"Meal name",
-    "pg.mealSub":"Short description",
-    "pg.mealRows":"Items",
-    "pg.addMealRow":"Add item",
-    "pg.rowGroup":"Group",
-    "pg.rowQty":"Amount",
-    "pg.habits":"Healthy habits",
-    "pg.addHabit":"Add habit",
-    "pg.tracker":"Weekly tracker table",
-    "pg.trackerHint":"An empty grid at the end of the sheet to tick each habit daily.",
 
-    "pg.stretch":"Stretching pages",
-    "pg.stretchHint":"Dynamic stretches before and static stretches after — ready made, appended at the end.",
 
-    "pg.design":"Sheet design",
-    "pg.dLogo":"Logo or coach photo",
-    "pg.dLogoPos":"Logo position",
-    "pg.posRight":"Right",
-    "pg.posCenter":"Center",
-    "pg.posLeft":"Left",
-    "pg.dCover":"Cover page",
-    "pg.dAccent":"Accent color",
-    "pg.dMono":"Print in black and white",
-    "pg.dMonoHint":"Saves color ink — tables print in gray.",
-    "pg.dFooter":"Footer text",
-    "pg.dPageNum":"Page numbers",
-    "pg.dLogCols":"Weight log columns",
-    "pg.dShowEn":"Show English name",
-    "pg.dShowVideo":"Show video column",
-    "pg.dQr":"QR code instead of the “Watch” link",
-    "pg.dQrHint":"For paper printing — the trainee scans it with a phone camera. In a PDF the “Watch” link is already tappable.",
 
-    "pg.strEdit":"Edit stretches",
-    "pg.strUpper":"Upper body",
-    "pg.strLower":"Lower body",
-    "pg.strBefore":"Before — dynamic",
-    "pg.strAfter":"After — static",
-    "pg.strAdd":"Add stretch",
-    "pg.strDur":"Reps / duration",
-    "pg.strReset":"Restore default stretches",
-    "pg.strResetDone":"Default stretches restored.",
 
-    "pg.mealImg":"Meal photo",
-    "pg.mealImgHint":"Shown at the top of the meal page on the sheet.",
 
-    "pg.fromSite":"From the site",
-    "pg.importCourse":"Import a course from the site",
-    "pg.importRecipe":"Import a recipe from the site",
-    "pg.importCourseSub":"The course is added as a full day with its exercises.",
-    "pg.importRecipeSub":"The recipe is added as a meal with its ingredients and photo.",
-    "pg.importEmpty":"Nothing on the site yet",
-    "pg.imported":"Added — edit it as you like.",
-    "pg.importSearch":"Search by title…",
 
-    "pg.theme":"Sheet template",
-    "pg.thClean":"Calm",
-    "pg.thCleanSub":"White and clean — least ink",
-    "pg.thEnergy":"Energy",
-    "pg.thEnergySub":"Angled bands and a lively cover",
-    "pg.thBold":"Bold",
-    "pg.thBoldSub":"Full-color cover and heavy headers",
-    "pg.setDefault":"Make this the default design",
-    "pg.defaultSaved":"Saved as the default design for every new program.",
 
-    "pg.sheetWatch":"Watch",
-    "pg.sheetWeight":"Weight",
-    "pg.sheetNum":"#",
-    "pg.sheetEx":"Exercise",
-    "pg.sheetMuscle":"Muscle",
-    "pg.sheetSets":"Sets",
-    "pg.sheetReps":"Reps",
-    "pg.sheetVideo":"Video",
-    "pg.sheetPage":"Page",
-    "pg.sheetHow":"How to use this program",
-    "pg.sheetWeek":"Weekly split",
-    "pg.sheetDayCol":"Day",
-    "pg.sheetContent":"Focus",
-    "pg.sheetTargets":"Target muscles",
-    "pg.sheetExCount":"Exercises",
-    "pg.sheetExUnit":"exercises",
-    "pg.sheetNotes":"Day notes",
-    "pg.sheetTrackTitle":"Weekly tracker",
-    "pg.sheetWeekN":"Week",
-    "pg.sheetHabit":"Habit",
-    "pg.sheetGroup":"Item",
-    "pg.sheetQty":"Amount",
-    "pg.sheetMeta":"Trainee details",
-    "pg.sheetStretchTitle":"Dynamic & static stretches",
-    "pg.sheetStretchBefore":"Before training — dynamic stretches",
-    "pg.sheetStretchAfter":"After training — static stretches",
-    "pg.sheetStretchUpper":"Upper body",
-    "pg.sheetStretchLower":"Lower body",
-    "pg.sheetStretchDur":"Reps / duration",
 
-    "pg.errTitle":"Enter a program title.",
-    "pg.saved":"Saved",
-    "pg.delTitle":"Delete this program?",
 
-    "pg.viewSwitch":"Switch view",
-    "pg.vEdit":"Edit",
-    "pg.vPreview":"Preview",
-    "pg.previewTitle":"Sheet preview",
-    "pg.prevPages":"{n} pages",
-    "pg.exPick":"From the exercise library",
-    "pg.exPickHint":"Type the first letters and the English name, muscle and video fill in automatically.",
 
-    "ct.intro":"Every piece of text on the home page. Write it in Arabic and in English — visitors see whichever language they pick.",
+    "ct.intro":"Every piece of text on the home page is written here — in Arabic and in English. An empty field shows as empty on the page.",
+    "tab.orders":"Orders",
+    "ord.intro":"Every subscription from the page’s pay button. “Paid” means Wayl itself confirmed the payment — not just that the client came back.",
+    "ord.all":"All",
+    "ord.paid":"Paid",
+    "ord.pending":"Pending",
+    "ord.failed":"Not completed",
+    "ord.cancelled":"Cancelled",
+    "ord.empty":"No orders yet",
+    "ord.emptySub":"As soon as someone pays from the page, their order shows up here.",
+    "ord.missing":"The orders table doesn’t exist yet — run landing.sql on Supabase.",
+    "ord.contacted":"Contacted",
+    "ord.notContacted":"Not contacted yet",
+    "ord.wa":"WhatsApp",
+    "ord.count":"{n} orders · {sum} IQD paid",
+    "ord.delTitle":"Delete this order?",
+    "ord.delText":"{x}’s order will be removed from this log. If paid, it stays on record in the Wayl account.",
+    "ct.pages":"Pages & payments",
+    "ct.pagesSub":"Recipes page · Workouts page · Online payment",
+    "ct.pagesHint":"The recipes and workouts pages are off — the site is a single intro page. Turn one on and its link appears in the navigation again. Online payment: when off, “Join now” opens WhatsApp with a ready message; when on, it opens the Wayl checkout (only turn it on once the Wayl account is active — see PROJECT.md).",
+    "page.food":"Recipes page",
+    "page.courses":"Workouts page",
+    "page.pay":"Online payment via Wayl",
+    "sec.services":"Services",
+    "ct.planAmount":"Amount in IQD (number only — this is what gets charged)",
+    "ct.planAmountHint":"e.g. 60000. Left empty, it is read from the price above.",
+    "ct.titleHint2":"To highlight a word in gold, wrap it in asterisks: *word*",
+    "ct.linesHint":"One item per line",
+    "ct.bioHint":"The bio itself is edited in the “Site info” tab.",
+    "ct.quotesHint":"The first one shows in the About section; all of them rotate in Testimonials.",
+    "ct.fallbackHint":"This is a suggested list because the saved one is empty — edit and save to make it yours.",
     "ct.emptyList":"Nothing here — add the first one.",
     "ct.hero":"Hero text",
     "ct.heroSub":"The main headline and the text under it",
@@ -2647,16 +1807,16 @@ const T = {
     "ct.title":"Main headline",
     "ct.titleHint":"You can highlight a word by wrapping it in <span class='hl'> and </span>",
     "ct.sub":"Text below the headline",
-    "ct.heroImgs":"Hero slideshow",
-    "ct.heroImgsSub":"The photos that rotate at the top of the page",
-    "ct.heroImgsHint":"They rotate automatically every 5 seconds, in this order. With a single photo it stays still.",
+    "ct.heroImgs":"Page photos",
+    "ct.heroImgsSub":"Intro card photo and FAQ photo",
+    "ct.heroImgsHint":"First photo = intro card (and the social share image). Second = FAQ section. Reorder with the arrows.",
     "ct.addHeroImg":"Add photo",
     "ct.aboutImg":"“About the coach” photo",
     "ct.aboutImgSub":"The large photo in the about section",
     "ct.stats":"Stats",
-    "ct.statsSub":"The small numbers under the hero",
-    "ct.creds":"Credentials",
-    "ct.credsSub":"Shown in the about section",
+    "ct.statsSub":"The first 3 show in the intro card and count up",
+    "ct.creds":"Service cards",
+    "ct.credsSub":"Cards in the Services section",
     "ct.plans":"Packages & prices",
     "ct.plansSub":"Package names, prices and features",
     "ct.quotes":"Reviews",
@@ -2697,13 +1857,13 @@ const T = {
     "ct.sections":"Page sections",
     "ct.sectionsSub":"What visitors see and what stays hidden",
     "ct.sectionsHint":"Turn off any section you don't want on the home page. A hidden section disappears along with the nav links pointing to it — its content stays saved, so you can bring it back any time.",
-    "sec.trust":"Feature strip under the hero",
+    "sec.trust":"Scrolling strip",
     "sec.plans":"Packages & prices",
-    "sec.about":"About the coach",
+    "sec.about":"About",
     "sec.reviews":"Reviews",
     "sec.faq":"FAQ",
     "sec.peek":"Latest recipes & courses",
-    "sec.cta":"“Ready to start?” band at the bottom",
+    "sec.cta":"Contact section at the bottom",
     "sec.on":"Visible",
     "sec.off":"Hidden",
 
@@ -2908,16 +2068,14 @@ function applyLang(){
   $('#gateLangTxt').textContent = LANG === 'ar' ? 'EN' : 'ع';
   $('#q').placeholder = t('app.searchPh');
   $('#newTxt').textContent = TAB === 'courses' ? t('app.newCourse') : t('app.new');
-  $('#pgQ').placeholder = t('app.searchPh');
   if (!$('#app').hidden){
     if (TAB === 'media')          renderMedia();
     else if (TAB === 'content'){ syncContent(); drawContent() }
-    else if (TAB === 'programs')  renderPrograms();
+    else if (TAB === 'orders')    renderOrders();
     else                          render();
   }
   if (!$('#picker').hidden) renderPicker();
   if (!$('#modal').hidden){ syncRows(); syncBase(); drawForm() }   /* ما نضيّع اللي انكتب */
-  if (!$('#pgModal').hidden){ syncProgram(); drawProgram(); drawPreview() }
 }
 function toggleLang(){
   LANG = LANG === 'ar' ? 'en' : 'ar';
@@ -2988,7 +2146,7 @@ function toggleTheme(){
    ⑤  الحالة
    ══════════════════════════════════════════════════════════ */
 let TAB     = 'recipes';   // recipes | courses | media | info
-let ROWS    = { recipes:[], courses:[], programs:[] };
+let ROWS    = { recipes:[], courses:[] };
 let INFO    = null;
 let VIEWS_ON = false;   /* هل جدول المشاهدات موجود؟ شوف views.sql */
 let EDITING = null;        // الصف قيد التعديل أو null للإضافة
@@ -3049,13 +2207,10 @@ function storagePath(url){
    ══════════════════════════════════════════════════════════ */
 async function loadAll(){
   $('#list').innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
-  const [r, c, i, p] = await Promise.all([
+  const [r, c, i] = await Promise.all([
     sb.from('recipes').select('*').order('sort_order', { ascending:true }).order('created_at', { ascending:false }),
     sb.from('courses').select('*').order('sort_order', { ascending:true }).order('created_at', { ascending:false }),
-    sb.from('site_info').select('*').eq('id', 1).maybeSingle(),
-    /* ⚠️ يفشل بصمت إذا programs.sql ما انفّذ بعد — نفس أسلوب item_views.
-       باقي اللوحة تشتغل عادي، وتبويب البرامج يطلع فاضي بدل ما ينكسر. */
-    sb.from('programs').select('*').order('sort_order', { ascending:true }).order('created_at', { ascending:false })
+    sb.from('site_info').select('*').eq('id', 1).maybeSingle()
   ]);
   if (r.error || c.error){
     $('#list').innerHTML = `<div class="empty">${ico('i-alert')}<b>${esc(t('app.loadErr'))}</b>
@@ -3064,9 +2219,6 @@ async function loadAll(){
   }
   ROWS.recipes  = r.data || [];
   ROWS.courses  = c.data || [];
-  ROWS.programs = p.error ? [] : (p.data || []);
-  sortPrograms();
-  buildExIndex();
   await loadViews();
   INFO = i.data || { id:1, name:'كوتش زهراء', initial:'ز', tagline:'', bio:'', avatar_url:'', instagram:'', whatsapp:'' };
   CT = null;                    /* يعاد بناؤه من INFO عند فتح تبويب المحتوى */
@@ -3179,7 +2331,7 @@ function render(){
                 title="${esc(x.is_published ? t('app.unpublish') : t('app.publish'))}">
           ${ico(x.is_published ? 'i-eye-off' : 'i-eye')}<span>${esc(x.is_published ? t('app.unpublish') : t('app.publish'))}</span>
         </button>
-        <a class="btn btn-quiet btn-sm" href="index.html#/${TAB === 'courses' ? 'c' : 'r'}/${esc(x.id)}"
+        <a class="btn btn-quiet btn-sm" href="catalog.html#/${TAB === 'courses' ? 'c' : 'r'}/${esc(x.id)}"
            target="_blank" rel="noopener"
            aria-label="${esc(t('app.preview'))}" title="${esc(t('app.preview'))}">
           ${ico('i-external')}<span>${esc(t('app.preview'))}</span>
@@ -3282,8 +2434,6 @@ function renderMedia(){
 function pickFolder(){
   if (!PICK_TARGET) return 'recipes';
   if (PICK_TARGET === 'avatar')          return 'avatar';
-  if (PICK_TARGET === 'pglogo')          return 'programs';
-  if (PICK_TARGET.startsWith('pgmeal:'))  return 'programs';
   if (PICK_TARGET === 'hero:add')        return 'site';
   if (PICK_TARGET.startsWith('ct:'))     return 'site';
   return destFolder();                   /* recipes أو courses حسب التبويب */
@@ -3306,7 +2456,7 @@ function closePicker(){
   const p = $('#picker');
   p.classList.remove('open');
   setTimeout(() => p.hidden = true, 220);
-  if ($('#modal').hidden && $('#pgModal').hidden) document.body.style.overflow = '';
+  if ($('#modal').hidden) document.body.style.overflow = '';
   PICK_TARGET = null;
 }
 function renderPicker(){
@@ -3319,21 +2469,6 @@ function renderPicker(){
          <b>${esc(t('media.pickEmpty'))}</b></div>`;
 }
 function choosePicked(url){
-  if (PICK_TARGET === 'pglogo'){
-    syncProgram();
-    PG.design.logo = url;
-    closePicker();
-    drawProgram();
-    return drawPreview();
-  }
-  if (PICK_TARGET && PICK_TARGET.startsWith('pgmeal:')){
-    syncProgram();
-    const meal = PG.content.meals[+PICK_TARGET.slice(7)];
-    if (meal) meal.img = url;
-    closePicker();
-    drawProgram();
-    return drawPreview();
-  }
   if (PICK_TARGET === 'hero:add'){
     syncContent();
     CT.hero_images.push(url);
@@ -3378,7 +2513,7 @@ function askDeleteMedia(path){
 /* ══════════════════════════════════════════════════════════
    ⑦  التبويبات
    ══════════════════════════════════════════════════════════ */
-const PANES = ['recipes','courses','media','content','programs','info'];
+const PANES = ['recipes','courses','media','content','orders','info'];
 
 function setTab(nextTab){
   TAB = nextTab;
@@ -3388,12 +2523,12 @@ function setTab(nextTab){
   $('#mediaPane').hidden    = TAB !== 'media';
   $('#contentPane').hidden  = TAB !== 'content';
   $('#infoPane').hidden     = TAB !== 'info';
-  $('#programsPane').hidden = TAB !== 'programs';
+  $('#ordersPane').hidden   = TAB !== 'orders';
   $('#newTxt').textContent = TAB === 'courses' ? t('app.newCourse') : t('app.new');
   $('#q').value = '';
   if (TAB === 'media')         { MEDIA.length ? renderMedia() : loadMedia() }
   else if (TAB === 'content')  { drawContent() }
-  else if (TAB === 'programs') { renderPrograms() }
+  else if (TAB === 'orders')   { loadOrders() }
   else if (isList)             { render() }
 }
 
@@ -4163,7 +3298,7 @@ function closeConfirm(){
   const c = $('#confirm');
   c.classList.remove('open');
   setTimeout(() => c.hidden = true, 220);
-  if ($('#modal').hidden && $('#pgModal').hidden) document.body.style.overflow = '';
+  if ($('#modal').hidden) document.body.style.overflow = '';
   PENDING_DELETE = null;
   lastFocus?.focus?.();
 }
@@ -4185,15 +3320,15 @@ async function doDelete(){
     return;
   }
 
-  /* حذف برنامج متمرن */
-  if (PENDING_DELETE.kind === 'program'){
+  /* حذف طلب */
+  if (PENDING_DELETE.kind === 'order'){
     const { id } = PENDING_DELETE;
-    const { error } = await sb.from('programs').delete().eq('id', id);
+    const { error } = await sb.from('orders').delete().eq('id', id);
     btn.disabled = false;
     if (error){ toast(t('err.delete') + ' — ' + error.message, 'bad'); closeConfirm(); return }
-    ROWS.programs = ROWS.programs.filter(x => x.id !== id);
+    ORDERS = ORDERS.filter(o => o.id !== id);
     closeConfirm();
-    renderPrograms();
+    renderOrders();
     toast(t('ok.deleted'));
     return;
   }
@@ -4218,7 +3353,34 @@ const emptyBi = () => ({ ar:'', en:'' });
 
 /* الأقسام اللي تنطفي وتشتغل — الترتيب هنا هو ترتيب ظهورها بالصفحة.
    لازم المفاتيح تطابق SECTION_NODES بـ index.html */
-const SECTION_KEYS = ['trust','plans','about','reviews','faq','peek','cta'];
+const SECTION_KEYS = ['trust','services','about','reviews','plans','faq','cta'];
+
+/* مفاتيح «تشتغل بس إذا انشغلت» — عكس الأقسام: الناقص = مطفي.
+   تنخزن بنفس عمود sections. food و courses تقرر ظهور catalog.html،
+   و pay يقرر إذا زر الاشتراك يفتح Wayl أو واتساب.
+   لازم تطابق page() بـ index.html و applyPages() بـ catalog.html */
+const PAGE_KEYS = ['food','courses','pay'];
+const LANDING_GROUPS = (window.LANDING_SCHEMA || []);
+const LISTS_FALLBACK = (window.LANDING_LISTS || {});
+let CT_FALLBACK = new Set();   /* القوائم اللي انعبّت من المقترح لأن المحفوظ فاضي */
+
+/* نصوص الصفحة: المحفوظ فوق الافتراضي، حقل حقل */
+function mergeLanding(saved){
+  const out = {};
+  const D = window.LANDING_DEFAULTS || {};
+  LANDING_GROUPS.forEach(g => {
+    out[g.g] = {};
+    g.f.forEach(([k, , kind]) => {
+      const sv = saved && saved[g.g] && saved[g.g][k];
+      const dv = (D[g.g] || {})[k] || (kind === 'lines' ? { ar:[], en:[] } : emptyBi());
+      const src = (sv && typeof sv === 'object' && ('ar' in sv || 'en' in sv)) ? sv : dv;
+      out[g.g][k] = kind === 'lines'
+        ? { ar:[...(src.ar || [])], en:[...(src.en || [])] }
+        : { ar:src.ar || '', en:src.en || '' };
+    });
+  });
+  return out;
+}
 
 function loadContent(){
   const s = INFO || {};
@@ -4226,7 +3388,10 @@ function loadContent(){
   const savedSections = (s.sections && typeof s.sections === 'object') ? s.sections : {};
   CT = {
     /* الافتراضي ظاهر — المفتاح الناقص ما يخفي شي */
-    sections: Object.fromEntries(SECTION_KEYS.map(k => [k, savedSections[k] !== false])),
+    sections: Object.assign(
+      Object.fromEntries(SECTION_KEYS.map(k => [k, savedSections[k] !== false])),
+      Object.fromEntries(PAGE_KEYS.map(k => [k, savedSections[k] === true]))),
+    landing: mergeLanding(s.landing),
     hero_images: Array.isArray(s.hero_images) && s.hero_images.length
                    ? s.hero_images.slice()
                    : (s.hero_image ? [s.hero_image] : []),
@@ -4236,12 +3401,15 @@ function loadContent(){
     credit:       bi(s.credit),
     hero_image:   s.hero_image || '',
     about_image:  s.about_image || '',
-    stats:  JSON.parse(JSON.stringify(s.stats  || [])),
-    creds:  JSON.parse(JSON.stringify(s.creds  || [])),
-    plans:  JSON.parse(JSON.stringify(s.plans  || [])),
-    quotes: JSON.parse(JSON.stringify(s.quotes || [])),
-    faq:    JSON.parse(JSON.stringify(s.faq    || []))
   };
+  /* قائمة فاضية بالداتابيس = الصفحة تعرض المقترح من landing-defaults.js،
+     فنعرضه هنا هم حتى الكوتش تشوف بالضبط اللي يبين وتعدّل عليه */
+  CT_FALLBACK = new Set();
+  ['stats','creds','plans','quotes','faq'].forEach(k => {
+    const saved = Array.isArray(s[k]) ? s[k] : [];
+    if (!saved.length && (LISTS_FALLBACK[k] || []).length) CT_FALLBACK.add(k);
+    CT[k] = JSON.parse(JSON.stringify(saved.length ? saved : (LISTS_FALLBACK[k] || [])));
+  });
 }
 
 /* حقل ثنائي اللغة — سطر واحد أو منطقة نص */
@@ -4317,6 +3485,42 @@ function heroImagesBlock(){
   </div>`;
 }
 
+/* مفاتيح الصفحات والدفع — الافتراضي مطفي */
+function pagesBlock(){
+  return `<p class="hint">${esc(t('ct.pagesHint'))}</p>
+  <div class="sec-toggles">
+    ${PAGE_KEYS.map(k => `
+      <label class="sec-row${CT.sections[k] ? '' : ' off'}">
+        <span class="sec-name">${esc(t('page.' + k))}</span>
+        <span class="sec-state">${esc(t(CT.sections[k] ? 'sec.on' : 'sec.off'))}</span>
+        <span class="switch">
+          <input type="checkbox" data-ct="sections.${k}"${CT.sections[k] ? ' checked' : ''}>
+          <span class="track"></span>
+        </span>
+      </label>`).join('')}
+  </div>`;
+}
+
+/* حقل نص من نصوص الصفحة (landing.<group>.<key>) */
+function landingField(g, k, label, kind){
+  const v = CT.landing[g][k];
+  if (kind === 'lines'){
+    const mk = (lng, cls) => `<span class="side ${cls}">
+        <span class="flag">${lng}</span>
+        <textarea class="inp" rows="5" data-ctlines="landing.${g}.${k}.${cls}"${cls === 'en' ? ' dir="ltr"' : ''}>${esc((v[cls] || []).join('\n'))}</textarea>
+      </span>`;
+    return `<div class="field"><span class="lbl-txt">${esc(label)}</span>
+      <div class="bi">${mk('عربي','ar')}${mk('English','en')}</div>
+      <p class="hint">${esc(t('ct.linesHint'))}</p></div>`;
+  }
+  return biField(label, `landing.${g}.${k}`, v, kind === 'area' || kind === 'title') +
+    (kind === 'title' ? `<p class="hint">${esc(t('ct.titleHint2'))}</p>` : '');
+}
+function landingGroup(g){
+  return g.f.map(([k, label, kind]) => landingField(g.g, k, label, kind)).join('');
+}
+const fallbackNote = k => CT_FALLBACK.has(k) ? `<p class="hint" style="color:var(--brand-ink)">${esc(t('ct.fallbackHint'))}</p>` : '';
+
 /* مفاتيح إظهار/إخفاء الأقسام */
 function sectionsBlock(){
   const on = SECTION_KEYS.filter(k => CT.sections[k] !== false).length;
@@ -4339,14 +3543,17 @@ function drawContent(){
   if (!CT) loadContent();
   const b = v => (v && typeof v === 'object') ? v : emptyBi();
 
-  let h = acc('sections', 'i-eye', t('ct.sections'), t('ct.sectionsSub'),
+  const G = Object.fromEntries(LANDING_GROUPS.map(g => [g.g, g]));
+  const grp = (id, extra) => G[id] ? acc('l-' + id, G[id].icon, G[id].t, null, null, landingGroup(G[id]) + (extra || '')) : '';
+
+  let h = acc('pages', 'i-globe', t('ct.pages'), t('ct.pagesSub'),
+              PAGE_KEYS.filter(k => CT.sections[k]).length, pagesBlock());
+
+  h += acc('sections', 'i-eye', t('ct.sections'), t('ct.sectionsSub'),
               SECTION_KEYS.filter(k => CT.sections[k] !== false).length, sectionsBlock());
 
-  h += acc('hero', 'i-spark', t('ct.hero'), t('ct.heroSub'), null, `
-    ${biField(t('ct.eyebrow'), 'hero_eyebrow', CT.hero_eyebrow)}
-    ${biField(t('ct.title'),   'hero_title',   CT.hero_title, true)}
-    <p class="hint">${esc(t('ct.titleHint'))}</p>
-    ${biField(t('ct.sub'),     'hero_sub',     CT.hero_sub, true)}`);
+  h += grp('nav');
+  h += grp('intro');
 
   h += acc('heroimgs', 'i-image', t('ct.heroImgs'), t('ct.heroImgsSub'),
            (CT.hero_images || []).length, heroImagesBlock());
@@ -4365,24 +3572,35 @@ function drawContent(){
     </div>`);
 
   h += acc('stats', 'i-spark', t('ct.stats'), t('ct.statsSub'), (CT.stats || []).length,
-    listBlock('stats', t('ct.stat'), t('ct.addStat'), s => `
+    fallbackNote('stats') + listBlock('stats', t('ct.stat'), t('ct.addStat'), s => `
       ${biField(t('ct.statN'), `stats.${CT.stats.indexOf(s)}.n`, b(s.n))}
       ${biField(t('ct.statL'), `stats.${CT.stats.indexOf(s)}.l`, b(s.l))}`));
 
+  h += grp('marquee');
+  h += grp('services');
   h += acc('creds', 'i-shield', t('ct.creds'), t('ct.credsSub'), (CT.creds || []).length,
-    listBlock('creds', t('ct.cred'), t('ct.addCred'), (c, i) => `
+    fallbackNote('creds') + listBlock('creds', t('ct.cred'), t('ct.addCred'), (c, i) => `
     <div class="field">
       <label>${esc(t('ct.icon'))}</label>
       <select class="inp" data-ct="creds.${i}.icon">
-        ${['i-shield','i-book','i-users','i-calendar','i-check-circle','i-dumbbell','i-salad']
+        ${['i-dumbbell','i-salad','i-calendar','i-users','i-shield','i-book','i-check-circle','i-flame','i-heart','i-star','i-spark']
           .map(v => `<option value="${v}"${v === c.icon ? ' selected' : ''}>${v}</option>`).join('')}
       </select>
     </div>
     ${biField(t('ct.credT'), `creds.${i}.t`, b(c.t))}
     ${biField(t('ct.credS'), `creds.${i}.s`, b(c.s))}`));
 
+  h += grp('about', `<p class="hint">${esc(t('ct.bioHint'))}</p>`);
+  h += grp('reviews');
+  h += acc('quotes', 'i-star', t('ct.quotes'), t('ct.quotesSub'), (CT.quotes || []).length,
+    `<p class="hint">${esc(t('ct.quotesHint'))}</p>` + fallbackNote('quotes') + listBlock('quotes', t('ct.quote'), t('ct.addQuote'), (q, i) => `
+      ${biField(t('ct.quoteT'), `quotes.${i}.t`, b(q.t), true)}
+      ${biField(t('ct.quoteN'), `quotes.${i}.n`, b(q.n))}
+      ${biField(t('ct.quoteR'), `quotes.${i}.r`, b(q.r))}`));
+
+  h += grp('plans');
   h += acc('plans', 'i-check-circle', t('ct.plans'), t('ct.plansSub'), (CT.plans || []).length,
-    listBlock('plans', t('ct.plan'), t('ct.addPlan'), (p, i) => `
+    fallbackNote('plans') + listBlock('plans', t('ct.plan'), t('ct.addPlan'), (p, i) => `
     <label class="switch">
       <input type="checkbox" data-ct="plans.${i}.featured"${p.featured ? ' checked' : ''}>
       <span class="track"></span><span class="lbl-txt">${esc(t('ct.featured'))}</span>
@@ -4391,6 +3609,12 @@ function drawContent(){
     ${biField(t('ct.planTag'),  `plans.${i}.tag`,   b(p.tag))}
     ${biField(t('ct.planPrice'),`plans.${i}.price`, b(p.price))}
     ${biField(t('ct.planUnit'), `plans.${i}.unit`,  b(p.unit))}
+    <div class="field">
+      <label class="lbl-txt" for="pamt${i}">${esc(t('ct.planAmount'))}</label>
+      <input class="inp" id="pamt${i}" inputmode="numeric" dir="ltr" data-num
+             data-ct="plans.${i}.amount" value="${esc(p.amount ?? '')}">
+      <p class="hint">${esc(t('ct.planAmountHint'))}</p>
+    </div>
     ${biField(t('ct.planDesc'), `plans.${i}.desc`,  b(p.desc), true)}
     <div class="field">
       <span class="lbl-txt">${esc(t('ct.features'))}</span>
@@ -4422,19 +3646,16 @@ function drawContent(){
       </div>
     </div>`));
 
-  h += acc('quotes', 'i-star', t('ct.quotes'), t('ct.quotesSub'), (CT.quotes || []).length,
-    listBlock('quotes', t('ct.quote'), t('ct.addQuote'), (q, i) => `
-      ${biField(t('ct.quoteT'), `quotes.${i}.t`, b(q.t), true)}
-      ${biField(t('ct.quoteN'), `quotes.${i}.n`, b(q.n))}
-      ${biField(t('ct.quoteR'), `quotes.${i}.r`, b(q.r))}`));
-
+  h += grp('faq');
   h += acc('faq', 'i-info', t('ct.faqs'), t('ct.faqsSub'), (CT.faq || []).length,
-    listBlock('faq', t('ct.faq'), t('ct.addFaq'), (f, i) => `
+    fallbackNote('faq') + listBlock('faq', t('ct.faq'), t('ct.addFaq'), (f, i) => `
       ${biField(t('ct.faqQ'), `faq.${i}.q`, b(f.q))}
       ${biField(t('ct.faqA'), `faq.${i}.a`, b(f.a), true)}`));
 
-  h += acc('credit', 'i-book', t('ct.credit'), t('ct.creditSub'), null,
-    biField('', 'credit', CT.credit));
+
+  h += grp('contact');
+  h += grp('footer');
+  h += grp('pay');
 
   h += `<div class="savebar">
     <button class="btn btn-primary" id="ctSave" type="button">${ico('i-check')}${esc(t('app.save'))}</button>
@@ -4456,7 +3677,16 @@ function syncContent(){
       node = node[k];
     }
     const last = parts[parts.length - 1];
-    node[last] = el.type === 'checkbox' ? el.checked : el.value;
+    node[last] = el.type === 'checkbox' ? el.checked
+               /* نص مو type=number — كيبورد التلفون العربي يكتب ٦٥٠٠٠ وحقل الأرقام يرفضها */
+               : el.hasAttribute('data-num') ? (String(latinizeDeep(el.value)).replace(/[^\d]/g, '') === '' ? null
+                                               : +String(latinizeDeep(el.value)).replace(/[^\d]/g, ''))
+               : el.value;
+  });
+  /* القوائم سطر بسطر (الشريط المتحرك) */
+  $$('#contentBody [data-ctlines]').forEach(el => {
+    const [, g, k, lng] = el.dataset.ctlines.split('.');
+    CT.landing[g][k][lng] = el.value.split('\n').map(x => x.trim()).filter(Boolean);
   });
 }
 
@@ -4470,7 +3700,7 @@ async function saveContent(){
     .update(latinizeDeep({
       hero_eyebrow:CT.hero_eyebrow, hero_title:CT.hero_title, hero_sub:CT.hero_sub,
       credit:CT.credit, about_image:CT.about_image,
-      hero_images:CT.hero_images, sections:CT.sections,
+      hero_images:CT.hero_images, sections:CT.sections, landing:CT.landing,
       /* أول صورة تبقى بـ hero_image لأن og:image يعتمد عليها */
       hero_image:CT.hero_images[0] || '',
       stats:CT.stats, creds:CT.creds, plans:CT.plans, quotes:CT.quotes, faq:CT.faq
@@ -4478,9 +3708,102 @@ async function saveContent(){
     .eq('id', 1).select().single();
 
   btn.disabled = false; btn.textContent = t('app.save');
-  if (error){ err.textContent = t('err.save') + ' — ' + error.message; return }
+  if (error){
+    /* عمود landing ينضاف بـ landing.sql — إذا ما انفّذ بعد، نقول هالشي بوضوح */
+    err.textContent = t('err.save') + ' — ' + error.message +
+      (/landing/.test(error.message) ? ' (نفّذي ملف landing.sql على Supabase)' : '');
+    return;
+  }
   INFO = data;
+  CT_FALLBACK = new Set();
+  drawContent();
   toast(t('ok.saved'));
+}
+
+/* ══════════════════════════════════════════════════════════
+   ⑩ج  الطلبات — اشتراكات Wayl
+   ══════════════════════════════════════════════════════════
+   الصفوف تنكتب من دالة wayl-checkout بس (مفتاح السيرفر). من هنا
+   الكوتش تقرا، تعلّم «تواصلت»، أو تحذف — ماكو إضافة يدوية.
+   الحالة «مدفوع» تنحط بعد ما الدالة تسأل Wayl نفسه. */
+let ORDERS = [], OFILTER = 'all', ORD_MISSING = false;
+
+async function loadOrders(){
+  $('#ordList').innerHTML = '<div class="skel"></div><div class="skel"></div>';
+  const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending:false }).limit(500);
+  ORD_MISSING = !!error;
+  ORDERS = error ? [] : (data || []);
+  renderOrders();
+}
+
+const ORD_STATES = ['paid','pending','failed','cancelled'];
+function renderOrders(){
+  const counts = Object.fromEntries(ORD_STATES.map(k => [k, ORDERS.filter(o => o.status === k).length]));
+  $('#ordChips').innerHTML = ['all', ...ORD_STATES].filter(k => k === 'all' || counts[k]).map(k =>
+    `<button class="chip" type="button" data-of="${k}" aria-pressed="${OFILTER === k}">
+       ${esc(t('ord.' + k))} <span class="num">${k === 'all' ? ORDERS.length : counts[k]}</span></button>`).join('');
+  const sum = ORDERS.filter(o => o.status === 'paid').reduce((a, o) => a + (+o.amount || 0), 0);
+  $('#ordCount').textContent = t('ord.count', { n:ORDERS.length, sum:sum.toLocaleString('en-US') });
+
+  if (ORD_MISSING){
+    $('#ordList').innerHTML = `<div class="empty">${ico('i-alert')}<b>${esc(t('ord.missing'))}</b></div>`;
+    return;
+  }
+  const rows = OFILTER === 'all' ? ORDERS : ORDERS.filter(o => o.status === OFILTER);
+  if (!rows.length){
+    $('#ordList').innerHTML = `<div class="empty">${ico('i-receipt')}<b>${esc(t('ord.empty'))}</b>
+      <span>${esc(t('ord.emptySub'))}</span></div>`;
+    return;
+  }
+  const pillCls = { paid:'on', pending:'', failed:'offp', cancelled:'offp' };
+  const when = d => new Date(d).toLocaleString(LANG === 'ar' ? 'ar-IQ-u-nu-latn' : 'en-GB',
+                    { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+  $('#ordList').innerHTML = rows.map(o => {
+    const wa = 'https://wa.me/' + String(o.phone).replace(/^\+/, '').replace(/^0/, '964');
+    return `<article class="row${o.status === 'paid' ? '' : ' off'}">
+      <span class="row-thumb">${ico(o.status === 'paid' ? 'i-check-circle' : 'i-receipt')}</span>
+      <div class="row-main">
+        <h3>${esc(o.name)} <span class="num" style="font-weight:500;color:var(--soft)" dir="ltr">${esc(o.phone)}</span></h3>
+        <div class="row-meta">
+          <span class="pill ${pillCls[o.status] || ''}">${esc(t('ord.' + o.status))}</span>
+          <span>${esc(o.plan_name)}</span>
+          <span class="num">${(+o.amount).toLocaleString('en-US')} ${esc(o.currency || 'IQD')}</span>
+          <span class="num">${esc(when(o.created_at))}</span>
+          ${o.contacted ? `<span class="pill on">${esc(t('ord.contacted'))}</span>` : ''}
+        </div>
+      </div>
+      <div class="row-acts">
+        <a class="btn btn-quiet btn-sm" href="${esc(wa)}" target="_blank" rel="noopener"
+           aria-label="${esc(t('ord.wa'))}" title="${esc(t('ord.wa'))}">${ico('i-whatsapp')}<span>${esc(t('ord.wa'))}</span></a>
+        <button class="btn btn-ghost btn-sm" type="button" data-oc="${o.id}"
+                aria-pressed="${!!o.contacted}" title="${esc(t(o.contacted ? 'ord.contacted' : 'ord.notContacted'))}">
+          ${ico(o.contacted ? 'i-check-circle' : 'i-check')}<span>${esc(t(o.contacted ? 'ord.contacted' : 'ord.notContacted'))}</span></button>
+        <button class="btn btn-quiet btn-sm" type="button" data-od="${o.id}" style="color:var(--clay-ink)"
+                aria-label="${esc(t('app.delete'))}" title="${esc(t('app.delete'))}">${ico('i-trash')}<span>${esc(t('app.delete'))}</span></button>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+async function toggleContacted(id){
+  const o = ORDERS.find(x => x.id === id); if (!o) return;
+  const next = !o.contacted;
+  o.contacted = next; renderOrders();
+  const { error } = await sb.from('orders').update({ contacted:next }).eq('id', id);
+  if (error){ o.contacted = !next; renderOrders(); toast(t('err.save') + ' — ' + error.message, 'bad') }
+}
+
+function askDeleteOrder(id){
+  const o = ORDERS.find(x => x.id === id); if (!o) return;
+  PENDING_DELETE = { kind:'order', id };
+  $('#confirmTitle').textContent = t('ord.delTitle');
+  $('#confirmText').textContent  = t('ord.delText', { x:o.name });
+  const c = $('#confirm');
+  lastFocus = document.activeElement;
+  c.hidden = false;
+  requestAnimationFrame(() => c.classList.add('open'));
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(() => $('#delNo').focus());
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -4532,1550 +3855,6 @@ async function saveInfo(e){
   $('#brandName').textContent = INFO.name;
   $('#brandMark').textContent = INFO.initial;
   toast(t('ok.saved'));
-}
-
-/* ══════════════════════════════════════════════════════════
-   ⑪ب  كتابة كورسات — برامج المتمرنين
-   ══════════════════════════════════════════════════════════
-
-   البرامج **ما تظهر بالموقع العام أبداً**. مخرجها الوحيد ورقة A4
-   تنطبع PDF وترسلها الكوتش للمشترك يدوياً. لذلك جدول `programs`
-   مقفل بالكامل — مشرفة فقط، بدون سياسة anon. شوف programs.sql.
-   ══════════════════════════════════════════════════════════ */
-
-const PG_ACCENTS = ['#B07D62','#C2410C','#0E7C66','#A62F40','#4A5D7E','#6B5B95','#3A3A3A'];
-
-/* التصميم الافتراضي — ينغلب عليه بـ INFO.program_design إذا الكوتش
-   ضبطت تصميمها، وبعدين بتصميم البرنامج نفسه */
-const PG_DESIGN_BASE = {
-  logo:'', logoPos:'right', cover:true, accent:'#B07D62', mono:false,
-  footer:'', pageNum:true, logCols:3, showEn:true, showVideo:true, qr:false,
-  theme:'clean'
-};
-
-/* ── الإطالات: ثابتة بكل برنامج، فما نخلي الكوتش تعيد كتابتها ──
-   نفس محتوى ملف «الإطالات المتحركة والثابتة». تنضاف بصفحتين
-   بآخر برنامج التمارين لمن يكون مفتاح stretch شغّال. */
-const STRETCH_PRESET = {
-  upper: {
-    before: [
-      { n:'دوائر الذراعين',                    en:'Arm Circles',        d:'10 – 15 مرة' },
-      { n:'تمرير العصا فوق الرأس وخلف الجسم',  en:'Stick Pass-Throughs',d:'10 – 15 مرة' },
-      { n:'لف الجذع الديناميكي',               en:'Torso Rotations',    d:'10 – 15 مرة' },
-      { n:'تأرجح الذراعين',                    en:'Arm Swings',         d:'10 – 15 مرة' }
-    ],
-    after: [
-      { n:'استطالة الصدر',                     en:'Chest Stretch',      d:'20 – 30 ثانية' },
-      { n:'استطالة الظهر',                     en:'Back Stretch',       d:'20 – 30 ثانية' },
-      { n:'استطالة الترايسبس',                 en:'Triceps Stretch',    d:'20 – 30 ثانية' },
-      { n:'استطالة الكتف',                     en:'Shoulder Stretch',   d:'20 – 30 ثانية' }
-    ]
-  },
-  lower: {
-    before: [
-      { n:'تأرجح الساق للأمام والخلف',         en:'Leg Swings',         d:'10 – 15 مرة' },
-      { n:'الخطوات الأمامية',                  en:'Walking Lunges',     d:'10 – 15 مرة' },
-      { n:'دوائر الورك',                       en:'Hip Circles',        d:'10 – 15 مرة' },
-      { n:'رفع الركبتين عالياً',                en:'High Knees',         d:'10 – 15 مرة' }
-    ],
-    after: [
-      { n:'استطالة العضلات الخلفية للفخذ',      en:'Hamstring Stretch',  d:'20 – 30 ثانية' },
-      { n:'استطالة العضلات الأمامية للفخذ',     en:'Quadriceps Stretch', d:'20 – 30 ثانية' },
-      { n:'استطالة الورك',                     en:'Hip Flexor Stretch', d:'20 – 30 ثانية' },
-      { n:'استطالة عضلات الفخذ الداخلي',        en:'Adductor Stretch',   d:'20 – 30 ثانية' }
-    ]
-  }
-};
-
-const STRETCH_NOTE_DYN = 'الإطالات المتحركة تُؤدى بحركة مستمرة ومتحكم بها — لا تثبت على وضعية معينة، ولا توصل نفسك لحد الألم.';
-const STRETCH_NOTE_ST  = 'بالإطالات الثابتة: ثبّت على الوضعية وتنفّس بهدوء، ولا تهزّ الجسم أو تندفع بالحركة.';
-
-/* ══════════════════════════════════════════════════════════
-   مكتبة التمارين
-   ══════════════════════════════════════════════════════════
-
-   ⚠️ **ماكو جدول للمكتبة بالداتابيس، وهذا مقصود.**
-   المكتبة تنبني بالذاكرة من شغلتين: بذرة ثابتة بالكود (تمارين الأجهزة
-   المعروفة)، و**كل تمرين انكتب بأي برنامج سابق**. يعني تكبر لحالها كل
-   ما الكوتش تكتب برنامج، وتشتغل بأثر رجعي على كل اللي انكتب من زمان،
-   بدون جدول جديد ولا صلاحيات ولا شغل إدارة زايد.
-
-   نفس فلسفة جدول MARKET بالموقع العام: نستنتج من البيانات الموجودة
-   بدل ما نطلب من الكوتش تملي حقل زايد. */
-
-const EX_SEED = [
-  /* أجهزة المقاومة — الجزء العلوي */
-  { n:'ضغط الصدر بالجهاز',           en:'BENCH PRESS MACHINE',          m:'الصدر' },
-  { n:'ضغط الصدر المائل بالجهاز',    en:'INCLINE CHEST PRESS MACHINE',  m:'الصدر' },
-  { n:'السحب الأمامي بالجهاز',       en:'LAT PULLDOWN MACHINE',         m:'الظهر' },
-  { n:'التجديف جالساً بالكيبل',       en:'CABLE SEATED ROW',             m:'الظهر' },
-  { n:'ضغط الكتف بالدمبل',           en:'DUMBBELL SHOULDER PRESS',      m:'الكتف' },
-  { n:'الرفرفة الجانبية بالدمبل',     en:'DUMBBELL LATERAL RAISE',       m:'الكتف' },
-  { n:'دفع الحبل للترايسبس',         en:'TRICEP ROPE PUSHDOWN',         m:'ترايسبس' },
-  { n:'تجميع مائل بالدمبل',          en:'INCLINE DUMBBELL CURL',        m:'بايسبس' },
-  /* أجهزة المقاومة — الجزء السفلي */
-  { n:'دفع الحوض بالجهاز',           en:'HIP THRUST MACHINE',           m:'جلوتس' },
-  { n:'تمديد الساق بالجهاز',         en:'LEG EXTENSION MACHINE',        m:'أمامية الفخذ' },
-  { n:'ضغط الرجل بالجهاز',           en:'LEG PRESS MACHINE',            m:'أمامية الفخذ' },
-  { n:'ثني الساق بالجهاز',           en:'LEG CURL MACHINE',             m:'خلفية الفخذ' },
-  { n:'ضم الأفخاذ جالساً',            en:'SEATED ADDUCTION MACHINE',     m:'الفخذ الداخلي' },
-  { n:'فتح الأفخاذ جالساً',           en:'SEATED ABDUCTION MACHINE',     m:'الفخذ الخارجي' },
-  { n:'تمرين البطن بالجهاز',         en:'ABDOMINAL CRUNCH MACHINE',     m:'البطن' },
-  { n:'رفع السمانة جالساً',           en:'SEATED CALF RAISE MACHINE',    m:'السمانة' },
-  /* وزن الجسم */
-  { n:'سكوات مع رفع الركبة',         en:'SQUAT KNEE DRIVE',             m:'' },
-  { n:'ضغط مائل على سطح مرتفع',      en:'INCLINE PUSH-UP',              m:'' },
-  { n:'خطوة خلفية مع رفع الركبة',    en:'REVERSE LUNGE KNEE DRIVE',     m:'' },
-  { n:'متسلق الجبل على سطح مرتفع',   en:'ELEVATED MOUNTAIN CLIMBERS',   m:'' },
-  { n:'مشي سريع برفع الركبتين',      en:'FAST HIGH-KNEE MARCH',         m:'' },
-  /* كارديو */
-  { n:'جهاز المشي',                  en:'TREADMILL',                    m:'' },
-  { n:'جهاز التجديف',                en:'ROWING MACHINE',               m:'' }
-];
-
-let EX_INDEX = new Map();   /* اسم مُطبَّع → {n,en,m,v} */
-
-/* تنبني من البذرة أول، وبعدين برامج الكوتش تغلب عليها — لأن اللي
-   كتبته هي بيدها (ورابط فيديو ناديها) أدق من الافتراضي */
-function buildExIndex(){
-  EX_INDEX = new Map();
-  const put = o => {
-    const k = norm(o.n);
-    if (!k) return;
-    const old = EX_INDEX.get(k) || {};
-    /* ما ندوس على قيمة موجودة بقيمة فاضية */
-    EX_INDEX.set(k, { n:o.n, en:o.en || old.en || '', m:o.m || old.m || '', v:o.v || old.v || '' });
-  };
-  EX_SEED.forEach(put);
-  [...ROWS.programs].sort((a,b) => new Date(a.updated_at || a.created_at) - new Date(b.updated_at || b.created_at)).forEach(p => {
-    if (p.kind !== 'training') return;
-    ((p.content || {}).days || []).forEach(day =>
-      (day.rows || []).forEach(r => { if (r && r.n) put(r) }));
-  });
-  const dl = $('#pg-exlist');
-  if (dl) dl.innerHTML = [...EX_INDEX.values()]
-    .map(o => `<option value="${esc(o.n)}">${esc([o.en,o.m].filter(Boolean).join(" · "))}</option>${o.en ? `<option value="${esc(o.en)}">${esc(o.n)} · ${esc(o.m)}</option>` : ""}`).join('');
-}
-
-/* لمن تكتب الكوتش اسم تمرين معروف، نملي الحقول الفاضية بس —
-   ⚠️ ما ندوس على شي كتبته هي، حتى لو مختلف عن المكتبة */
-function autofillExercise(input){
-  const row = input.closest('.erow'); if (!row) return;
-  const hit = [...EX_INDEX.values()].find(x => norm(x.n) === norm(input.value) || norm(x.en) === norm(input.value));
-  if (!hit) return;
-  input.value = hit.n;
-  [['.en-in', hit.en], ['.m-in', hit.m], ['.v-in', hit.v]].forEach(([sel, val]) => {
-    const el = row.querySelector(sel);
-    if (el && (!el.value.trim() || el.value === el.dataset.autofill)) {
-      el.value = val || ''; el.dataset.autofill = el.value;
-    }
-  });
-}
-
-/* نسخة قابلة للتعديل من البذرة — JSON.parse حتى ما تنمسّ STRETCH_PRESET
-   نفسها. لو انمسّت، أول تعديل بالإطالات ينسحب على كل البرامج الجاية. */
-const freshStretches = () => JSON.parse(JSON.stringify(STRETCH_PRESET));
-
-/* الإطالات الفعلية للبرنامج المفتوح.
-   ⚠️ البرامج المحفوظة قبل ما تصير الإطالات قابلة للتعديل ماكو بيها
-   stretchList — ترجع للبذرة بدل ما تطلع فاضية. */
-function pgStretches(){
-  const c = PG.content;
-  if (!c.stretchList) c.stretchList = freshStretches();
-  const L = c.stretchList;
-  ['upper','lower'].forEach(part => {
-    if (!L[part]) L[part] = { before:[], after:[] };
-    ['before','after'].forEach(ph => {
-      if (!Array.isArray(L[part][ph])) L[part][ph] = [];
-    });
-  });
-  return L;
-}
-
-let PG      = null;   /* مسودة البرنامج المفتوح */
-let PG_EDIT = null;   /* الصف الأصلي أو null للجديد */
-
-const pgDesign = () => Object.assign({}, PG_DESIGN_BASE,
-  (INFO && INFO.program_design) || {}, (PG && PG.design) || {});
-
-function blankProgram(kind){
-  const d = Object.assign({}, PG_DESIGN_BASE, (INFO && INFO.program_design) || {});
-  const base = {
-    kind, title:'', is_template:false,
-    sort_order:(ROWS.programs.length + 1),
-    trainee:{ name:'', height:'', weight:'', start:'', daysPerWeek:4,
-              weeks:8, coach:(INFO && INFO.name) || '' },
-    design:d,
-    content: kind === 'training'
-      ? { days:[], stretch:true }
-      : { meals:[], habits:[], tracker:true }
-  };
-  return base;
-}
-
-/* ── القائمة ── */
-function visiblePrograms(){
-  const s = norm($('#pgQ').value);
-  return ROWS.programs.filter(p =>
-    !s || norm(p.title).includes(s) || norm((p.trainee || {}).name).includes(s));
-}
-
-function renderPrograms(){
-  const rows = visiblePrograms();
-  $('#pgCount').textContent = rows.length + ' ' + t('pg.count');
-  if (!rows.length){
-    $('#pgList').innerHTML = `<div class="empty">${ico('i-clipboard')}
-      <b>${esc(t('pg.empty'))}</b><span>${esc(t('pg.emptySub'))}</span></div>`;
-    return;
-  }
-  $('#pgList').innerHTML = rows.map(p => {
-    const tr = p.trainee || {};
-    const kindTxt = p.kind === 'nutrition' ? t('pg.newNutrition') : t('pg.newTraining');
-    const kindIco = p.kind === 'nutrition' ? 'i-salad' : 'i-dumbbell';
-    const n = p.kind === 'nutrition'
-      ? ((p.content || {}).meals || []).length + ' ' + t('pg.meals')
-      : ((p.content || {}).days  || []).length + ' ' + t('pg.days');
-    return `<div class="row">
-      <div class="row-thumb">${ico(kindIco)}</div>
-      <div class="row-main">
-        <h3>${esc(p.title)}</h3>
-        <div class="row-meta">
-          ${p.is_template ? `<span class="pill on">${esc(t('pg.template'))}</span>` : ''}
-          <span class="pill">${esc(kindTxt)}</span>
-          ${tr.name ? `<span>${ico('i-user')} ${esc(tr.name)}</span>` : ''}
-          <span>${esc(n)}</span>
-        </div>
-      </div>
-      <div class="row-acts">
-        <button class="btn btn-quiet btn-sm" type="button" data-pg="edit" data-id="${esc(p.id)}">
-          ${ico('i-edit')}${esc(t('app.edit'))}</button>
-        <button class="btn btn-quiet btn-sm" type="button" data-pg="print" data-id="${esc(p.id)}">
-          ${ico('i-print')}${esc(t('pg.print'))}</button>
-        <button class="btn btn-quiet btn-sm" type="button" data-pg="dup" data-id="${esc(p.id)}">
-          ${ico('i-copy')}${esc(t('pg.dupTrainee'))}</button>
-        <button class="btn btn-quiet btn-sm" type="button" data-pg="del" data-id="${esc(p.id)}">
-          ${ico('i-trash')}${esc(t('app.delete'))}</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-/* ── فتح وإغلاق المحرر ── */
-let pgBaseline = '', pgSaving = false, pgOwner = '', pgDraftKey = '';
-const pgText = (ar,en) => document.documentElement.lang === 'en' ? en : ar;
-function pgDirty(){ return PG && JSON.stringify(PG) !== pgBaseline }
-function persistPgDraft(){
-  if (!PG || !pgOwner || !pgDirty()) return;
-  try { localStorage.setItem(pgDraftKey, JSON.stringify({at:Date.now(), program:PG}));
-    const status = $('#pgDraftStatus'); if(status) status.textContent = pgText('المسودة محفوظة على هذا الجهاز','Draft saved on this device');
-  } catch(e) { const status=$('#pgDraftStatus'); if(status) status.textContent=pgText('تعذر حفظ المسودة محلياً — احفظي البرنامج','Local draft unavailable — save the program'); }
-}
-function openProgram(row){
-  clearTimeout(prevTimer);
-  $('#pgDraftStatus').textContent = '';
-  pgDraftKey = 'cz-program-draft:' + pgOwner + ':' + (row?.id || ('new-' + row?.kind));
-  const original = row;
-  try {
-    const saved = JSON.parse(localStorage.getItem(pgDraftKey));
-    if(saved?.program && Date.now()-saved.at < 30*86400000 && saved.program.kind === row.kind &&
-       confirm(pgText('توجد مسودة غير محفوظة. تريدين استرجاعها؟','Restore your unsaved draft?'))) row = saved.program;
-  } catch(e){}
-  pgBaseline = JSON.stringify(original);
-  /* ⚠️ وجود `id` هو اللي يفرّق التعديل عن الإضافة — مو وجود الصف نفسه.
-     البرنامج الجديد والنسخة الجديدة الثنين ينوصلون كصف كامل بلا id،
-     ولو حسبناهم تعديل چان الحفظ يسوي update على id غير موجود. */
-  PG_EDIT = (row && row.id) ? row : null;
-  PG = row ? JSON.parse(JSON.stringify(row)) : null;
-  if (!PG) return;
-  PG.trainee = PG.trainee || {};
-  PG.design  = PG.design  || {};
-  PG.content = PG.content || {};
-  if (PG.kind === 'training'){
-    PG.content.days = Array.isArray(PG.content.days) ? PG.content.days : [];
-  } else {
-    PG.content.meals  = Array.isArray(PG.content.meals)  ? PG.content.meals  : [];
-    PG.content.habits = Array.isArray(PG.content.habits) ? PG.content.habits : [];
-  }
-  drawProgram();
-  const m = $('#pgModal');
-  lastFocus = document.activeElement;
-  m.hidden = false;
-  syncProgram();
-  if(row === original) pgBaseline = JSON.stringify(PG);
-  $('#pgSplit').dataset.view = 'edit';
-  $$('.pg-seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pgview === 'edit')));
-  requestAnimationFrame(() => m.classList.add('open'));
-  document.body.style.overflow = 'hidden';
-  watchPreview();
-  drawPreview();
-  requestAnimationFrame(() => $('#pg-title')?.focus());
-}
-
-function closeProgram(force = false){
-  if(pgSaving) return;
-  syncProgram();
-  if(!force && pgDirty()) {
-    persistPgDraft();
-    if(!confirm(pgText('عندك تعديلات غير محفوظة. تغلقين المحرر؟','You have unsaved changes. Close the editor?'))) return;
-  }
-  clearTimeout(prevTimer);
-  const m = $('#pgModal');
-  m.classList.remove('open');
-  document.body.style.overflow = '';
-  m.hidden = true; PG = null; PG_EDIT = null;
-  lastFocus?.focus();
-}
-
-/* ── قراءة الحقول من الـDOM للمسودة ──
-   تنتادى قبل أي إعادة رسم حتى ما يضيع اللي انكتب، نفس مبدأ
-   syncRows()/syncBase() بفورم الوصفات */
-function syncProgram(){
-  if (!PG || $('#pgModal').hidden) return;
-  const v = id => ($('#' + id)?.value ?? '').trim();
-
-  PG.title = $('#pg-title')?.value.trim() ?? PG.title;
-  PG.is_template = $('#pg-template')?.checked ?? PG.is_template;
-
-  PG.trainee = {
-    name:v('pg-tName'), height:v('pg-tHeight'), weight:v('pg-tWeight'),
-    start:v('pg-tStart'), coach:v('pg-tCoach'),
-    daysPerWeek:nz($('#pg-tDays')?.value) || '', weeks:nz($('#pg-tWeeks')?.value) || ''
-  };
-
-  const d = PG.design;
-  if ($('#pg-dFooter'))   d.footer    = v('pg-dFooter');
-  if ($('#pg-dCover'))    d.cover     = $('#pg-dCover').checked;
-  if ($('#pg-dMono'))     d.mono      = $('#pg-dMono').checked;
-  if ($('#pg-dPageNum'))  d.pageNum   = $('#pg-dPageNum').checked;
-  if ($('#pg-dShowEn'))   d.showEn    = $('#pg-dShowEn').checked;
-  if ($('#pg-dShowVideo'))d.showVideo = $('#pg-dShowVideo').checked;
-  if ($('#pg-dQr'))       d.qr        = $('#pg-dQr').checked;
-  const th = $('#pg-dTheme input:checked'); if (th) d.theme = th.value;
-  if ($('#pg-dLogCols'))  d.logCols   = nz($('#pg-dLogCols').value);
-  if ($('#pg-dLogoPos'))  d.logoPos   = $('#pg-dLogoPos').value;
-
-  if (PG.kind === 'training'){
-    if ($('#pg-stretch')) PG.content.stretch = $('#pg-stretch').checked;
-    if ($('#pgBody .erow.pgstr')){
-      const L = pgStretches();
-      $$('#pgBody .erow.pgstr').forEach(r => {
-        const list = L[r.dataset.str] && L[r.dataset.str][r.dataset.phase];
-        const o = list && list[+r.dataset.i]; if (!o) return;
-        o.n  = r.querySelector('.n-in')?.value.trim()  ?? o.n;
-        o.en = r.querySelector('.en-in')?.value.trim() ?? o.en;
-        o.d  = r.querySelector('.d-in')?.value.trim()  ?? o.d;
-      });
-    }
-    /* ⚠️ `details[data-day]` مو `[data-day]` المجرّدة — أزرار «إضافة
-       تمرين» و«حذف» تحمل نفس الخاصية، والحلقة چانت تمر عليها بعد.
-       الحقول تنجو بـ `?? old` لأن querySelector يرجع null، بس
-       العضلات چانت تنمسح: '' تنقسم لمصفوفة فاضية وتطبّق على اليوم. */
-    $$('#pgBody details[data-day]').forEach(el => {
-      const day = PG.content.days[+el.dataset.day]; if (!day) return;
-      day.label   = el.querySelector('.d-label')?.value.trim()  ?? day.label;
-      day.title   = el.querySelector('.d-title')?.value.trim()  ?? day.title;
-      day.kind    = el.querySelector('.d-kind')?.value          ?? day.kind;
-      day.note    = el.querySelector('.d-note')?.value.trim()   ?? day.note;
-      const mus   = el.querySelector('.d-muscles');
-      if (mus) day.muscles = mus.value.split(/[،,·]/).map(x => x.trim()).filter(Boolean);
-      el.querySelectorAll('.erow[data-i]').forEach(r => {
-        const o = day.rows[+r.dataset.i]; if (!o) return;
-        o.n    = r.querySelector('.n-in')?.value.trim()    ?? o.n;
-        o.en   = r.querySelector('.en-in')?.value.trim()   ?? o.en;
-        o.m    = r.querySelector('.m-in')?.value.trim()    ?? o.m;
-        o.sets = r.querySelector('.sets-in')?.value.trim() ?? o.sets;
-        o.reps = r.querySelector('.reps-in')?.value.trim() ?? o.reps;
-        o.v    = r.querySelector('.v-in')?.value.trim()    ?? o.v;
-        o.rest = r.querySelector('.rest-in')?.value.trim() ?? o.rest;
-        o.note = r.querySelector('.note-in')?.value.trim() ?? o.note;
-      });
-    });
-  } else {
-    if ($('#pg-tracker')) PG.content.tracker = $('#pg-tracker').checked;
-    /* نفس سبب details[data-day] فوق */
-    $$('#pgBody details[data-meal]').forEach(el => {
-      const meal = PG.content.meals[+el.dataset.meal]; if (!meal) return;
-      meal.title = el.querySelector('.m-title')?.value.trim() ?? meal.title;
-      meal.sub   = el.querySelector('.m-sub')?.value.trim()   ?? meal.sub;
-      meal.note  = el.querySelector('.m-note')?.value.trim()  ?? meal.note;
-      el.querySelectorAll('.erow[data-i]').forEach(r => {
-        const o = meal.rows[+r.dataset.i]; if (!o) return;
-        o.n    = r.querySelector('.n-in')?.value.trim()    ?? o.n;
-        o.m    = r.querySelector('.m-in')?.value.trim()    ?? o.m;
-        o.reps = r.querySelector('.reps-in')?.value.trim() ?? o.reps;
-      });
-    });
-    $$('#pgBody .erow.pghabit').forEach(r => {
-      PG.content.habits[+r.dataset.h] = r.querySelector('.n-in')?.value.trim() ?? '';
-    });
-  }
-}
-
-/* ── رسم المحرر ── */
-function drawProgram(){
-  const isT = PG.kind === 'training';
-  const tr  = PG.trainee, d = pgDesign();
-  $('#pgTitle').textContent = PG_EDIT ? t('pg.editTitle') : t('pg.newTitle');
-
-  let h = `<div class="fset">
-    <h4>${esc(t('pg.title'))}</h4>
-    <div class="field">
-      <label class="sr-only" for="pg-title">${esc(t('pg.title'))}</label>
-      <input class="inp" id="pg-title" required placeholder="${esc(t('pg.titlePh'))}" value="${esc(PG.title)}">
-    </div>
-    <label class="switch">
-      <input type="checkbox" id="pg-template" ${PG.is_template ? 'checked' : ''}>
-      <span class="track"></span><span class="lbl-txt">${esc(t('pg.isTemplate'))}</span>
-    </label>
-    <span class="hint">${esc(t('pg.isTemplateHint'))}</span>
-  </div>
-
-  <div class="fset">
-    <h4>${esc(t('pg.trainee'))}</h4>
-    <div class="grid2">
-      <div class="field"><label for="pg-tName">${esc(t('pg.tName'))}</label>
-        <input class="inp" id="pg-tName" value="${esc(tr.name || '')}"></div>
-      <div class="field"><label for="pg-tCoach">${esc(t('pg.tCoach'))}</label>
-        <input class="inp" id="pg-tCoach" value="${esc(tr.coach || '')}"></div>
-      <div class="field"><label for="pg-tHeight">${esc(t('pg.tHeight'))}</label>
-        <input class="inp" id="pg-tHeight" placeholder="170 سم" value="${esc(tr.height || '')}"></div>
-      <div class="field"><label for="pg-tWeight">${esc(t('pg.tWeight'))}</label>
-        <input class="inp" id="pg-tWeight" placeholder="138 كغم" value="${esc(tr.weight || '')}"></div>
-      <div class="field"><label for="pg-tStart">${esc(t('pg.tStart'))}</label>
-        <input class="inp" id="pg-tStart" type="date" value="${esc(tr.start || '')}"></div>
-      <div class="field"><label for="pg-tDays">${esc(t('pg.tDays'))}</label>
-        <input class="inp" id="pg-tDays" type="number" min="1" max="7" value="${esc(tr.daysPerWeek || '')}"></div>
-      <div class="field"><label for="pg-tWeeks">${esc(t('pg.tWeeks'))}</label>
-        <input class="inp" id="pg-tWeeks" type="number" min="1" max="52" value="${esc(tr.weeks || '')}"></div>
-    </div>
-  </div>`;
-
-  h += isT ? pgDaysBlock() : pgMealsBlock();
-  h += pgDesignBlock(d);
-
-  const body = $('#pgBody'), scroll = body.scrollTop;
-  body.innerHTML = h;
-  body.scrollTop = scroll;
-  body.querySelectorAll('.erow input').forEach(input => {
-    if (!input.closest('label')) {
-      const label=document.createElement('label'); label.className='pg-field field-' + [...input.classList].find(x=>x!=='inp');
-      const caption=document.createElement('span'); caption.textContent=input.placeholder;
-      input.before(label); label.append(caption,input);
-    }
-  });
-  body.querySelectorAll('details[data-day]').forEach(el => {
-    const di=+el.dataset.day;
-    el.querySelector('.acc-body').insertAdjacentHTML('afterbegin',pgTools('day',di,di,PG.content.days.length));
-    el.querySelectorAll('.erow').forEach(row => {
-      row.insertAdjacentHTML('beforeend',pgTools('row',di,+row.dataset.i,PG.content.days[di].rows.length));
-      const hit=EX_INDEX.get(norm(row.querySelector('.n-in').value));
-      if(hit) [['.en-in','en'],['.m-in','m'],['.v-in','v']].forEach(([sel,key])=>{
-        const input=row.querySelector(sel); if(input && input.value===hit[key]) input.dataset.autofill=input.value;
-      });
-    });
-  });
-}
-
-function pgTools(kind,day,i,length){
-  return '<div class="pg-tools"><button type="button" class="btn btn-quiet btn-sm pg-drag" data-kind="'+kind+'" data-day="'+day+'" data-i="'+i+'" aria-label="'+pgText('اسحبي لتغيير الترتيب؛ أو استخدمي أزرار الأعلى والأسفل','Drag to reorder, or use the move buttons')+'">⠿ '+pgText('سحب','Drag')+'</button>' + [['copy',pgText('نسخ','Duplicate')],['up',pgText('↑ للأعلى','↑ Move up')],['down',pgText('↓ للأسفل','↓ Move down')]].map(([action,label]) =>
-    '<button type="button" class="btn btn-quiet btn-sm" data-pgtool="'+action+'" data-kind="'+kind+'" data-day="'+day+'" data-i="'+i+'" '+((action==='up' && i===0)||(action==='down' && i===length-1)?'disabled':'')+'>'+label+'</button>').join('') + '</div>';
-}
-function pgDaysBlock(){
-  let h = `<div class="fset">
-    <h4>${esc(t('pg.days'))}</h4>`;
-
-  h += PG.content.days.map((day, i) => {
-    const isCardio = day.kind === 'cardio';
-    const isGym    = day.kind === 'gym';
-    return `<details class="acc" data-day="${i}" open>
-      <summary>
-        <span class="ai">${ico(isCardio ? 'i-refresh' : 'i-dumbbell')}</span>
-        <span class="atxt">
-          <span>${esc(day.label || t('pg.dayLabel'))}${day.title ? ' — ' + esc(day.title) : ''}</span>
-          <span class="asub">${esc((day.muscles || []).join(' · '))}</span>
-        </span>
-        <span class="acount">${(day.rows || []).length}</span>
-        <span class="chev">${ico('i-down')}</span>
-      </summary>
-      <div class="acc-body">
-        <div class="pgday-head">
-          <div class="field"><label>${esc(t('pg.dayLabel'))}</label>
-            <input class="inp d-label" value="${esc(day.label || '')}" placeholder="DAY 1" dir="ltr"></div>
-          <div class="field"><label>${esc(t('pg.dayTitle'))}</label>
-            <input class="inp d-title" value="${esc(day.title || '')}" placeholder="${esc(t('pg.dayTitlePh'))}"></div>
-          <div class="field"><label>${esc(t('pg.dayKind'))}</label>
-            <select class="inp d-kind">
-              <option value="gym"        ${isGym ? 'selected' : ''}>${esc(t('pg.kGym'))}</option>
-              <option value="bodyweight" ${day.kind === 'bodyweight' ? 'selected' : ''}>${esc(t('pg.kBody'))}</option>
-              <option value="cardio"     ${isCardio ? 'selected' : ''}>${esc(t('pg.kCardio'))}</option>
-            </select></div>
-        </div>
-        <div class="field"><label>${esc(t('pg.muscles'))}</label>
-          <input class="inp d-muscles" value="${esc((day.muscles || []).join('، '))}" placeholder="${esc(t('pg.musclesPh'))}"></div>
-
-        <div class="rows">${pgExRows(day, i)}</div>
-        <button class="add-row" type="button" data-pgadd="row" data-day="${i}">${ico('i-plus')}${esc(t('pg.addRow'))}</button>
-        <span class="hint">${ico('i-search')} ${esc(t('pg.exPickHint'))}</span>
-
-        <div class="field"><label>${esc(t('pg.dayNote'))}</label>
-          <input class="inp d-note" value="${esc(day.note || '')}" placeholder="${esc(t('pg.dayNotePh'))}"></div>
-
-        <button class="btn btn-quiet btn-sm" type="button" data-pgdel="day" data-day="${i}" style="justify-self:start">
-          ${ico('i-trash')}${esc(t('pg.removeDay'))}</button>
-      </div>
-    </details>`;
-  }).join('');
-
-  if (!PG.content.days.length) h += `<p class="rows-empty">${esc(t('pg.emptySub'))}</p>`;
-
-  h += `<div class="add-row-pair">
-      <button class="add-row" type="button" data-pgadd="day">${ico('i-plus')}${esc(t('pg.addDay'))}</button>
-      <button class="add-row" type="button" data-pgimport="course">${ico('i-dumbbell')}${esc(t('pg.fromSite'))}</button>
-    </div>
-  </div>`;
-
-  h += pgStretchBlock();
-  return h;
-}
-
-/* ── الإطالات ──
-   المفتاح يشغّلها، وجدولها ينفتح للتعديل بس لمن يكون شغّال — ماكو
-   فايدة نعرض ٣٢ حقل لبرنامج ما راح يستعمل الإطالات أصلاً. */
-function pgStretchBlock(){
-  const on = PG.content.stretch !== false;
-  let h = `<div class="fset">
-    <h4>${esc(t('pg.stretch'))}</h4>
-    <label class="switch">
-      <input type="checkbox" id="pg-stretch" ${on ? 'checked' : ''}>
-      <span class="track"></span><span class="lbl-txt">${esc(t('pg.stretch'))}</span>
-    </label>
-    <span class="hint">${esc(t('pg.stretchHint'))}</span>`;
-
-  if (on){
-    const L = pgStretches();
-    h += [['upper', t('pg.strUpper')], ['lower', t('pg.strLower')]].map(([part, title]) => {
-      const n = L[part].before.length + L[part].after.length;
-      return `<details class="acc" data-strpart="${part}">
-        <summary>
-          <span class="ai">${ico('i-refresh')}</span>
-          <span class="atxt"><span>${esc(title)}</span>
-            <span class="asub">${esc(t('pg.strEdit'))}</span></span>
-          <span class="acount">${n}</span>
-          <span class="chev">${ico('i-down')}</span>
-        </summary>
-        <div class="acc-body">
-          ${['before','after'].map(ph => `
-            <h5 class="sub-h">${esc(t(ph === 'before' ? 'pg.strBefore' : 'pg.strAfter'))}</h5>
-            <div class="rows">${
-              L[part][ph].length
-                ? L[part][ph].map((r, i) => `<div class="erow pgstr"
-                    data-str="${part}" data-phase="${ph}" data-i="${i}">
-                    <input class="inp n-in"  value="${esc(r.n  || '')}" placeholder="${esc(t('pg.rowN'))}">
-                    <input class="inp en-in" value="${esc(r.en || '')}" placeholder="${esc(t('pg.rowEn'))}" dir="ltr">
-                    <input class="inp d-in"  value="${esc(r.d  || '')}" placeholder="${esc(t('pg.strDur'))}">
-                    <button class="del-row" type="button" data-pgdel="str"
-                      data-str="${part}" data-phase="${ph}" data-i="${i}"
-                      aria-label="${esc(t('pg.removeRow'))}">${ico('i-trash')}</button>
-                  </div>`).join('')
-                : `<p class="rows-empty">${esc(t('pg.strAdd'))}</p>`
-            }</div>
-            <button class="add-row" type="button" data-pgadd="str"
-              data-str="${part}" data-phase="${ph}">${ico('i-plus')}${esc(t('pg.strAdd'))}</button>`).join('')}
-        </div>
-      </details>`;
-    }).join('');
-
-    h += `<button class="btn btn-quiet btn-sm" type="button" id="pg-strReset" style="justify-self:start">
-      ${ico('i-refresh')}<span>${esc(t('pg.strReset'))}</span></button>`;
-  }
-
-  h += `</div>`;
-  return h;
-}
-
-function pgExRows(day, di){
-  const rows = day.rows || [];
-  if (!rows.length) return `<p class="rows-empty">${esc(t('pg.addRow'))}</p>`;
-  const cardio = day.kind === 'cardio';
-  return rows.map((r, i) => cardio
-    ? `<div class="erow pgcar" data-i="${i}">
-         <input class="inp n-in" list="pg-exlist" value="${esc(r.n  || '')}" placeholder="${esc(t('pg.rowN'))}">
-         <input class="inp en-in"   value="${esc(r.en || '')}" placeholder="${esc(t('pg.rowEn'))}" dir="ltr">
-         <input class="inp m-in"    value="${esc(r.m  || '')}" placeholder="${esc(t('pg.cardioM'))}">
-         <input class="inp reps-in" value="${esc(r.reps || '')}" placeholder="${esc(t('pg.cardioReps'))}">
-         <button class="del-row" type="button" data-pgdel="row" data-day="${di}" data-i="${i}"
-           aria-label="${esc(t('pg.removeRow'))}">${ico('i-trash')}</button>
-         ${pgExtraFields(r)}
-       </div>`
-    : `<div class="erow pgex" data-i="${i}">
-         <input class="inp n-in" list="pg-exlist" value="${esc(r.n  || '')}" placeholder="${esc(t('pg.rowN'))}">
-         <input class="inp en-in"   value="${esc(r.en || '')}" placeholder="${esc(t('pg.rowEn'))}" dir="ltr">
-         <input class="inp m-in"    value="${esc(r.m  || '')}" placeholder="${esc(t('pg.rowM'))}">
-         <input class="inp sets-in" value="${esc(r.sets || '')}" placeholder="${esc(t('pg.rowSets'))}">
-         <input class="inp reps-in" value="${esc(r.reps || '')}" placeholder="${esc(t('pg.rowReps'))}">
-         <button class="del-row" type="button" data-pgdel="row" data-day="${di}" data-i="${i}"
-           aria-label="${esc(t('pg.removeRow'))}">${ico('i-trash')}</button>
-         <input class="inp v-in" value="${esc(r.v || '')}" placeholder="${esc(t('pg.rowV'))}" dir="ltr">
-         ${pgExtraFields(r)}
-       </div>`).join('');
-}
-function pgExtraFields(r){
-  return `<input class="inp rest-in" value="${esc(r.rest || '')}" placeholder="${pgText('الراحة (مثلاً ٦٠ ثانية)','Rest (e.g. 60 sec)')}"><input class="inp note-in" value="${esc(r.note || '')}" placeholder="${pgText('ملاحظات الأداء','Exercise notes')}">`;
-}
-
-function pgMealsBlock(){
-  let h = `<div class="fset"><h4>${esc(t('pg.meals'))}</h4>`;
-
-  h += PG.content.meals.map((meal, i) => `<details class="acc" data-meal="${i}" open>
-    <summary>
-      <span class="ai">${ico('i-salad')}</span>
-      <span class="atxt">
-        <span>${esc(meal.title || t('pg.mealTitle'))}</span>
-        <span class="asub">${esc(meal.sub || '')}</span>
-      </span>
-      <span class="acount">${(meal.rows || []).length}</span>
-      <span class="chev">${ico('i-down')}</span>
-    </summary>
-    <div class="acc-body">
-      <div class="grid2">
-        <div class="field"><label>${esc(t('pg.mealTitle'))}</label>
-          <input class="inp m-title" value="${esc(meal.title || '')}" placeholder="الفطور"></div>
-        <div class="field"><label>${esc(t('pg.mealSub'))}</label>
-          <input class="inp m-sub" value="${esc(meal.sub || '')}" placeholder="الوجبة الأولى"></div>
-      </div>
-
-      <div class="field"><span class="lbl-txt">${esc(t('pg.mealImg'))}</span>
-        <div class="cover-box">
-          <div class="cover-prev">${meal.img
-            ? `<img src="${esc(meal.img)}" alt="">`
-            : `${ico('i-image')}<span>${esc(t('f.coverNone'))}</span>`}</div>
-          <div class="cover-ctl">
-            <div class="cover-btns">
-              <button class="btn btn-ghost btn-sm" type="button" data-pgmealimg="${i}">
-                ${ico('i-image')}<span>${esc(t('media.pick'))}</span></button>
-              ${meal.img ? `<button class="btn btn-quiet btn-sm" type="button" data-pgmealimgclear="${i}">
-                ${ico('i-close')}<span>${esc(t('app.delete'))}</span></button>` : ''}
-            </div>
-            <span class="hint">${esc(t('pg.mealImgHint'))}</span>
-          </div>
-        </div>
-      </div>
-      <div class="rows">${
-        (meal.rows || []).length
-          ? meal.rows.map((r, j) => `<div class="erow pgmeal" data-i="${j}">
-              <input class="inp n-in"    value="${esc(r.n || '')}"    placeholder="${esc(t('pg.sheetGroup'))}">
-              <input class="inp m-in"    value="${esc(r.m || '')}"    placeholder="${esc(t('pg.rowGroup'))}">
-              <input class="inp reps-in" value="${esc(r.reps || '')}" placeholder="${esc(t('pg.rowQty'))}">
-              <button class="del-row" type="button" data-pgdel="mrow" data-meal="${i}" data-i="${j}"
-                aria-label="${esc(t('pg.removeRow'))}">${ico('i-trash')}</button>
-            </div>`).join('')
-          : `<p class="rows-empty">${esc(t('pg.addMealRow'))}</p>`
-      }</div>
-      <button class="add-row" type="button" data-pgadd="mrow" data-meal="${i}">${ico('i-plus')}${esc(t('pg.addMealRow'))}</button>
-
-      <div class="field"><label>${esc(t('pg.dayNote'))}</label>
-        <input class="inp m-note" value="${esc(meal.note || '')}"></div>
-
-      <button class="btn btn-quiet btn-sm" type="button" data-pgdel="meal" data-meal="${i}" style="justify-self:start">
-        ${ico('i-trash')}${esc(t('pg.removeDay'))}</button>
-    </div>
-  </details>`).join('');
-
-  if (!PG.content.meals.length) h += `<p class="rows-empty">${esc(t('pg.emptySub'))}</p>`;
-
-  h += `<div class="add-row-pair">
-      <button class="add-row" type="button" data-pgadd="meal">${ico('i-plus')}${esc(t('pg.addMeal'))}</button>
-      <button class="add-row" type="button" data-pgimport="recipe">${ico('i-salad')}${esc(t('pg.fromSite'))}</button>
-    </div>
-  </div>
-
-  <div class="fset">
-    <h4>${esc(t('pg.habits'))}</h4>
-    <div class="rows">${
-      PG.content.habits.length
-        ? PG.content.habits.map((x, i) => `<div class="erow pghabit" data-h="${i}">
-            <span class="stepno">${i + 1}</span>
-            <input class="inp n-in" value="${esc(x)}">
-            <button class="del-row" type="button" data-pgdel="habit" data-i="${i}"
-              aria-label="${esc(t('pg.removeRow'))}">${ico('i-trash')}</button>
-          </div>`).join('')
-        : `<p class="rows-empty">${esc(t('pg.addHabit'))}</p>`
-    }</div>
-    <button class="add-row" type="button" data-pgadd="habit">${ico('i-plus')}${esc(t('pg.addHabit'))}</button>
-
-    <label class="switch" style="margin-top:var(--s-2)">
-      <input type="checkbox" id="pg-tracker" ${PG.content.tracker !== false ? 'checked' : ''}>
-      <span class="track"></span><span class="lbl-txt">${esc(t('pg.tracker'))}</span>
-    </label>
-    <span class="hint">${esc(t('pg.trackerHint'))}</span>
-  </div>`;
-  return h;
-}
-
-function pgDesignBlock(d){
-  const themes = [
-    ['clean',  t('pg.thClean'),  t('pg.thCleanSub')],
-    ['energy', t('pg.thEnergy'), t('pg.thEnergySub')],
-    ['bold',   t('pg.thBold'),   t('pg.thBoldSub')]
-  ];
-  return `<div class="fset">
-    <h4>${esc(t('pg.design'))}</h4>
-
-    <div class="field"><span class="lbl-txt">${esc(t('pg.theme'))}</span>
-      <div class="th-row" id="pg-dTheme">${themes.map(([v, name, sub]) => `
-        <label class="th-opt">
-          <input type="radio" name="pgtheme" value="${v}" ${(d.theme || 'clean') === v ? 'checked' : ''}>
-          <span class="th-card">
-            <span class="th-mini th-mini-${v}" aria-hidden="true"></span>
-            <b>${esc(name)}</b><span>${esc(sub)}</span>
-          </span>
-        </label>`).join('')}</div>
-    </div>
-
-    <div class="cover-box">
-      <div class="cover-prev" id="pg-logoPrev">${d.logo
-        ? `<img src="${esc(d.logo)}" alt="">`
-        : `${ico('i-image')}<span>${esc(t('f.coverNone'))}</span>`}</div>
-      <div class="cover-ctl">
-        <label class="sr-only" for="pg-dLogo">${esc(t('pg.dLogo'))}</label>
-        <input class="inp" id="pg-dLogo" dir="ltr" placeholder="https://…" value="${esc(d.logo || '')}" readonly>
-        <div class="cover-btns">
-          <button class="btn btn-ghost btn-sm" type="button" id="pg-logoPick">
-            ${ico('i-image')}<span>${esc(t('media.pick'))}</span></button>
-          ${d.logo ? `<button class="btn btn-quiet btn-sm" type="button" id="pg-logoClear">
-            ${ico('i-close')}<span>${esc(t('app.delete'))}</span></button>` : ''}
-        </div>
-        <div class="where"><span class="wl">${ico('i-folder')}<span>
-          <b>${esc(t('cov.dest'))}</b> <code>media/programs/</code></span></span></div>
-      </div>
-    </div>
-
-    <div class="grid2">
-      <div class="field"><label for="pg-dLogoPos">${esc(t('pg.dLogoPos'))}</label>
-        <select class="inp" id="pg-dLogoPos">
-          <option value="right"  ${d.logoPos === 'right'  ? 'selected' : ''}>${esc(t('pg.posRight'))}</option>
-          <option value="center" ${d.logoPos === 'center' ? 'selected' : ''}>${esc(t('pg.posCenter'))}</option>
-          <option value="left"   ${d.logoPos === 'left'   ? 'selected' : ''}>${esc(t('pg.posLeft'))}</option>
-        </select></div>
-      <div class="field"><label for="pg-dLogCols">${esc(t('pg.dLogCols'))}</label>
-        <input class="inp" id="pg-dLogCols" type="number" min="0" max="5" value="${esc(d.logCols)}"></div>
-    </div>
-
-    <div class="field"><span class="lbl-txt">${esc(t('pg.dAccent'))}</span>
-      <div class="sw-row" id="pg-accents">${PG_ACCENTS.map(c =>
-        `<button class="sw" type="button" data-accent="${esc(c)}" style="background:${esc(c)}"
-          aria-pressed="${String(c.toLowerCase() === String(d.accent).toLowerCase())}"
-          aria-label="${esc(c)}"></button>`).join('')}</div>
-    </div>
-
-    <div class="field"><label for="pg-dFooter">${esc(t('pg.dFooter'))}</label>
-      <input class="inp" id="pg-dFooter" value="${esc(d.footer || '')}"
-        placeholder="${esc((INFO && INFO.name) || 'كوتش زهراء')}"></div>
-
-    <label class="switch"><input type="checkbox" id="pg-dCover" ${d.cover ? 'checked' : ''}>
-      <span class="track"></span><span class="lbl-txt">${esc(t('pg.dCover'))}</span></label>
-    <label class="switch"><input type="checkbox" id="pg-dPageNum" ${d.pageNum ? 'checked' : ''}>
-      <span class="track"></span><span class="lbl-txt">${esc(t('pg.dPageNum'))}</span></label>
-    <label class="switch"><input type="checkbox" id="pg-dShowEn" ${d.showEn ? 'checked' : ''}>
-      <span class="track"></span><span class="lbl-txt">${esc(t('pg.dShowEn'))}</span></label>
-    <label class="switch"><input type="checkbox" id="pg-dShowVideo" ${d.showVideo ? 'checked' : ''}>
-      <span class="track"></span><span class="lbl-txt">${esc(t('pg.dShowVideo'))}</span></label>
-    <label class="switch"><input type="checkbox" id="pg-dQr" ${d.qr ? 'checked' : ''}>
-      <span class="track"></span><span class="lbl-txt">${esc(t('pg.dQr'))}</span></label>
-    <span class="hint">${esc(t('pg.dQrHint'))}</span>
-    <label class="switch"><input type="checkbox" id="pg-dMono" ${d.mono ? 'checked' : ''}>
-      <span class="track"></span><span class="lbl-txt">${esc(t('pg.dMono'))}</span></label>
-    <span class="hint">${esc(t('pg.dMonoHint'))}</span>
-
-    <button class="btn btn-ghost btn-sm" type="button" id="pg-setDefault" style="justify-self:start">
-      ${ico('i-check')}<span>${esc(t('pg.setDefault'))}</span></button>
-  </div>`;
-}
-
-/* ══════════════════════════════════════════════════════════
-   الاستيراد من الموقع
-   ══════════════════════════════════════════════════════════
-
-   الكوتش كاتبة كورسات ووصفات بالموقع أصلاً — ماكو معنى تعيد كتابتها
-   بالبرنامج. الاستيراد ينسخ المحتوى **نسخة مستقلة**: تعديل البرنامج
-   ما يمس الكورس بالموقع، والعكس. */
-
-let IMPORT_KIND = null;   /* 'course' أو 'recipe' */
-
-/* «3 × 12» أو «3 × 40 ثانية» → جولات وعدات منفصلة.
-   اللي ما ينفهم يروح كامل لعمود العدات بدل ما يضيع. */
-function splitSets(str){
-  const m = String(str || '').match(/^\s*(\d+)\s*[x×*]\s*(.+)$/i);
-  return m ? { sets:m[1], reps:m[2].trim() } : { sets:'', reps:String(str || '').trim() };
-}
-
-function courseToDay(c){
-  const moves = Array.isArray(c.moves) ? c.moves : [];
-  return {
-    label: 'DAY ' + (PG.content.days.length + 1),
-    title: c.title || '',
-    kind:  'bodyweight',            /* الكورسات بالموقع ماكو بيها عمود عضلة */
-    muscles: c.area ? c.area.split(/[،,·]/).map(x => x.trim()).filter(Boolean) : [],
-    rows: moves.map(mv => {
-      const sp = splitSets(mv.s);
-      /* الفيديو مال الكورس واحد للكورس كله — ننسخه لكل تمرين لأن
-         عمود الفيديو بالورقة على مستوى التمرين */
-      return { n:mv.n || '', en:'', m:'', sets:sp.sets, reps:sp.reps, v:c.video || '' };
-    }),
-    note: c.duration ? c.duration : ''
-  };
-}
-
-function recipeToMeal(r){
-  const ing = Array.isArray(r.ingredients) ? r.ingredients : [];
-  const macros = [
-    r.kcal    ? r.kcal + ' سعرة'      : '',
-    r.protein ? 'بروتين ' + r.protein : '',
-    r.carbs   ? 'كارب '   + r.carbs   : '',
-    r.fat     ? 'دهون '   + r.fat     : ''
-  ].filter(Boolean).join(' · ');
-  return {
-    title: r.title || '',
-    sub:   [r.tag, r.duration].filter(Boolean).join(' · '),
-    img:   r.cover || '',
-    /* المكوّنات بالداتابيس للوصفة كاملة — ننسخها مثل ما هي ونذكر
-       عدد الحصص بالملاحظة حتى ما تنفهم غلط */
-    rows: ing.map(i => ({
-      n:    i.n || '',
-      m:    (Array.isArray(i.alt) && i.alt.length) ? 'بدائل: ' + i.alt.join(' · ') : '',
-      reps: [i.q, i.u].filter(Boolean).join(' ')
-    })),
-    note: [macros, r.servings ? 'الكمية لـ' + r.servings + ' حصة' : ''].filter(Boolean).join(' — ')
-  };
-}
-
-function openImport(kind){
-  IMPORT_KIND = kind;
-  const isC = kind === 'course';
-  $('#pgImportTitle').textContent = t(isC ? 'pg.importCourse' : 'pg.importRecipe');
-  $('#pgImportSub').textContent   = t(isC ? 'pg.importCourseSub' : 'pg.importRecipeSub');
-  $('#pgImportQ').value = '';
-  $('#pgImportQ').placeholder = t('pg.importSearch');
-  renderImport();
-  const m = $('#pgImport');
-  m.hidden = false;
-  requestAnimationFrame(() => m.classList.add('open'));
-}
-
-function closeImport(){
-  const m = $('#pgImport');
-  m.classList.remove('open');
-  setTimeout(() => { m.hidden = true }, 220);
-  IMPORT_KIND = null;
-}
-
-function renderImport(){
-  const rows = ROWS[IMPORT_KIND === 'course' ? 'courses' : 'recipes'] || [];
-  const q = norm($('#pgImportQ').value);
-  const hits = rows.filter(x => !q || norm(x.title).includes(q));
-  if (!hits.length){
-    $('#pgImportList').innerHTML = `<div class="empty">${ico('i-empty')}
-      <b>${esc(t('pg.importEmpty'))}</b></div>`;
-    return;
-  }
-  $('#pgImportList').innerHTML = hits.map(x => {
-    const n = IMPORT_KIND === 'course'
-      ? ((x.moves || []).length + ' ' + t('pg.rows'))
-      : ((x.ingredients || []).length + ' ' + t('pg.mealRows'));
-    return `<button class="row imp-row" type="button" data-imp="${esc(x.id)}">
-      <div class="row-thumb">${x.cover
-        ? `<img src="${esc(x.cover)}" alt="">`
-        : ico(IMPORT_KIND === 'course' ? 'i-dumbbell' : 'i-salad')}</div>
-      <div class="row-main">
-        <h3>${esc(x.title)}</h3>
-        <div class="row-meta">
-          <span class="pill">${esc(tag(x.tag))}</span>
-          <span>${esc(n)}</span>
-          ${x.area ? `<span>${esc(x.area)}</span>` : ''}
-        </div>
-      </div>
-    </button>`;
-  }).join('');
-}
-
-function doImport(id){
-  syncProgram();
-  if (IMPORT_KIND === 'course'){
-    const c = ROWS.courses.find(x => x.id === id); if (!c) return;
-    PG.content.days.push(courseToDay(c));
-  } else {
-    const r = ROWS.recipes.find(x => x.id === id); if (!r) return;
-    PG.content.meals.push(recipeToMeal(r));
-  }
-  closeImport();
-  drawProgram();
-  drawPreview();
-  buildExIndex();
-  toast(t('pg.imported'));
-}
-
-/* ══════════════════════════════════════════════════════════
-   بناء ورقة الطباعة
-   ══════════════════════════════════════════════════════════ */
-
-/* الروابط تنكتب داخل href — نفس درس safeUrl() بالموقع العام:
-   esc() تمنع الخروج من الوسم بس ما تمنع javascript: */
-function pgSafeUrl(u){
-  const s = String(u || '').trim();
-  return /^https?:\/\//i.test(s) ? s : '';
-}
-
-/* ── رمز QR لرابط الفيديو ──
-   المكتبة تبني مصفوفة الوحدات وترجع SVG — vector، فينطبع حاد بأي
-   دقة طابعة. الصورة النقطية (createDataURL) تطلع مشوّشة بالورق.
-
-   ⚠️ الرابط ما يدخل الـSVG كنص أبداً — المكتبة ترسم مربعات بس،
-   فماكو مجال حقن. ومع هذا يمر بـpgSafeUrl() قبلها.
-
-   المستوى 'M' توازن معقول: يتحمّل تلف ~١٥٪ من الرمز (بقعة حبر،
-   طيّة بالورقة) بدون ما يكبر حجمه كثير. */
-function pgQrSvg(url){
-  const safe = pgSafeUrl(url);
-  if (!safe) return '';
-  try {
-    const q = qrcode(0, 'M');     /* 0 = يختار أصغر نسخة تكفي الرابط */
-    q.addData(safe);
-    q.make();
-    return `<span class="qr">${q.createSvgTag({ cellSize:2, margin:0, scalable:true })}</span>`;
-  } catch(e){
-    /* رابط أطول من طاقة أكبر نسخة — نرجع للرابط النصي بدل ما ننكسر */
-    return '';
-  }
-}
-
-const pgDate = s => {
-  if (!s) return '';
-  const d = new Date(s);
-  return isNaN(d) ? String(s)
-    : d.toLocaleDateString('ar-IQ-u-nu-latn', { year:'numeric', month:'long', day:'numeric' });
-};
-
-function pgPage(inner, d, n, total){
-  const pos  = d.logoPos === 'center' ? 'c' : d.logoPos === 'left' ? 'l' : '';
-  const head = `<div class="pp-head ${pos}">
-    ${d.logo ? `<img class="pp-logo" src="${esc(d.logo)}" alt="">` : ''}
-    <div class="pp-htxt">
-      <h2>${esc(PG.title)}</h2>
-      ${PG.trainee.name ? `<div class="sub">${esc(PG.trainee.name)}</div>` : ''}
-    </div>
-  </div>`;
-  const foot = `<div class="pp-foot">
-    <span>${esc(d.footer || (INFO && INFO.name) || '')}</span>
-    ${d.pageNum ? `<span class="pno">${esc(t('pg.sheetPage'))} ${n} / ${total}</span>` : '<span></span>'}
-  </div>`;
-  return `<section class="pp">${head}<div class="pp-body">${inner}</div>${foot}</section>`;
-}
-
-/* جدول تمارين يوم واحد */
-function pgDayTable(day, d){
-  const cardio = day.kind === 'cardio';
-  const gym    = day.kind === 'gym';
-  const logN   = Math.max(0, Math.min(5, nz(d.logCols)));
-
-  const head = cardio
-    ? `<tr><th class="num">#</th><th>${esc(t('pg.sheetEx'))}</th>
-         <th>${esc(t('pg.cardioM'))}</th><th class="num">${esc(t('pg.cardioReps'))}</th></tr>`
-    : `<tr><th class="num">#</th><th>${esc(t('pg.sheetEx'))}</th>
-         ${gym ? `<th>${esc(t('pg.sheetMuscle'))}</th>` : ''}
-         <th class="num">${esc(t('pg.sheetSets'))}</th>
-         <th class="num">${esc(t('pg.sheetReps'))}</th>
-         ${d.showVideo ? `<th class="num">${esc(t('pg.sheetVideo'))}</th>` : ''}
-         ${Array.from({ length:logN }, (_, i) =>
-            `<th class="num log">${esc(t('pg.sheetWeight'))} ${i + 1}</th>`).join('')}
-       </tr>`;
-
-  const body = (day.rows || []).map((r, i) => {
-    /* الاسم الإنكليزي بسطر ثاني — dir/lang صريحة حتى الترتيب ما ينقلب
-       جوّا فقرة عربية، والقارئ الآلي يلفظه إنكليزي */
-    const name = `${esc(r.n || '')}${(d.showEn && r.en)
-      ? `<span class="en" dir="ltr" lang="en">${esc(r.en)}</span>` : ''}${r.rest ? `<span class="ex-detail">${pgText('الراحة','Rest')}: ${esc(r.rest)}</span>` : ''}${r.note ? `<span class="ex-detail">${esc(r.note)}</span>` : ''}`;
-    const url = pgSafeUrl(r.v);
-    return cardio
-      ? `<tr><td class="num">${i + 1}</td><td>${name}</td>
-           <td>${esc(r.m || '')}</td><td class="num"><bdi dir="ltr">${esc(r.reps || '')}</bdi></td></tr>`
-      : `<tr>
-           <td class="num">${i + 1}</td>
-           <td>${name}</td>
-           ${gym ? `<td>${esc(r.m || '')}</td>` : ''}
-           <td class="num"><bdi dir="ltr">${esc(r.sets || '')}</bdi></td>
-           <td class="num"><bdi dir="ltr">${esc(r.reps || '')}</bdi></td>
-           ${d.showVideo ? (d.qr
-              ? `<td class="qrcell">${pgQrSvg(url) || '<span class="qr-none">—</span>'}</td>`
-              : `<td class="num">${url
-                  ? `<a class="watch" href="${esc(url)}">▶ ${esc(t('pg.sheetWatch'))}</a>` : '—'}</td>`) : ''}
-           ${Array.from({ length:logN }, () => '<td class="log"></td>').join('')}
-         </tr>`;
-  }).join('');
-
-  return `<h3>${esc(day.label || '')}${day.title ? ' — ' + esc(day.title) : ''}</h3>
-    ${(day.muscles || []).length ? `<p class="lead">${esc(day.muscles.join(' · '))}</p>` : ''}
-    <table class="tbl"><thead>${head}</thead><tbody>${body}</tbody></table>
-    <div class="notes"><b>${esc(t('pg.sheetNotes'))}${day.note ? ' — ' + esc(day.note) : ''}</b>
-      <div class="ln"></div><div class="ln"></div><div class="ln"></div></div>`;
-}
-
-function pgStretchPage(part, title){
-  const tbl = (rows, cap) => !rows.length ? '' : `<h3>${esc(cap)}</h3>
-    <table class="tbl"><thead><tr>
-      <th class="num">#</th><th>${esc(t('pg.sheetEx'))}</th><th class="num">${esc(t('pg.sheetStretchDur'))}</th>
-    </tr></thead><tbody>${rows.map((r, i) => `<tr>
-      <td class="num">${i + 1}</td>
-      <td>${esc(r.n)}${r.en ? `<span class="en" dir="ltr" lang="en">${esc(r.en)}</span>` : ''}</td>
-      <td class="num">${esc(r.d || '')}</td>
-    </tr>`).join('')}</tbody></table>`;
-  return `<h3 style="font-size:13pt">${esc(title)}</h3>
-    ${tbl(part.before, t('pg.sheetStretchBefore'))}
-    ${tbl(part.after,  t('pg.sheetStretchAfter'))}
-    <div class="notes"><b>${esc(STRETCH_NOTE_DYN)}</b><div style="font-size:9.5pt;color:#555">${esc(STRETCH_NOTE_ST)}</div></div>`;
-}
-
-/* يبني ورقة البرنامج كاملة ويرجعها كنص HTML + عدد الصفحات.
-   ما يلمس الـDOM — paintSheet() هي اللي تحقنها، مرة بـ #pdfArea
-   للطباعة ومرة بالمعاينة. */
-function buildSheet(){
-  const d  = pgDesign();
-  const tr = PG.trainee || {};
-  const pages = [];
-
-  /* ① الغلاف */
-  if (d.cover){
-    pages.push(`__COVER__`);
-  }
-
-  /* ② بيانات المتمرن + توزيع الأسبوع */
-  const meta = [
-    [t('pg.tName'),   tr.name],
-    [t('pg.tHeight'), tr.height],
-    [t('pg.tWeight'), tr.weight],
-    [t('pg.tStart'),  pgDate(tr.start)],
-    [t('pg.tDays'),   tr.daysPerWeek],
-    [t('pg.tWeeks'),  tr.weeks],
-    [t('pg.tCoach'),  tr.coach]
-  ].filter(([, v]) => v !== '' && v != null);
-
-  let intro = `<h3>${esc(t('pg.sheetMeta'))}</h3>
-    <table class="tbl"><tbody>${meta.map(([k, v]) =>
-      `<tr><td style="width:42%;font-weight:600">${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}
-    </tbody></table>`;
-
-  if (PG.kind === 'training' && PG.content.days.length){
-    intro += `<h3>${esc(t('pg.sheetWeek'))}</h3>
-      <table class="tbl"><thead><tr>
-        <th>${esc(t('pg.sheetDayCol'))}</th><th>${esc(t('pg.sheetContent'))}</th>
-        <th>${esc(t('pg.sheetTargets'))}</th><th class="num">${esc(t('pg.sheetExCount'))}</th>
-      </tr></thead><tbody>${PG.content.days.map(day => `<tr>
-        <td style="font-weight:700">${esc(day.label || '')}</td>
-        <td>${esc(day.title || '')}</td>
-        <td>${esc((day.muscles || []).join(' · '))}</td>
-        <td class="num">${(day.rows || []).length}</td>
-      </tr>`).join('')}</tbody></table>`;
-  }
-  pages.push(intro);
-
-  /* ③ صفحة لكل يوم أو وجبة */
-  if (PG.kind === 'training'){
-    PG.content.days.forEach(day => pages.push(pgDayTable(day, d)));
-
-    if (PG.content.stretch !== false){
-      /* من stretchList مو من البذرة — الكوتش تقدر تعدّلها */
-      const L = pgStretches();
-      if (L.upper.before.length || L.upper.after.length)
-        pages.push(pgStretchPage(L.upper, t('pg.sheetStretchUpper')));
-      if (L.lower.before.length || L.lower.after.length)
-        pages.push(pgStretchPage(L.lower, t('pg.sheetStretchLower')));
-    }
-  } else {
-    PG.content.meals.forEach(meal => {
-      pages.push(`<h3>${esc(meal.title || '')}${meal.sub ? ' — ' + esc(meal.sub) : ''}</h3>
-        ${meal.img ? `<img class="meal-img" src="${esc(meal.img)}" alt="">` : ''}
-        <table class="tbl"><thead><tr>
-          <th>${esc(t('pg.sheetGroup'))}</th><th>${esc(t('pg.rowGroup'))}</th><th class="num">${esc(t('pg.sheetQty'))}</th>
-        </tr></thead><tbody>${(meal.rows || []).map(r => `<tr>
-          <td>${esc(r.n || '')}</td><td>${esc(r.m || '')}</td><td class="num">${esc(r.reps || '')}</td>
-        </tr>`).join('')}</tbody></table>
-        ${meal.note ? `<div class="notes"><b>${esc(meal.note)}</b></div>` : ''}`);
-    });
-
-    if (PG.content.habits.length){
-      pages.push(`<h3>${esc(t('pg.habits'))}</h3>
-        <table class="tbl"><thead><tr>
-          <th class="num">#</th><th>${esc(t('pg.sheetHabit'))}</th>
-        </tr></thead><tbody>${PG.content.habits.map((x, i) =>
-          `<tr><td class="num">${i + 1}</td><td>${esc(x)}</td></tr>`).join('')}</tbody></table>`);
-    }
-  }
-
-  /* ④ جدول المتابعة الأسبوعية — صفحة لكل أسبوع من مدة البرنامج */
-  const habits = PG.kind === 'nutrition' ? PG.content.habits : [];
-  if (PG.kind === 'nutrition' && PG.content.tracker !== false && habits.length){
-    const weeks = Math.max(1, Math.min(12, nz(tr.weeks) || 4));
-    const days  = ['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة'];
-    for (let w = 1; w <= weeks; w++){
-      pages.push(`<h3>${esc(t('pg.sheetTrackTitle'))} — ${esc(t('pg.sheetWeekN'))} ${w}</h3>
-        <table class="tbl"><thead><tr>
-          <th>${esc(t('pg.sheetHabit'))}</th>${days.map(x => `<th class="num">${esc(x)}</th>`).join('')}
-        </tr></thead><tbody>${habits.map(x => `<tr>
-          <td>${esc(x)}</td>${days.map(() => '<td class="tick"><span class="box"></span></td>').join('')}
-        </tr>`).join('')}</tbody></table>`);
-    }
-  }
-
-  /* التذييل يحتاج العدد الكلي، فنبنيه بعد ما نعرف كم صفحة */
-  const total = pages.length;
-  const html = pages.map((p, i) => {
-    if (p === '__COVER__'){
-      return `<section class="pp pp-cover">
-        ${d.logo ? `<img class="cv-logo" src="${esc(d.logo)}" alt="">` : ''}
-        <div class="cv-kicker">${esc(PG.kind === 'nutrition' ? 'NUTRITION PLAN' : 'TRAINING PROGRAM')}</div>
-        <h1>${esc(PG.title)}</h1>
-        <div class="cv-rule"></div>
-        <div class="cv-meta">${[tr.weeks ? tr.weeks+' '+pgText('أسابيع','weeks') : '',tr.daysPerWeek ? tr.daysPerWeek+' '+pgText('أيام بالأسبوع','days / week') : '', tr.start ? pgDate(tr.start) : ''].filter(Boolean).map(x=>'<span>'+esc(x)+'</span>').join('')}</div>
-        ${tr.name ? `<div class="cv-name">${esc(tr.name)}</div>` : ''}
-        ${tr.coach ? `<div class="sub" style="font-size:10.5pt;color:#666">${esc(t('pg.tCoach'))}: ${esc(tr.coach)}</div>` : ''}
-      </section>`;
-    }
-    return pgPage(p, d, i + 1, total);
-  }).join('');
-
-  return pgPaginate(html, d);
-}
-
-/* يحقن ناتج buildSheet() بعنصر — يستعمله كل من الطباعة والمعاينة.
-   ⚠️ مصدر واحد للحقيقة: لو انفصلوا، الـPDF تطلع مختلفة عن المعاينة */
-function pgPaginate(html, d){
-  const probe=document.createElement('div'); probe.className='pdfsheet pg-measure';
-  probe.style.setProperty('--pa', d.mono ? '#3A3A3A' : d.accent);
-  probe.innerHTML=html; document.body.append(probe);
-  const limit=263/25.4*96;
-  try {
-    for(let index=0; index<probe.children.length; index++){
-      const page=probe.children[index], body=page.querySelector('.pp-body');
-      if(!body || page.getBoundingClientRect().height<=limit+1) continue;
-      const next=page.cloneNode(true), nextBody=next.querySelector('.pp-body'); nextBody.replaceChildren();
-      let moved=false;
-      while(page.getBoundingClientRect().height>limit+1 && body.children.length){
-        const last=body.lastElementChild;
-        if(last.matches('table') && last.tBodies[0]?.rows.length>1){
-          const copy=last.cloneNode(true); copy.tBodies[0].replaceChildren();
-          nextBody.prepend(copy);
-          while(page.getBoundingClientRect().height>limit+1 && last.tBodies[0].rows.length>1){
-            copy.tBodies[0].prepend(last.tBodies[0].lastElementChild); moved=true;
-          }
-          break;
-        }
-        if(body.children.length===1 || [...body.children].slice(0,-1).every(x=>x.matches('h3,.lead'))) break;
-        nextBody.prepend(last); moved=true;
-      }
-      if(moved){
-        const title=body.querySelector('h3');
-        if(title && !nextBody.firstElementChild?.matches('h3')){const heading=title.cloneNode(true);heading.dataset.baseTitle=title.dataset.baseTitle || title.textContent;heading.textContent=heading.dataset.baseTitle+' — '+pgText('تكملة','continued');nextBody.prepend(heading);}
-        page.after(next);
-      }
-    }
-    const total=probe.children.length;
-    [...probe.children].forEach((page,i)=>{const n=page.querySelector('.pno');if(n)n.innerHTML=esc(t('pg.sheetPage'))+' <bdi dir="ltr">'+(i+1)+' / '+total+'</bdi>';});
-    return {html:probe.innerHTML,count:total,design:d};
-  } finally {probe.remove();}
-}
-function paintSheet(el, sheet, extraClass){
-  const d = sheet.design;
-  const th = ['clean','energy','bold'].includes(d.theme) ? d.theme : 'clean';
-  el.className = (extraClass || '') + ' th-' + th + (d.mono ? ' mono' : '');
-  /* لون التمييز ينحط inline — هو القيمة الوحيدة المتغيّرة بالورقة،
-     وباقي الألوان صريحة بالـCSS حتى الوضع الليلي ما يطبع أسود */
-  el.style.setProperty('--pa', d.mono ? '#3A3A3A' : (d.accent || '#B07D62'));
-  el.innerHTML = sheet.html;
-}
-
-function buildPdf(){
-  paintSheet($('#pdfArea'), buildSheet(), 'pdfsheet');
-}
-
-/* ══════════════════════════════════════════════════════════
-   المعاينة الحيّة
-   ══════════════════════════════════════════════════════════ */
-
-/* عرض ورقة A4 بالبكسل عند 96dpi — 210mm ÷ 25.4 × 96 */
-const PAGE_W_PX = 210 / 25.4 * 96;
-
-function drawPreview(){
-  if (!PG || $('#pgModal').hidden) return;
-  const sheet = buildSheet();
-  paintSheet($('#pgPreviewSheet'), sheet, 'pdfsheet pg-prev-page');
-  $('#pgPrevCount').textContent = t('pg.prevPages', { n:sheet.count });
-  fitPreview();
-}
-
-/* الورقة عرضها ثابت 210mm وتنصغّر بـ transform حتى تدخل بالعمود.
-   transform ما يأثر على التخطيط، فالحاوية لازم تاخذ الارتفاع
-   المصغّر يدوياً وإلا يبقى فراغ بطول الورقة الكاملة تحتها. */
-/* ── مراقب حجم عمود المعاينة ──
-   ⚠️ **مو requestAnimationFrame.** الـrAF ما يشتغل أصلاً لمن تكون
-   الصفحة مخفية (تبويب ثاني، أو التطبيق بالخلفية)، فالورقة چانت تبقى
-   بحجمها الكامل ٢١٠مم وتطلع بره الشاشة لو الكوتش بدّلت تبويب وهي
-   تكتب. ResizeObserver يشتغل مع أي تغيّر تخطيط — بضمنه لحظة ما
-   العمود ينقلب من display:none لـflex — وبلا تخمين توقيت.
-
-   وما تصير حلقة: العمود المراقَب حجمه من flex:1 مو من محتواه،
-   وعرضه ثابت بفضل scrollbar-gutter:stable. */
-let PREV_RO = null;
-function watchPreview(){
-  if (PREV_RO || typeof ResizeObserver === 'undefined') return;
-  PREV_RO = new ResizeObserver(() => fitPreview());
-  PREV_RO.observe($('#pgPrevScroll'));
-}
-
-function fitPreview(){
-  const scroll = $('#pgPrevScroll'), fit = $('#pgPrevFit'), sheet = $('#pgPreviewSheet');
-  if (!scroll || !fit || !sheet) return;
-  const avail = scroll.clientWidth - 24;
-  if (avail <= 0) return;      /* العمود مخفي — المراقب ينادينا لمن يبين */
-  const k = Math.min(1, avail / PAGE_W_PX);
-
-  /* نقيس بلا تصغير، بعدين نصغّر ونعطي الحاوية المقاس الناتج */
-  sheet.style.transform = 'none';
-  const h = sheet.offsetHeight;
-  sheet.style.transform = k < 1 ? `scale(${k})` : 'none';
-  fit.style.width  = Math.round(PAGE_W_PX * k) + 'px';
-  fit.style.height = Math.round(h * k) + 'px';
-}
-
-/* التحديث مؤجّل: كل ضغطة زر بالمحرر ما تستاهل إعادة بناء الورقة كاملة */
-let prevTimer;
-function schedulePreview(){
-  clearTimeout(prevTimer);
-  prevTimer = setTimeout(() => { syncProgram(); persistPgDraft(); drawPreview() }, 400);
-}
-
-async function printProgram(){
-  syncProgram();
-  if (!PG.title.trim()){ toast(t('pg.errTitle'), 'bad'); return }
-  const program = PG;
-  await document.fonts.ready;
-  if(PG !== program) return;
-  buildPdf();
-  await Promise.all([...$('#pdfArea').querySelectorAll('img')].map(img => img.decode().catch(()=>{})));
-  if(PG !== program) return;
-  const oldTitle=document.title;
-  document.title=PG.title;
-  document.body.classList.add('printing');
-  /* finally مو then — لو المستخدم لغى الطباعة لازم الكلاس ينشال بأي حال */
-  try { window.print() } finally { document.body.classList.remove('printing'); document.title=oldTitle; }
-}
-
-/* ══════════════════════════════════════════════════════════
-   حفظ ونسخ وحذف البرامج
-   ══════════════════════════════════════════════════════════ */
-async function saveProgram(){
-  if(pgSaving || !PG) return;
-  syncProgram();
-  if (!PG.title.trim()){ toast(t('pg.errTitle'), 'bad'); $('#pg-title').focus(); return }
-  const invalid=$('#pgBody input:invalid'); if(invalid){ invalid.reportValidity(); return }
-  pgSaving = true;
-  $('#pgBody').inert = true;
-  $('#pgPrintBtn').disabled = true;
-  const editId=PG_EDIT?.id, savedKey=pgDraftKey;
-  const btn = $('#pgSaveBtn');
-  btn.disabled = true;
-  const old = btn.textContent;
-  btn.textContent = t('app.saving');
-
-  const payload = {
-    kind:PG.kind, title:PG.title.trim(), trainee:PG.trainee,
-    design:PG.design, content:PG.content,
-    is_template:!!PG.is_template, sort_order:PG.sort_order || 0
-  };
-
-  const q = PG_EDIT
-    ? sb.from('programs').update(payload).eq('id', PG_EDIT.id).select().single()
-    : sb.from('programs').insert(payload).select().single();
-
-  let data, error;
-  try { ({data,error}=await q); } catch(e){error=e}
-  pgSaving = false;
-  $('#pgBody').inert = false;
-  $('#pgPrintBtn').disabled = false;
-  btn.disabled = false;
-  btn.textContent = old;
-
-  if (error){ toast(error.message, 'bad'); return }
-
-  if (editId){
-    const i = ROWS.programs.findIndex(x => x.id === editId);
-    if (i > -1) ROWS.programs[i] = data;
-  } else {
-    ROWS.programs.unshift(data);
-  }
-  sortPrograms();
-  buildExIndex();          /* التمارين الجديدة تدخل المكتبة فوراً */
-  renderPrograms();
-  try { localStorage.removeItem(savedKey); } catch(e){}
-  closeProgram(true);
-  toast(t('pg.saved'));
-}
-
-/* القوالب فوق، وبعدين الترتيب اليدوي ثم الأحدث */
-function sortPrograms(){
-  ROWS.programs.sort((a, b) =>
-    (b.is_template - a.is_template) ||
-    (a.sort_order - b.sort_order) ||
-    (new Date(b.created_at) - new Date(a.created_at)));
-}
-
-/* نسخة لمتمرن جديد — البرنامج والتصميم ينمشون، بيانات المتمرن تنفرّغ.
-   هاي اللي تحوّل الشغلة من «اكتبي ملف لكل متمرن» لـ«دقيقتين وينطبع» */
-function dupProgram(id){
-  const src = ROWS.programs.find(x => x.id === id);
-  if (!src) return;
-  const copy = JSON.parse(JSON.stringify(src));
-  delete copy.id; delete copy.created_at; delete copy.updated_at;
-  copy.is_template = false;
-  copy.trainee = Object.assign({}, copy.trainee, { name:'', height:'', weight:'', start:'' });
-  openProgram(copy);
-  toast(t('pg.duped'));
-}
-
-/* ── حفظ التصميم كافتراضي بـ site_info ──
-   بالداتابيس مو localStorage حتى ينمشي بين تلفونها ولابتوبها */
-async function savePgDefaultDesign(){
-  syncProgram();
-  const design=JSON.parse(JSON.stringify(PG.design));
-  const { error } = await sb.from('site_info')
-    .update({ program_design:design }).eq('id', 1);
-  if (error){ toast(error.message, 'bad'); return }
-  if (INFO) INFO.program_design = design;
-  toast(t('pg.defaultSaved'));
-}
-
-/* ── ربط أحداث تبويب البرامج ── */
-function wirePrograms(){
-  let drag=null;
-  $('#pgBody').addEventListener('pointerdown',e=>{
-    const handle=e.target.closest('.pg-drag'); if(!handle || pgSaving) return;
-    syncProgram(); drag={handle,kind:handle.dataset.kind,day:+handle.dataset.day,i:+handle.dataset.i,x:e.clientX,y:e.clientY};
-    handle.setPointerCapture(e.pointerId); handle.classList.add('dragging');
-  });
-  $('#pgBody').addEventListener('pointerup',e=>{
-    if(!drag)return;
-    const from=drag; drag=null; from.handle.classList.remove('dragging');
-    if(Math.hypot(e.clientX-from.x,e.clientY-from.y)<8)return;
-    const target=document.elementFromPoint(e.clientX,e.clientY)?.closest(from.kind==='day'?'details[data-day]':'.erow');
-    if(!target)return;
-    if(from.kind==='row' && +target.closest('details[data-day]')?.dataset.day!==from.day)return;
-    const to=+(from.kind==='day'?target.dataset.day:target.dataset.i);
-    const list=from.kind==='day'?PG.content.days:PG.content.days[from.day].rows;
-    if(!Number.isInteger(to)||to===from.i)return;
-    list.splice(to,0,list.splice(from.i,1)[0]);drawProgram();persistPgDraft();drawPreview();
-  });
-  $('#pgBody').addEventListener('pointercancel',()=>{drag?.handle.classList.remove('dragging');drag=null;});
-  let dq;
-  $('#pgQ').addEventListener('input', () => {
-    clearTimeout(dq); dq = setTimeout(renderPrograms, 130);
-  });
-
-  $('#pgNewBtn').addEventListener('click', () => {
-    const p = $('#pgPick');
-    lastFocus = document.activeElement;
-    p.hidden = false;
-    requestAnimationFrame(() => p.classList.add('open'));
-    document.body.style.overflow = 'hidden';
-  });
-
-  $('#pgPick').addEventListener('click', e => {
-    const b = e.target.closest('[data-pgpick]');
-    const outside = e.target === e.currentTarget;
-    if (!b && !outside) return;
-    const kind = b ? b.dataset.pgpick : 'cancel';
-    const p = $('#pgPick');
-    p.classList.remove('open');
-    document.body.style.overflow = '';
-    setTimeout(() => { p.hidden = true }, 200);
-    if (kind === 'training' || kind === 'nutrition'){
-      openProgram(blankProgram(kind));
-    } else {
-      lastFocus?.focus();
-    }
-  });
-
-  $('#pgList').addEventListener('click', async e => {
-    const b = e.target.closest('[data-pg]'); if (!b) return;
-    const id = b.dataset.id;
-    const row = ROWS.programs.find(x => x.id === id);
-    if (b.dataset.pg === 'edit')  return openProgram(row);
-    if (b.dataset.pg === 'dup')   return dupProgram(id);
-    if (b.dataset.pg === 'del'){
-      /* نستعمل نفس نافذة التأكيد ودالة doDelete الموجودات */
-      PENDING_DELETE = { kind:'program', id, title:(row && row.title) || '' };
-      $('#confirmTitle').textContent = t('pg.delTitle');
-      $('#confirmText').textContent  = (row && row.title) || '';
-      const c = $('#confirm');
-      lastFocus = document.activeElement;
-      c.hidden = false;
-      requestAnimationFrame(() => c.classList.add('open'));
-      document.body.style.overflow = 'hidden';
-      requestAnimationFrame(() => $('#delNo').focus());
-      return;
-    }
-    if (b.dataset.pg === 'print'){
-      /* الطباعة من القائمة تشتغل بلا ما نفتح المحرر */
-      PG_EDIT = row; PG = JSON.parse(JSON.stringify(row));
-      PG.trainee = PG.trainee || {}; PG.design = PG.design || {}; PG.content = PG.content || {};
-      await document.fonts.ready;
-      buildPdf();
-      await Promise.all([...$('#pdfArea').querySelectorAll('img')].map(img => img.decode().catch(()=>{})));
-      document.body.classList.add('printing');
-      try { window.print() } finally { document.body.classList.remove('printing') }
-      PG = null; PG_EDIT = null;
-    }
-  });
-
-  addEventListener('beforeunload', e => { syncProgram(); if(pgDirty()){persistPgDraft(); e.preventDefault(); e.returnValue='';} });
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){syncProgram();persistPgDraft();}});
-  /* ── المحرر ── */
-  $('#pgModal').addEventListener('click', e => {
-    if(pgSaving) return;
-    const tool=e.target.closest('[data-pgtool]');
-    if(tool){
-      syncProgram();
-      const list=tool.dataset.kind==='day'?PG.content.days:PG.content.days[+tool.dataset.day].rows;
-      const i=+tool.dataset.i, action=tool.dataset.pgtool;
-      if(action==='copy') {const copy=JSON.parse(JSON.stringify(list[i])); if(tool.dataset.kind==='day') copy.label += pgText(' — نسخة',' — copy'); list.splice(i+1,0,copy);}
-      else {const j=i+(action==='up'?-1:1); if(j>=0 && j<list.length) [list[i],list[j]]=[list[j],list[i]];}
-      drawProgram(); persistPgDraft(); drawPreview(); return;
-    }
-    if (e.target === e.currentTarget) return closeProgram();
-    if (e.target.closest('[data-pgact="cancel"]')) return closeProgram();
-
-    const add = e.target.closest('[data-pgadd]');
-    if (add){
-      syncProgram();
-      const k = add.dataset.pgadd;
-      if (k === 'day')   PG.content.days.push({ label:'DAY ' + (PG.content.days.length + 1),
-                                                title:'', kind:'gym', muscles:[], rows:[], note:'' });
-      if (k === 'row')   (PG.content.days[+add.dataset.day].rows ||= [])
-                           .push({ n:'', en:'', m:'', sets:'3', reps:'12', v:'' });
-      if (k === 'meal')  PG.content.meals.push({ title:'', sub:'', img:'', rows:[], note:'' });
-      if (k === 'mrow')  (PG.content.meals[+add.dataset.meal].rows ||= [])
-                           .push({ n:'', m:'', reps:'' });
-      if (k === 'habit') PG.content.habits.push('');
-      if (k === 'str')   pgStretches()[add.dataset.str][add.dataset.phase].push({ n:'', en:'', d:'' });
-      drawProgram(); persistPgDraft(); drawPreview();
-      return;
-    }
-
-    const del = e.target.closest('[data-pgdel]');
-    if (del){
-      syncProgram();
-      const k = del.dataset.pgdel;
-      if (k === 'day')   PG.content.days.splice(+del.dataset.day, 1);
-      if (k === 'row')   PG.content.days[+del.dataset.day].rows.splice(+del.dataset.i, 1);
-      if (k === 'meal')  PG.content.meals.splice(+del.dataset.meal, 1);
-      if (k === 'mrow')  PG.content.meals[+del.dataset.meal].rows.splice(+del.dataset.i, 1);
-      if (k === 'habit') PG.content.habits.splice(+del.dataset.i, 1);
-      if (k === 'str')   pgStretches()[del.dataset.str][del.dataset.phase].splice(+del.dataset.i, 1);
-      drawProgram(); persistPgDraft(); drawPreview();
-      return;
-    }
-
-    const sw = e.target.closest('[data-accent]');
-    if (sw){
-      syncProgram();
-      PG.design.accent = sw.dataset.accent;
-      /* نحدّث aria-pressed بمكانه بدل ما نعيد بناء المحرر كله —
-         إعادة البناء تهدم الحقل اللي تحت المؤشر وترجّع التمرير للراس */
-      $$('#pg-accents .sw').forEach(b =>
-        b.setAttribute('aria-pressed', String(b === sw)));
-      drawPreview();
-      return;
-    }
-
-    if (e.target.closest('#pg-logoPick')) return openPicker('pglogo');
-    if (e.target.closest('#pg-logoClear')){
-      syncProgram();
-      PG.design.logo = '';
-      drawProgram(); persistPgDraft(); drawPreview();
-      return;
-    }
-    if (e.target.closest('#pg-setDefault')) return savePgDefaultDesign();
-
-    if (e.target.closest('#pg-strReset')){
-      syncProgram();
-      PG.content.stretchList = freshStretches();
-      drawProgram(); persistPgDraft(); drawPreview();
-      toast(t('pg.strResetDone'));
-      return;
-    }
-
-    /* صورة الوجبة — نخزن الفهرس بـPICK_TARGET حتى نعرف أي وجبة نرجع لها */
-    const mi = e.target.closest('[data-pgmealimg]');
-    if (mi){ syncProgram(); return openPicker('pgmeal:' + mi.dataset.pgmealimg) }
-
-    const mic = e.target.closest('[data-pgmealimgclear]');
-    if (mic){
-      syncProgram();
-      const meal = PG.content.meals[+mic.dataset.pgmealimgclear];
-      if (meal) meal.img = '';
-      drawProgram(); persistPgDraft(); drawPreview();
-      return;
-    }
-
-    const imp = e.target.closest('[data-pgimport]');
-    if (imp){ syncProgram(); return openImport(imp.dataset.pgimport) }
-  });
-
-  /* تبديل نوع اليوم يغيّر أعمدة الجدول، فنعيد الرسم */
-  $('#pgModal').addEventListener('change', e => {
-    if (e.target.classList.contains('d-kind')){ syncProgram(); drawProgram(); persistPgDraft(); drawPreview(); return }
-    /* مفاتيح التصميم والإطالات تغيّر الورقة فوراً */
-    schedulePreview();
-  });
-
-  /* ── التحديث الحي ──
-     ⚠️ `input` تحدّث **المعاينة بس**، وأبداً ما تعيد بناء المحرر.
-     إعادة البناء تهدم الحقل اللي تحت المؤشر وتضيّع مكان الكتابة —
-     نفس درس syncFilterPanel() بالموقع العام. */
-  $('#pgBody').addEventListener('input', e => {
-    /* التعبئة من المكتبة قبل جدولة المعاينة، حتى الحقول المملية
-       تنقرأ بنفس دورة المزامنة */
-    if (e.target.classList.contains('n-in')) autofillExercise(e.target);
-    schedulePreview();
-  });
-
-  /* تبديل تحرير/معاينة بالموبايل */
-  $('#pgModal').addEventListener('click', e => {
-    const v = e.target.closest('[data-pgview]'); if (!v) return;
-    syncProgram();
-    $('#pgSplit').dataset.view = v.dataset.pgview;
-    $$('.pg-seg button').forEach(b => b.setAttribute('aria-pressed', String(b === v)));
-    if (v.dataset.pgview === 'prev') drawPreview();   /* والمراقب يضبط المقاس */
-  });
-
-  /* تغيّر عرض النافذة يغيّر معامل التصغير */
-  let rz;
-  addEventListener('resize', () => {
-    if ($('#pgModal').hidden) return;
-    clearTimeout(rz); rz = setTimeout(() => fitPreview(), 120);
-  });
-
-  /* ── نافذة الاستيراد ── */
-  $('#pgImportClose').addEventListener('click', closeImport);
-  $('#pgImport').addEventListener('click', e => {
-    if (e.target === e.currentTarget) return closeImport();
-    const b = e.target.closest('[data-imp]');
-    if (b) doImport(b.dataset.imp);
-  });
-  let iq;
-  $('#pgImportQ').addEventListener('input', () => {
-    clearTimeout(iq); iq = setTimeout(renderImport, 130);
-  });
-
-  $('#pgSaveBtn').addEventListener('click', saveProgram);
-  $('#pgPrintBtn').addEventListener('click', printProgram);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -6143,7 +3922,6 @@ async function saveNewPassword(e){
 let SIGNED_IN = false;   /* يمنع جلب البيانات مرتين عند أول تحميل */
 
 async function showApp(session){
-  pgOwner = session?.user?.id || '';
   if (RECOVERING) return;          /* لا تتخطّى شاشة كلمة السر */
   $('#gate').hidden = true;
   $('#pwGate').hidden = true;
@@ -6162,7 +3940,8 @@ function showGate(){
   $('#gate').hidden = false;
   /* ⚠️ لازم يطابق تعريف ROWS الأصلي — مفتاح ناقص هنا معناه
      `undefined.filter` بأول ما يفتح التبويب مالته بعد الخروج */
-  ROWS = { recipes:[], courses:[], programs:[] };
+  ROWS = { recipes:[], courses:[] };
+  ORDERS = [];
   $('#loginErr').textContent = '';
 }
 
@@ -6220,7 +3999,16 @@ function wire(){
 
   PANES.forEach(k => $('#tab-' + k).addEventListener('click', () => setTab(k)));
 
-  wirePrograms();
+  /* ── الطلبات ── */
+  $('#ordRefresh').addEventListener('click', loadOrders);
+  $('#ordChips').addEventListener('click', e => {
+    const c = e.target.closest('[data-of]'); if (!c) return;
+    OFILTER = c.dataset.of; renderOrders();
+  });
+  $('#ordList').addEventListener('click', e => {
+    const c = e.target.closest('[data-oc]'); if (c) return toggleContacted(c.dataset.oc);
+    const d = e.target.closest('[data-od]'); if (d) return askDeleteOrder(d.dataset.od);
+  });
 
   /* ── محرر محتوى الصفحة ── */
   /* احفظ أي أقسام مفتوحة حتى ما تنسدّ عند إعادة الرسم */
@@ -6250,7 +4038,7 @@ function wire(){
       const blank = {
         stats:  { n:emptyBi(), l:emptyBi() },
         creds:  { icon:'i-check-circle', t:emptyBi(), s:emptyBi() },
-        plans:  { featured:false, name:emptyBi(), tag:emptyBi(), price:emptyBi(),
+        plans:  { featured:false, name:emptyBi(), tag:emptyBi(), price:emptyBi(), amount:null,
                   unit:emptyBi(), desc:emptyBi(), features:{ ar:[], en:[] } },
         quotes: { t:emptyBi(), n:emptyBi(), r:emptyBi() },
         faq:    { q:emptyBi(), a:emptyBi() }
@@ -6295,11 +4083,17 @@ function wire(){
   $('#contentBody').addEventListener('change', e => {
     const inp = e.target;
     if (!inp.matches || !inp.matches('[data-ct^="sections."]')) return;
-    CT.sections[inp.dataset.ct.slice('sections.'.length)] = inp.checked;
+    const key = inp.dataset.ct.slice('sections.'.length);
+    CT.sections[key] = inp.checked;
 
     const row = inp.closest('.sec-row');
     row.classList.toggle('off', !inp.checked);
     row.querySelector('.sec-state').textContent = t(inp.checked ? 'sec.on' : 'sec.off');
+    if (PAGE_KEYS.includes(key)){
+      const pb = $('#contentBody [data-acc="pages"] .acount');
+      if (pb) pb.textContent = PAGE_KEYS.filter(k => CT.sections[k]).length;
+      return;
+    }
 
     const on = SECTION_KEYS.filter(k => CT.sections[k] !== false).length;
     const badge = $('#contentBody [data-acc="sections"] .acount');
@@ -6491,14 +4285,13 @@ function wire(){
     if (e.key !== 'Escape') return;
     if (!$('#confirm').hidden) return closeConfirm();
     if (!$('#picker').hidden)  return closePicker();
-    if (!$('#pgModal').hidden) return closeProgram();
     if (!$('#modal').hidden)   return closeForm();
   });
 
   /* حصر التركيز داخل المودال المفتوح */
   document.addEventListener('keydown', e => {
     if (e.key !== 'Tab') return;
-    const box = !$('#confirm').hidden ? $('#confirm') : (!$('#picker').hidden ? $('#picker') : !$('#pgModal').hidden ? $('#pgModal') : !$('#pgPick').hidden ? $('#pgPick') : !$('#modal').hidden ? $('#modal') : null);
+    const box = !$('#confirm').hidden ? $('#confirm') : (!$('#picker').hidden ? $('#picker') : !$('#modal').hidden ? $('#modal') : null);
     if (!box) return;
     const f = [...box.querySelectorAll('a[href],button:not([disabled]),input:not([type=hidden]),select,textarea,[tabindex="0"]')]
                 .filter(el => el.offsetParent !== null);
@@ -6513,7 +4306,6 @@ function wire(){
    ⑭  الإقلاع
    ══════════════════════════════════════════════════════════ */
 applyLang();
-buildExIndex();     /* البذرة تشتغل حتى قبل أول تحميل من الداتابيس */
 syncThemeColor();
 syncThemeIcons();
 wire();

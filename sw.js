@@ -5,11 +5,11 @@
      • الخطوط والصور                → الكاش أول، والشبكة تحدّثه
      • طلبات Supabase (API)         → الشبكة فقط، أبداً ما تنكشّ
    ═══════════════════════════════════════════════════════════ */
-/* ⚠️ ارفع الرقم مع كل تعديل جوهري على index.html أو admin.html.
+/* ⚠️ ارفع الرقم مع كل تعديل جوهري على index.html أو catalog.html أو admin.html.
    الاستراتيجية «الشبكة أول» فالنسخة الجديدة توصل عادةً، بس النسخة
    المخزونة هي اللي تنعرض أوفلاين — وبدون رفع الرقم تبقى القديمة. */
-const V     = 'cz-v6';
-const SHELL = ['./', './index.html', './manifest.webmanifest'];
+const V     = 'cz-v7';
+const SHELL = ['./', './index.html', './landing-defaults.js', './manifest.webmanifest'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
