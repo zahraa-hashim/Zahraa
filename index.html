@@ -1215,10 +1215,12 @@ function paint(){
   paintMark(); paintNav(); paintTitle(); paintStats(); paintMarquee();
   paintServices(); paintAbout(); paintReviews(); paintPlans(); paintFaq(); paintContact();
 
-  const ph = photos();
-  photoInto($('#introPhoto'), ph[0]);
-  photoInto($('#aboutPhoto'), SITE.about_image || ph[1] || ph[0]);
-  photoInto($('#faqPhoto'), ph[1] || ph[0] || SITE.about_image);
+  /* الصور من خاناتها باللوحة (landing.photos)، وإذا ماكو، من الأعمدة القديمة */
+  const ph = photos(), lp = (SITE.landing && SITE.landing.photos) || {};
+  const pick = (v, fb) => v !== undefined ? v : fb;
+  photoInto($('#introPhoto'), pick(lp.intro, ph[0]));
+  photoInto($('#aboutPhoto'), pick(lp.about, SITE.about_image || ph[1] || ph[0]));
+  photoInto($('#faqPhoto'),   pick(lp.faq, ph[1] || ph[0] || SITE.about_image));
 
   wireReveal(); wireTilt(); wireMagnetic(); countUp(); startReviews(); onScroll();
 }
