@@ -3849,6 +3849,7 @@ async function runAi(file){
   let res, note;
   try {
     const image = await toAiBase64(file);
+    var t0 = Date.now();
     const { data, error } = await sb.functions.invoke(AI_FN,
       { body: { image, media_type: 'image/jpeg', model, hint } });
     if (error){
@@ -3863,7 +3864,9 @@ async function runAi(file){
         catch(e){ msg = body.slice(0, 200) }
       } catch(e){}
       if (st === 404 && code === 'generic') code = 'not_found';
-      if (code === 'generic' && !msg) msg = `${error.name}${st ? ' ' + st : ''}: ${error.message}`;
+      /* الثواني والمصدر يفرّقون بين «انكطع بعد انتظار طويل» و«انمنع فوراً» */
+      if (code === 'generic' && !msg) msg = `${error.name}${st ? ' ' + st : ''}: ${error.message}` +
+        ` (${((Date.now() - t0) / 1000).toFixed(0)}s · ${location.origin} · ${error.context?.message || ''})`;
       else if (code === 'generic' && st) msg = st + ' — ' + msg;
       const k = 'ai.e.' + code;
       note = { bad:true, text: (t(k) !== k ? t(k) : t('ai.e.generic')) + (msg ? ' — ' + msg : '') };
