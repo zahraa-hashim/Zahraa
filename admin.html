@@ -627,7 +627,7 @@ const DEF = window.LANDING_DEFAULTS || {};
 const LISTS = window.LANDING_LISTS || {};
 
 /* الأقسام اللي تنطفي (الناقص = ظاهر) — لازم تطابق SECTION_NODES بـ index.html */
-const SECTION_KEYS = ['trust','services','about','reviews','plans','faq','cta'];
+const SECTION_KEYS = ['trust','services','about','reviews','plans','classes','faq','cta'];
 /* الصفحات والميزات (الناقص = مطفي) — لازم تطابق page() بـ index.html */
 const PAGE_KEYS = ['food','courses','pay'];
 
@@ -638,6 +638,14 @@ const SLOTS = [
   { id:'about', path:'landing.photos.about', folder:'site',   t:'صورة «تعرّفي عليّ»',       where:'جنب النبذة والتوقيع' },
   { id:'faq',   path:'landing.photos.faq',   folder:'site',   t:'صورة قسم الأسئلة',         where:'جنب الأسئلة المتكررة' }
 ];
+
+/* خانة صورة — الثابتة من SLOTS، وصورة كل كلاس «class:رقم» */
+function slotDef(id){
+  const m = /^class:(\d+)$/.exec(id);
+  if (m) return { id, path:`classes.${m[1]}.image`, folder:'site', t:`صورة الكلاس ${+m[1] + 1}`, where:'أعلى بطاقة الكلاس' };
+  return SLOTS.find(s => s.id === id);
+}
+const classSlots = () => (D && D.classes || []).map((_, i) => slotDef('class:' + i));
 
 function getPath(o, path){ return path.split('.').reduce((n, k) => n == null ? n : n[k], o) }
 function setPath(o, path, v){
@@ -693,6 +701,10 @@ function buildDraft(s){
   });
   /* مزايا الباقة لازم تكون {ar:[],en:[]} */
   d.plans.forEach(p => { p.features = p.features && typeof p.features === 'object' ? p.features : { ar:[], en:[] } });
+  /* الكلاسات تنحفظ داخل landing.classes — ماكو عمود جديد ولا SQL */
+  const sc = s.landing && Array.isArray(s.landing.classes) ? s.landing.classes : [];
+  d.classes = clone(sc).map(c => Object.assign(BLANKS.classes(), c));
+  d.classes.forEach(c => { c.features = c.features && typeof c.features === 'object' ? c.features : { ar:[], en:[] } });
   return d;
 }
 
@@ -735,7 +747,7 @@ function group(g, skip = []){
 
 /* خانة صورة صغيرة داخل القسم */
 function slotHtml(id, big){
-  const s = SLOTS.find(x => x.id === id);
+  const s = slotDef(id);
   const url = getPath(D, s.path) || '';
   return `<div class="slot">
     <span class="slot-img">${url ? `<img src="${esc(url)}" alt="">` : ico('i-image')}</span>
@@ -768,7 +780,9 @@ const BLANKS = {
   creds:  () => ({ icon:'i-spark', t:emptyBi(), s:emptyBi() }),
   quotes: () => ({ t:emptyBi(), n:emptyBi(), r:emptyBi() }),
   plans:  () => ({ featured:false, name:emptyBi(), tag:emptyBi(), price:emptyBi(), unit:emptyBi(), amount:null, desc:emptyBi(), features:{ ar:[], en:[] } }),
-  faq:    () => ({ q:emptyBi(), a:emptyBi() })
+  faq:    () => ({ q:emptyBi(), a:emptyBi() }),
+  classes:() => ({ featured:false, name:emptyBi(), tag:emptyBi(), image:'', schedule:emptyBi(), duration:emptyBi(), place:emptyBi(), seats:emptyBi(),
+                   price:emptyBi(), unit:emptyBi(), desc:emptyBi(), features:{ ar:[], en:[] } })
 };
 const SVC_ICONS = [['i-dumbbell','دمبل'],['i-salad','أكل'],['i-calendar','تقويم'],['i-users','ناس'],['i-heart','قلب'],['i-flame','نار'],['i-star','نجمة'],['i-spark','لمعة'],['i-shield','درع'],['i-book','كتاب'],['i-check-circle','صح']];
 
@@ -800,9 +814,10 @@ const PAGE_SECTIONS = [
       <div class="fld"><span class="lbl">النبذة</span>
         <textarea class="inp" rows="6" data-k="bio">${esc(D.bio)}</textarea>
         <div class="f-en"><textarea class="inp" rows="6" data-k="bio_en" dir="ltr">${esc(D.bio_en)}</textarea></div></div>
-      <p class="hint">الاقتباس الوردي جنب النبذة = أول رأي بقسم الآراء.</p>` },
+      <p class="hint">«الاقتباس بالبطاقة الوردية» فوق هو البطاقة الوردية اللي جنب النبذة. إذا فرّغتيه تختفي البطاقة.</p>` },
   { id:'reviews', icon:'i-star', t:'الآراء', sub:'آراء المتدربات — يتقلبن تلقائياً', anchor:'reviews', toggle:'reviews',
     body:() => `${group('reviews')}<h4 class="sub">الآراء</h4>
+      <p class="hint">البطاقة الوردية جنب النبذة تتعدّل من قسم «تعرّفي عليّ».</p>
       ${listEditor('quotes','رأي', it => biTxt(it.n), (it, i) =>
         `${biField('الرأي', `quotes.${i}.t`, 'area')}<div class="grid2">${biField('الاسم', `quotes.${i}.n`)}${biField('تحت الاسم (مثل: متدربة أونلاين)', `quotes.${i}.r`)}</div>`)}` },
   { id:'plans', icon:'i-check-circle', t:'الباقات والأسعار', sub:'الباقات اللي تنباع', anchor:'plans', toggle:'plans',
@@ -815,6 +830,19 @@ const PAGE_SECTIONS = [
         ${biField('سطر تحت الاسم (اختياري)', `plans.${i}.tag`)}
         ${biField('الوصف', `plans.${i}.desc`)}
         ${biField('المزايا', `plans.${i}.features`, 'lines')}`)}` },
+  { id:'classes', icon:'i-users', t:'الكلاسات', sub:'الكلاسات الجماعية — تبين بشريط دوّار مثل الباقات', anchor:'classes', toggle:'classes',
+    body:() => `${group('classes')}<h4 class="sub">الكلاسات</h4>
+      <p class="hint">إذا ماكو ولا كلاس، القسم وزرّه بأول الصفحة يختفون تلقائياً. الحجز يفتح واتساب برسالة باسم الكلاس.</p>
+      ${listEditor('classes','كلاس', it => biTxt(it.name), (it, i) => `
+        <label class="en-toggle" style="justify-self:start"><span class="sw"><input type="checkbox" data-k="classes.${i}.featured" data-bool${it.featured ? ' checked' : ''}><i></i></span>الكلاس المميّز (غامق وفيه شارة)</label>
+        ${slotHtml('class:' + i)}
+        ${biField('اسم الكلاس', `classes.${i}.name`)}
+        ${biField('سطر تحت الاسم (اختياري — مثل: للمبتدئات)', `classes.${i}.tag`)}
+        <div class="grid2">${biField('الأيام والوقت (مثل: السبت والثلاثاء · ٦ مساءً)', `classes.${i}.schedule`)}${biField('مدة الجلسة (مثل: ٦٠ دقيقة)', `classes.${i}.duration`)}</div>
+        <div class="grid2">${biField('المكان (مثل: نادي … / أونلاين)', `classes.${i}.place`)}${biField('عدد المقاعد (مثل: ١٢ مقعد)', `classes.${i}.seats`)}</div>
+        <div class="grid2">${biField('السعر كما يبين (اختياري)', `classes.${i}.price`)}${biField('الوحدة (مثل د.ع / شهر)', `classes.${i}.unit`)}</div>
+        ${biField('الوصف (يبين بظهر البطاقة)', `classes.${i}.desc`, 'area')}
+        ${biField('شنو يتضمن (يبين بظهر البطاقة)', `classes.${i}.features`, 'lines')}`)}` },
   { id:'faq', icon:'i-info', t:'الأسئلة المتكررة', sub:'سؤال وجواب + صورة', anchor:'faq', toggle:'faq',
     body:() => `${slotHtml('faq')}${group('faq')}<h4 class="sub">الأسئلة</h4>
       ${listEditor('faq','سؤال', it => biTxt(it.q), (it, i) => `${biField('السؤال', `faq.${i}.q`)}${biField('الجواب', `faq.${i}.a`, 'area')}`)}` },
@@ -854,7 +882,7 @@ function storagePath(url){
 /* وين مستعملة الصورة — بالمسودة (حتى قبل الحفظ) وبالوصفات والكورسات */
 function usedBy(url){
   if (!url) return [];
-  const hits = SLOTS.filter(s => getPath(D, s.path) === url).map(s => s.t.replace('صورة ', ''));
+  const hits = [...SLOTS, ...classSlots()].filter(s => getPath(D, s.path) === url).map(s => s.t.replace('صورة ', ''));
   COVERS.forEach(c => { if (c.cover === url) hits.push(c.title) });
   return hits;
 }
@@ -946,7 +974,7 @@ async function uploadImage(original, folder, bar){
 /* ── نافذة الاختيار ── */
 let PICK = null;   /* خانة الصورة اللي ديختار إلها */
 function openPicker(slotId){
-  PICK = SLOTS.find(s => s.id === slotId);
+  PICK = slotDef(slotId);
   $('#pickTitle').textContent = PICK.t;
   $('#pickWhere').textContent = 'تبين: ' + PICK.where;
   drawPicker();
@@ -963,7 +991,7 @@ function drawPicker(){
     : `<div class="empty" style="grid-column:1/-1">${ico('i-image')}<b>المكتبة فاضية</b><span>ارفعي صورة جديدة من الزر فوق.</span></div>`;
 }
 function setSlot(slotId, url){
-  const s = SLOTS.find(x => x.id === slotId);
+  const s = slotDef(slotId);
   setPath(D, s.path, url);
   markDirty();
   if (VIEW === 'page') drawPage(); else drawPhotos();
@@ -1101,7 +1129,7 @@ async function save(){
   const payload = {
     name:D.name.trim() || 'كوتش زهراء', name_en:D.name_en.trim(), initial:(D.initial.trim() || D.name.trim().charAt(0) || 'ز'),
     avatar_url:D.avatar_url, whatsapp:D.whatsapp.trim(), instagram:D.instagram.trim(),
-    bio:D.bio, bio_en:D.bio_en, sections:D.sections, landing:D.landing,
+    bio:D.bio, bio_en:D.bio_en, sections:D.sections, landing:Object.assign({}, D.landing, { classes:D.classes }),
     stats:D.stats, creds:D.creds, plans:D.plans, quotes:D.quotes, faq:D.faq,
     hero_image:p.intro || '', hero_images:[p.intro, p.faq].filter(Boolean), about_image:p.about || ''
   };
@@ -1244,7 +1272,7 @@ function wire(){
     if (error) return toast('الحذف فشل — ' + error.message, 'bad');
     MEDIA = MEDIA.filter(x => x !== m);
     /* إذا مستعملة بخانة، فرّغ الخانة حتى ما يبقى رابط مكسور */
-    SLOTS.forEach(s => { if (getPath(D, s.path) === m.url){ setPath(D, s.path, ''); markDirty() } });
+    [...SLOTS, ...classSlots()].forEach(s => { if (getPath(D, s.path) === m.url){ setPath(D, s.path, ''); markDirty() } });
     drawPhotos(); paintBrand(); toast('انحذفت');
   });
   $('#pickUpload').addEventListener('click', () => $('#pickFile').click());

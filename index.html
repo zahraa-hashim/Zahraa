@@ -349,7 +349,9 @@ h1,h2,h3{font-family:var(--f-head);line-height:1.15;text-wrap:balance}
 .stat span{font-size:13px;color:var(--on-night-soft)}
 /* الأرقام تنعرض مثل ما انكتبت (+120 تبقى +120 مو 120+) */
 .stat b,.burst b,.price b{direction:ltr;unicode-bidi:isolate}
-.stat b{text-align:start}
+/* الرقم LTR، فـ text-align:start يصير يسار ويبعد عن الكلمة.
+   عرضه على قد الرقم، فيلزق بنفس حافة الكلمة تحته (يمين بالعربي، يسار بالإنكليزي) */
+.stat b{width:fit-content;max-width:100%}
 
 .intro-art{position:relative;min-height:clamp(380px,62vw,520px);order:1;overflow:hidden}
 .intro-photo{position:absolute;inset:-8% 0;will-change:transform}
@@ -498,40 +500,129 @@ h1,h2,h3{font-family:var(--f-head);line-height:1.15;text-wrap:balance}
 .dots button[aria-current="true"]{width:30px;background:var(--gold)}
 .dots button::before{content:"";display:block;width:44px;height:44px;margin:-17px} /* مساحة لمس أكبر */
 
-/* ══ ⑬  الباقات ══ */
-.plan-grid{display:grid;gap:16px;grid-template-columns:1fr;align-items:stretch;perspective:1200px}
-@media (min-width:860px){ .plan-grid{grid-template-columns:repeat(3,1fr)} }
-.plan{
-  position:relative;display:flex;flex-direction:column;gap:18px;
-  padding:32px 28px;border-radius:var(--r-lg);background:var(--card);border:1px solid var(--line);
-  transform-style:preserve-3d;transition:transform .5s var(--ease),box-shadow .5s var(--ease);
+/* ══ ⑬  الباقات والكلاسات — شريط بطاقات دوّار (coverflow)
+   البطاقة بالنص كبيرة وقدّام، والجيران مايلين لورا. البطاقة الفعّالة
+   تنقلب (مثل الكارت) لما يمر عليها المؤشر أو تنضغط «التفاصيل»:
+   الوجه = الاسم والسعر، والظهر = كل المزايا وزر الاشتراك. ══ */
+#plans,#classes{overflow-x:clip}
+.sec-night{background:var(--night);color:var(--on-night)}
+.sec-night .kicker{color:var(--gold)}
+.sec-night .head p{color:var(--on-night-soft)}
+
+.cf{--w:min(360px,80vw);--h:580px;position:relative}
+.cf-stage{position:relative;height:var(--h);perspective:1500px;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.cf-card{
+  position:absolute;top:0;left:50%;width:var(--w);height:100%;margin-left:calc(var(--w) / -2);
+  transform-style:preserve-3d;will-change:transform;
+  transition:transform .75s var(--ease),opacity .5s var(--ease);
 }
-.plan:hover{box-shadow:var(--shadow-lg)}
-.plan.feat{background:var(--night);color:var(--on-night);border-color:transparent;box-shadow:var(--shadow-lg)}
-.plan.feat::before{
-  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  background:radial-gradient(420px circle at 100% 0%,rgba(227,160,92,.30),transparent 60%);
+.cf-card:not(.on){cursor:pointer}
+.cf-card.far{opacity:0;pointer-events:none}
+.cf-card .flip{
+  position:relative;width:100%;height:100%;transform-style:preserve-3d;
+  transition:transform .85s cubic-bezier(.3,1.3,.5,1);
 }
-@media (min-width:860px){ .plan.feat{transform:translateY(-14px)} }
+.cf-card.flipped .flip{transform:rotateY(180deg)}
+.cf-card:not(.on) .face{filter:saturate(.8) brightness(.94)}
+.sec-night .cf-card:not(.on) .face{filter:brightness(.62)}
+
+.face{
+  position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;
+  padding:30px 26px 26px;border-radius:var(--r-lg);overflow:hidden;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow-lg);
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;transition:filter .5s var(--ease);
+}
+.face.back{transform:rotateY(180deg)}
+.feat .face{background:var(--night);color:var(--on-night);border-color:transparent}
+.feat .face::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(420px circle at 100% 0%,rgba(227,160,92,.32),transparent 60%);
+}
+.sec-night .feat .face{background:linear-gradient(165deg,#2C2117,#16120E 70%);border:1px solid rgba(227,160,92,.5)}
+.face > *{position:relative}
 .badge{
-  position:absolute;inset-block-start:-13px;inset-inline-start:24px;
-  padding:5px 14px;border-radius:999px;background:var(--blush);color:#3A1E24;
+  position:absolute;inset-block-start:18px;inset-inline-end:18px;z-index:1;
+  padding:5px 13px;border-radius:999px;background:var(--blush);color:#3A1E24;
   font-family:var(--f-head);font-size:12.5px;font-weight:800;
 }
-.plan h3{font-size:22px;font-weight:900}
-.plan .tag{font-size:13.5px;color:var(--soft)}
-.plan.feat .tag,.plan.feat .desc,.plan.feat li{color:var(--on-night-soft)}
+.face h3{font-size:clamp(21px,2.2vw,24px);font-weight:900;line-height:1.25}
+.face .tag{display:block;margin-top:4px;font-size:13.5px;color:var(--soft)}
+.feat .face .tag,.feat .face .desc,.feat .face li,.feat .face .peek li{color:var(--on-night-soft)}
 .price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.price b{font-family:var(--f-head);font-size:clamp(38px,4.6vw,48px);font-weight:900;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
-.plan.feat .price b{color:var(--gold)}
+.price b{font-family:var(--f-head);font-size:clamp(38px,4.4vw,46px);font-weight:900;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.feat .price b{color:var(--gold)}
 .price span{font-size:14px;color:var(--soft)}
-.plan.feat .price span{color:var(--on-night-soft)}
-.desc{font-size:14.5px;color:var(--soft)}
-.plan ul{list-style:none;margin:0;padding:18px 0 0;border-top:1px solid var(--line);display:grid;gap:11px;flex:1}
-.plan.feat ul{border-color:rgba(247,240,232,.14)}
-.plan li{display:flex;gap:10px;align-items:flex-start;font-size:15px;color:var(--ink-2)}
-.plan li .icon{color:var(--gold);margin-top:.3em}
-.plan .btn{width:100%}
+.feat .price span{color:var(--on-night-soft)}
+.desc{font-size:14.5px;color:var(--soft);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+.face ul{list-style:none;margin:0;padding:0;display:grid;gap:11px;align-content:start}
+.face li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:var(--ink-2)}
+.face li .icon{color:var(--gold);margin-top:.3em;flex:none}
+.peek{padding-top:14px!important;border-top:1px solid var(--line)}
+.feat .peek{border-color:rgba(247,240,232,.14)}
+.peek li span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.peek .more{font-size:13px;font-weight:700;color:var(--gold-ink)}
+.feat .peek .more{color:var(--gold)}
+.face .grow{flex:1;min-height:0}
+.face-acts{display:flex;gap:10px;align-items:center}
+.face-acts .btn{flex:1}
+.flip-btn{
+  flex:none;display:inline-flex;align-items:center;gap:6px;min-height:var(--bh,52px);padding:0 16px;border-radius:999px;
+  font-family:var(--f-head);font-weight:800;font-size:14px;border:1.5px solid var(--line-2);color:inherit;
+  transition:background-color .2s,border-color .2s,transform .3s var(--spring);
+}
+.flip-btn:hover{border-color:var(--gold);background:rgba(227,160,92,.12)}
+.flip-btn:active{transform:scale(.95)}
+.feat .flip-btn{border-color:rgba(247,240,232,.28)}
+.flip-btn .icon{width:18px;height:18px}
+/* الظهر */
+.back-head{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.feat .back-head{border-color:rgba(247,240,232,.14)}
+.back-head b{flex:1;font-family:var(--f-head);font-size:18px;font-weight:900;line-height:1.3}
+.back-head .ibtn{flex:none;color:inherit;background:var(--line)}
+.feat .back-head .ibtn{background:rgba(247,240,232,.1)}
+.back-list{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-inline-end:4px;scrollbar-width:thin}
+.back-list .desc{-webkit-line-clamp:unset;display:block;margin-bottom:14px;white-space:pre-line}
+.back-sum{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-family:var(--f-head)}
+.back-sum b{font-size:24px;font-weight:900;font-variant-numeric:tabular-nums}
+.feat .back-sum b{color:var(--gold)}
+.back-sum span{font-size:13px;color:var(--soft)}
+.feat .back-sum span{color:var(--on-night-soft)}
+/* بطاقة الكلاس: صورة فوق */
+.face.cls{padding:0;gap:0}
+.cls-img{position:relative;height:190px;flex:none;overflow:hidden;background:linear-gradient(135deg,var(--gold),#C9713F)}
+.cls-img img{width:100%;height:100%;object-fit:cover}
+.cls-img .ph{position:absolute;inset:0;display:grid;place-items:center;color:rgba(22,19,15,.55)}
+.cls-img .ph .icon{width:64px;height:64px;stroke-width:1.4}
+.cls-img::after{content:"";position:absolute;inset:auto 0 0;height:50%;background:linear-gradient(transparent,rgba(0,0,0,.35))}
+.cls-body{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding:20px 24px 24px}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.meta span{
+  display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;
+  font-size:12.5px;font-weight:600;background:var(--line);color:var(--ink-2);
+}
+.feat .meta span{background:rgba(247,240,232,.1);color:var(--on-night)}
+.meta .icon{width:14px;height:14px;color:var(--gold-ink)}
+.feat .meta .icon{color:var(--gold)}
+.cls .price b{font-size:clamp(30px,3.4vw,36px)}
+/* التنقل تحت الشريط */
+.cf-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:30px}
+.cf-arrow{
+  width:50px;height:50px;border-radius:50%;display:grid;place-items:center;
+  background:var(--card);border:1px solid var(--line-2);color:var(--ink);box-shadow:0 6px 20px -8px rgba(22,19,15,.25);
+  transition:transform .3s var(--spring),background-color .2s,color .2s;
+}
+.cf-arrow:hover{background:var(--gold);color:var(--night);border-color:transparent}
+.cf-arrow:active{transform:scale(.9)}
+.cf-arrow.next .icon{transform:scaleX(1)}
+.cf-arrow.prev .icon{transform:scaleX(-1)}
+:root[dir="ltr"] .cf-arrow.next .icon{transform:scaleX(-1)}
+:root[dir="ltr"] .cf-arrow.prev .icon{transform:scaleX(1)}
+.sec-night .cf-arrow{background:rgba(247,240,232,.08);border-color:rgba(247,240,232,.18);color:var(--on-night)}
+.sec-night .cf-arrow:hover{background:var(--gold);color:var(--night)}
+.cf-dots{margin-top:0}
+.sec-night .cf-dots button{background:rgba(247,240,232,.25)}
+.sec-night .cf-dots button[aria-current="true"]{background:var(--gold)}
+@media (max-width:560px){ .cf{--h:560px} .face{padding:26px 22px 22px} }
 .pay-note{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:30px;color:var(--soft);font-size:14px;text-align:center}
 
 /* ══ ⑭  الأسئلة ══ */
@@ -686,6 +777,8 @@ dialog[open]::backdrop{animation:fade .3s var(--ease)}
     <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8.4h13M17 8.4l-3.2-3.2M17 8.4l-3.2 3.2"/><path d="M20 15.6H7M7 15.6l3.2-3.2M7 15.6l3.2 3.2"/></symbol>
       <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s6.6-5.6 6.6-11.2a6.6 6.6 0 0 0-13.2 0C5.4 15.4 12 21 12 21Z"/><circle cx="12" cy="9.8" r="2.4"/></symbol>
+    <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M3.6 12a8.4 8.4 0 0 1 14.3-6"/><path d="M18.4 2.8v3.6h-3.6"/><path d="M20.4 12a8.4 8.4 0 0 1-14.3 6"/><path d="M5.6 21.2v-3.6h3.6"/></symbol>
 </defs>
 </svg>
 
@@ -727,7 +820,7 @@ dialog[open]::backdrop{animation:fade .3s var(--ease)}
           <p class="intro-sub" data-l="intro.sub"></p>
           <div class="intro-acts">
             <a class="btn btn-gold" href="#plans" data-mag><span data-l="intro.cta1"></span><svg class="icon arr"><use href="#i-arrow"></use></svg></a>
-            <a class="btn btn-line" href="#services" data-l="intro.cta2"></a>
+            <a class="btn btn-line" href="#classes" id="classesCta"><svg class="icon"><use href="#i-users"></use></svg><span data-l="intro.ctaClasses"></span></a>
           </div>
           <div class="stats" id="stats"></div>
         </div>
@@ -809,8 +902,20 @@ dialog[open]::backdrop{animation:fade .3s var(--ease)}
         <h2 data-lh="plans.title"></h2>
         <p data-l="plans.sub"></p>
       </div>
-      <div class="plan-grid" id="planGrid"></div>
+      <div class="cf" id="planCf" data-rv></div>
       <p class="pay-note" id="payNote" data-rv><svg class="icon"><use href="#i-lock"></use></svg><span data-l="plans.note"></span></p>
+    </div>
+  </section>
+
+  <!-- ══ الكلاسات ══ -->
+  <section class="sec sec-night" id="classes">
+    <div class="wrap">
+      <div class="head" data-rv>
+        <span class="kicker" data-l="classes.kicker"></span>
+        <h2 data-lh="classes.title"></h2>
+        <p data-l="classes.sub"></p>
+      </div>
+      <div class="cf" id="classCf" data-rv></div>
     </div>
   </section>
 
@@ -975,6 +1080,10 @@ function titleHtml(raw){
 
 /* قائمة من site_info — والاحتياطية إذا فاضية تماماً */
 const list = key => (Array.isArray(SITE[key]) && SITE[key].length) ? SITE[key] : (LANDING_LISTS[key] || []);
+/* الكلاسات محفوظة بـ site_info.landing.classes (ما تحتاج عمود جديد).
+   ماكو قائمة احتياطية: إذا ماكو كلاسات، القسم وزرّه ورابطه يختفون. */
+const classList = () => (SITE.landing && Array.isArray(SITE.landing.classes) ? SITE.landing.classes : []).filter(c => bi(c.name));
+const hasClasses = () => sec('classes') && classList().length > 0;
 
 const siteName = () => (LANG === 'en' && SITE.name_en) ? SITE.name_en : (SITE.name || (LANG === 'en' ? 'Coach Zahraa' : 'كوتش زهراء'));
 const siteBio  = () => latin((LANG === 'en' && SITE.bio_en) ? SITE.bio_en : (SITE.bio || ''));
@@ -996,14 +1105,15 @@ const SECTION_NODES = {
   about:    ['#about'],
   reviews:  ['#reviews'],
   plans:    ['#plans'],
+  classes:  ['#classes'],
   faq:      ['#faq'],
   cta:      ['#contact']
 };
 
 function navItems(){
   const items = [
-    ['services','#services'],['about','#about'],['plans','#plans'],['faq','#faq'],['contact','#contact']
-  ].filter(([k]) => sec(k === 'contact' ? 'cta' : k))
+    ['services','#services'],['about','#about'],['plans','#plans'],['classes','#classes'],['faq','#faq'],['contact','#contact']
+  ].filter(([k]) => k === 'classes' ? hasClasses() : sec(k === 'contact' ? 'cta' : k))
    .map(([k, href]) => ({ k, href, txt:L('nav.' + k) }));
   if (page('food'))    items.push({ k:'food',    href:'catalog.html#/recipes', txt:L('nav.food'),    ext:true });
   if (page('courses')) items.push({ k:'courses', href:'catalog.html#/courses', txt:L('nav.courses'), ext:true });
@@ -1108,12 +1218,13 @@ function paintServices(){
 
 function paintAbout(){
   $('#bio').textContent = siteBio();
-  const q = list('quotes')[0];
-  $('#aboutQuote').innerHTML = q ? `
+  /* البطاقة الوردية: نصها من «تعرّفي عليّ» باللوحة — فاضي = تختفي */
+  const t = L('about.quote'), by = L('about.quoteBy');
+  $('#aboutQuote').innerHTML = t ? `
     <span class="qm" aria-hidden="true">”</span>
-    <blockquote>${esc(bi(q.t))}</blockquote>
-    <cite>— ${esc(bi(q.n))}</cite>` : '';
-  $('#aboutQuote').hidden = !q;
+    <blockquote>${esc(t)}</blockquote>
+    ${by ? `<cite>— ${esc(by)}</cite>` : ''}` : '';
+  $('#aboutQuote').hidden = !t;
 }
 
 let REV_I = 0, revTimer = null;
@@ -1153,20 +1264,215 @@ function planAmount(p){
   return digits ? +digits : 0;
 }
 
-function paintPlans(){
-  $('#planGrid').innerHTML = list('plans').map((p, i) => {
-    const feats = biArr(p.features);
-    return `<article class="plan${p.featured ? ' feat' : ''}" data-rv style="--d:${i * .1}s" data-tilt>
-      ${p.featured ? `<span class="badge">${esc(L('plans.popular'))}</span>` : ''}
-      <div><h3>${esc(bi(p.name))}</h3>${bi(p.tag) ? `<span class="tag">${esc(bi(p.tag))}</span>` : ''}</div>
+/* ── وجه وظهر البطاقة ── */
+const flipBtn = () => `<button class="flip-btn" type="button" data-flip>${ico('i-rotate')}<span>${esc(L('plans.details'))}</span></button>`;
+const backHead = name => `<div class="back-head"><b>${esc(name)}</b>
+  <button class="ibtn" type="button" data-unflip aria-label="${esc(L('plans.back'))}" title="${esc(L('plans.back'))}">${ico('i-rotate')}</button></div>`;
+const featList = feats => `<ul>${feats.map(f => `<li>${ico('i-check')}<span>${esc(f)}</span></li>`).join('')}</ul>`;
+
+function planCard(p, i){
+  const feats = biArr(p.features), name = bi(p.name);
+  const buy = `<button class="btn ${p.featured ? 'btn-gold' : 'btn-dark'}" type="button" data-plan="${i}">
+      <span>${esc(L('plans.cta'))}</span><svg class="icon arr"><use href="#i-arrow"></use></svg></button>`;
+  const more = feats.length - 3;
+  return {
+    feat: !!p.featured, label: name,
+    front: `${p.featured ? `<span class="badge">${esc(L('plans.popular'))}</span>` : ''}
+      <div><h3>${esc(name)}</h3>${bi(p.tag) ? `<span class="tag">${esc(bi(p.tag))}</span>` : ''}</div>
       <div class="price"><b>${esc(bi(p.price))}</b><span>${esc(bi(p.unit))}</span></div>
       ${bi(p.desc) ? `<p class="desc">${esc(bi(p.desc))}</p>` : ''}
-      <ul>${feats.map(f => `<li>${ico('i-check')}<span>${esc(f)}</span></li>`).join('')}</ul>
-      <button class="btn ${p.featured ? 'btn-gold' : 'btn-dark'}" type="button" data-plan="${i}" data-mag>
-        ${esc(L('plans.cta'))}<svg class="icon arr"><use href="#i-arrow"></use></svg></button>
-    </article>`;
-  }).join('');
+      ${feats.length ? `<ul class="peek">${feats.slice(0, 3).map(f => `<li>${ico('i-check')}<span>${esc(f)}</span></li>`).join('')}
+        ${more > 0 ? `<li class="more">+${more} ${LANG === 'ar' ? 'بالتفاصيل' : 'more'}</li>` : ''}</ul>` : ''}
+      <div class="grow"></div>
+      <div class="face-acts">${buy}${feats.length || bi(p.desc) ? flipBtn() : ''}</div>`,
+    back: `${backHead(name)}
+      <div class="back-list">${bi(p.desc) ? `<p class="desc">${esc(bi(p.desc))}</p>` : ''}${featList(feats)}</div>
+      <div class="back-sum"><b>${esc(bi(p.price))}</b><span>${esc(bi(p.unit))}</span></div>
+      <div class="face-acts">${buy}</div>`
+  };
+}
+
+function classCard(c, i){
+  const feats = biArr(c.features), name = bi(c.name), img = safeUrl(c.image);
+  const meta = [['i-calendar', c.schedule], ['i-clock', c.duration], ['i-pin', c.place], ['i-users', c.seats]]
+    .filter(([, v]) => bi(v)).map(([ic, v]) => `<span>${ico(ic)}${esc(bi(v))}</span>`).join('');
+  const book = `<button class="btn ${c.featured ? 'btn-gold' : 'btn-dark'}" type="button" data-class="${i}">
+      <span>${esc(L('classes.cta'))}</span><svg class="icon arr"><use href="#i-arrow"></use></svg></button>`;
+  return {
+    feat: !!c.featured, label: name, cls: true,
+    front: `${c.featured ? `<span class="badge">${esc(L('classes.popular'))}</span>` : ''}
+      <div class="cls-img">${img !== '#' ? `<img src="${esc(img)}" alt="" loading="lazy" decoding="async">` : `<span class="ph">${ico('i-users')}</span>`}</div>
+      <div class="cls-body">
+        <div><h3>${esc(name)}</h3>${bi(c.tag) ? `<span class="tag">${esc(bi(c.tag))}</span>` : ''}</div>
+        ${meta ? `<div class="meta">${meta}</div>` : ''}
+        ${bi(c.price) ? `<div class="price"><b>${esc(bi(c.price))}</b><span>${esc(bi(c.unit))}</span></div>` : ''}
+        <div class="grow"></div>
+        <div class="face-acts">${book}${feats.length || bi(c.desc) ? flipBtn() : ''}</div>
+      </div>`,
+    back: `${backHead(name)}
+      <div class="back-list">${bi(c.desc) ? `<p class="desc">${esc(bi(c.desc))}</p>` : ''}${featList(feats)}</div>
+      ${meta ? `<div class="meta">${meta}</div>` : ''}
+      <div class="face-acts">${book}</div>`
+  };
+}
+
+function paintPlans(){
+  CF.plans = coverflow($('#planCf'), list('plans').map(planCard), CF.plans);
   $('#payNote').hidden = !page('pay');
+}
+function paintClasses(){
+  const cs = classList();
+  CF.classes = coverflow($('#classCf'), cs.map(classCard), CF.classes);
+  $('#classes').classList.toggle('sec-hidden', !hasClasses());
+  $('#classesCta').hidden = !hasClasses();
+}
+
+/* ══════════════════════════════════════════════════════════
+   الشريط الدوّار (coverflow) — نفسه للباقات والكلاسات
+   • البطاقة الفعّالة بالنص، وجارتين من كل جهة مايلات لورا
+   • يدور وحده كل ٦ ثواني، ويوقف إذا المؤشر عليه أو بطاقة مقلوبة
+     أو الشريط مو بالشاشة أو «تقليل الحركة» شغّال
+   • سحب بالإصبع، أسهم، نقاط، وأسهم الكيبورد
+   ══════════════════════════════════════════════════════════ */
+const CF = {};
+function coverflow(root, cards, prev){
+  if (prev) prev.destroy();
+  const n = cards.length;
+  root.innerHTML = '';
+  if (!n) return null;
+  const rtl = () => document.documentElement.dir === 'rtl';
+  root.setAttribute('role', 'region');
+  root.setAttribute('aria-roledescription', 'carousel');
+  root.innerHTML = `<div class="cf-stage">${cards.map((c, i) => `
+    <article class="cf-card${c.feat ? ' feat' : ''}" role="group" aria-roledescription="slide" aria-label="${esc(c.label)} — ${i + 1} / ${n}" data-i="${i}">
+      <div class="flip">
+        <div class="face front${c.cls ? ' cls' : ''}">${c.front}</div>
+        <div class="face back" inert>${c.back}</div>
+      </div>
+    </article>`).join('')}</div>
+    ${n > 1 ? `<div class="cf-nav">
+      <button class="cf-arrow prev" type="button" aria-label="${LANG === 'ar' ? 'السابق' : 'Previous'}">${ico('i-arrow')}</button>
+      <div class="dots cf-dots" role="group">${cards.map((c, i) => `<button type="button" data-dot="${i}" aria-label="${esc(c.label)}"></button>`).join('')}</div>
+      <button class="cf-arrow next" type="button" aria-label="${LANG === 'ar' ? 'التالي' : 'Next'}">${ico('i-arrow')}</button>
+    </div>` : ''}`;
+  const stage = root.querySelector('.cf-stage');
+  const els = [...root.querySelectorAll('.cf-card')];
+  /* البداية على المميزة إذا موجودة */
+  let cur = Math.max(0, cards.findIndex(c => c.feat));
+  let timer = null, hover = false, seen = false, focusIn = false;
+
+  const setFlip = (el, on) => {
+    el.classList.toggle('flipped', on);
+    const on2 = el.classList.contains('on');
+    el.querySelector('.front').inert = !on2 || on;
+    el.querySelector('.back').inert  = !on2 || !on;
+    if (!on) el._hoverFlip = false;
+  };
+
+  function layout(){
+    const w = els[0].offsetWidth || 340;
+    const small = innerWidth < 700;
+    const sp = w * (small ? .74 : .68), dir = rtl() ? -1 : 1;
+    els.forEach((el, i) => {
+      let d = ((i - cur) % n + n) % n;
+      if (d > n / 2) d -= n;
+      const a = Math.abs(d);
+      const x = dir * d * sp;
+      const rot = a ? -Math.sign(x) * (small ? 22 : 30) : 0;
+      el.style.transform = `translate3d(${x.toFixed(1)}px,0,${-a * (small ? 110 : 150)}px) rotateY(${rot}deg) scale(${(1 - a * .05).toFixed(3)})`;
+      el.style.zIndex = String(20 - a);
+      el.classList.toggle('on', a === 0);
+      el.classList.toggle('far', a > 2);
+      el.setAttribute('aria-hidden', String(a !== 0));
+      if (a !== 0 && el.classList.contains('flipped')) setFlip(el, false);
+      else setFlip(el, el.classList.contains('flipped'));
+    });
+    root.querySelectorAll('[data-dot]').forEach((b, i) => {
+      if (i === cur) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    });
+  }
+  const go = i => { cur = ((i % n) + n) % n; layout() };
+
+  const anyFlipped = () => els.some(el => el.classList.contains('flipped'));
+  function tick(){
+    clearInterval(timer);
+    if (RM.matches || n < 2) return;
+    timer = setInterval(() => {
+      if (document.hidden || hover || focusIn || !seen || anyFlipped()) return;
+      go(cur + 1);
+    }, 6000);
+  }
+
+  /* الضغط: بطاقة جانبية = تصير بالنص؛ أزرار القلب؛ الأسهم والنقاط */
+  let dragX = null, dragged = false;
+  const onClick = e => {
+    if (dragged){ dragged = false; return }
+    const card = e.target.closest('.cf-card');
+    if (e.target.closest('.prev')) return go(cur - 1), tick();
+    if (e.target.closest('.next')) return go(cur + 1), tick();
+    const dot = e.target.closest('[data-dot]'); if (dot) return go(+dot.dataset.dot), tick();
+    if (!card) return;
+    if (!card.classList.contains('on')){ e.preventDefault(); go(+card.dataset.i); tick(); return }
+    if (e.target.closest('[data-flip]')){ setFlip(card, true); card._pinned = true; card.querySelector('[data-unflip]')?.focus({ preventScroll:true }); return }
+    if (e.target.closest('[data-unflip]')){ card._pinned = false; card._noHover = true; setFlip(card, false); card.querySelector('[data-flip]')?.focus({ preventScroll:true }); return }
+    /* لمس على وجه البطاقة (مو على زر) يقلبها — للموبايل */
+    if (!FINE.matches && !e.target.closest('button,a') && e.target.closest('.front')){ setFlip(card, true); card._pinned = true }
+  };
+  /* المرور بالمؤشر يقلب البطاقة الفعّالة (مثل الكارت) */
+  const onEnter = e => {
+    if (!FINE.matches) return;
+    const card = e.target.closest('.cf-card.on'); if (!card || card._noHover) return;
+    if (!card.classList.contains('flipped')){ card._hoverFlip = true; setFlip(card, true) }
+  };
+  const onLeave = e => {
+    const card = e.target.closest('.cf-card'); if (!card) return;
+    if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+    card._noHover = false;
+    if (card._hoverFlip && !card._pinned) setFlip(card, false);
+  };
+  const onDown = e => { if (e.pointerType !== 'mouse' || e.button === 0){ dragX = e.clientX; dragged = false } };
+  const onUp = e => {
+    if (dragX == null) return;
+    const dx = e.clientX - dragX; dragX = null;
+    if (Math.abs(dx) < 45) return;
+    dragged = true; setTimeout(() => { dragged = false }, 0);
+    const fwd = rtl() ? dx > 0 : dx < 0;
+    go(cur + (fwd ? 1 : -1)); tick();
+  };
+  const onKey = e => {
+    if (e.target.closest('input,textarea')) return;
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    const fwd = (e.key === 'ArrowLeft') === rtl();
+    e.preventDefault(); go(cur + (fwd ? 1 : -1)); tick();
+    requestAnimationFrame(() => els[cur].querySelector('.front button')?.focus({ preventScroll:true }));
+  };
+
+  root.addEventListener('click', onClick);
+  stage.addEventListener('pointerover', onEnter);
+  stage.addEventListener('pointerout', onLeave);
+  stage.addEventListener('pointerdown', onDown);
+  stage.addEventListener('pointerup', onUp);
+  stage.addEventListener('pointercancel', () => { dragX = null });
+  root.addEventListener('keydown', onKey);
+  const hIn = () => { hover = true }, hOut = () => { hover = false };
+  root.addEventListener('pointerenter', hIn); root.addEventListener('pointerleave', hOut);
+  const fIn = () => { focusIn = true }, fOut = e => { if (!root.contains(e.relatedTarget)) focusIn = false };
+  root.addEventListener('focusin', fIn); root.addEventListener('focusout', fOut);
+  addEventListener('resize', layout, { passive:true });
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => { seen = es[0].isIntersecting }, { threshold:.35 }) : null;
+  if (io) io.observe(root); else seen = true;
+
+  layout(); tick();
+  return {
+    go,
+    destroy(){
+      clearInterval(timer); io?.disconnect();
+      removeEventListener('resize', layout);
+      root.removeEventListener('click', onClick); root.removeEventListener('keydown', onKey);
+      root.removeEventListener('pointerenter', hIn); root.removeEventListener('pointerleave', hOut);
+      root.removeEventListener('focusin', fIn); root.removeEventListener('focusout', fOut);
+    }
+  };
 }
 
 function paintFaq(){
@@ -1213,7 +1519,7 @@ function paint(){
     SECTION_NODES[k].forEach(s => $$(s).forEach(el => el.classList.toggle('sec-hidden', !sec(k))));
 
   paintMark(); paintNav(); paintTitle(); paintStats(); paintMarquee();
-  paintServices(); paintAbout(); paintReviews(); paintPlans(); paintFaq(); paintContact();
+  paintServices(); paintAbout(); paintReviews(); paintPlans(); paintClasses(); paintFaq(); paintContact();
 
   /* الصور من خاناتها باللوحة (landing.photos)، وإذا ماكو، من الأعمدة القديمة */
   const ph = photos(), lp = (SITE.landing && SITE.landing.photos) || {};
@@ -1308,7 +1614,7 @@ function onScroll(){
       });
     }
     let cur = '';
-    for (const k of ['services','about','reviews','plans','faq','contact']){
+    for (const k of ['services','about','reviews','plans','classes','faq','contact']){
       const el = document.getElementById(k);
       if (el && !el.classList.contains('sec-hidden') && el.getBoundingClientRect().top < innerHeight * .4) cur = k;
     }
@@ -1362,6 +1668,14 @@ function openPay(i){
   $('#paySubmit').disabled = false;
   $('#payDlg').showModal();
   setTimeout(() => $('#payName').focus(), 60);
+}
+
+/* حجز كلاس: رسالة واتساب جاهزة باسم الكلاس */
+function openClass(i){
+  const c = classList()[i]; if (!c) return;
+  const href = waLink(L('classes.wa').split('{class}').join(bi(c.name)));
+  if (href !== '#') open(href, '_blank', 'noopener');
+  else location.hash = '#contact';
 }
 
 async function submitPay(e){
@@ -1483,8 +1797,11 @@ function wire(){
   $('#reviews').addEventListener('pointerenter', () => clearInterval(revTimer));
   $('#reviews').addEventListener('pointerleave', startReviews);
 
-  $('#planGrid').addEventListener('click', e => {
-    const b = e.target.closest('[data-plan]'); if (b) openPay(+b.dataset.plan);
+  $('#planCf').addEventListener('click', e => {
+    const b = e.target.closest('.cf-card.on [data-plan]'); if (b) openPay(+b.dataset.plan);
+  });
+  $('#classCf').addEventListener('click', e => {
+    const b = e.target.closest('.cf-card.on [data-class]'); if (b) openClass(+b.dataset.class);
   });
   $('#payForm').addEventListener('submit', submitPay);
   $('#payForm').addEventListener('input', () => { $('#payErr').textContent = '' });

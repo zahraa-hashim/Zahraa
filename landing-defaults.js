@@ -24,6 +24,7 @@
       services: { ar:'الخدمات',        en:'Services' },
       about:    { ar:'عنّي',           en:'About' },
       plans:    { ar:'الباقات',        en:'Plans' },
+      classes:  { ar:'الكلاسات',       en:'Classes' },
       faq:      { ar:'الأسئلة',        en:'FAQ' },
       contact:  { ar:'تواصل',          en:'Contact' },
       food:     { ar:'الأكل',          en:'Recipes' },
@@ -36,7 +37,7 @@
       sub:    { ar:'تدريب مصمّم لحياتچ الحقيقية — على أهدافچ، ووقتچ، والنسخة الأقوى منچ اللي ديتبنى.',
                 en:'Training built for real life — around your goals, your schedule, and the stronger you in the making.' },
       cta1:   { ar:'ابدئي خطتچ',    en:'Start your plan' },
-      cta2:   { ar:'شوفي الباقات',  en:'See plans' },
+      ctaClasses:{ ar:'الكلاسات',    en:'Classes' },
       badge:  { ar:'+١٢٠',          en:'120+' },
       badgeSub:{ ar:'متدربة',        en:'women coached' },
       floatT: { ar:'متابعة أسبوعية', en:'Weekly check-ins' },
@@ -56,7 +57,9 @@
       title:  { ar:'أهلاً، آني زهراء', en:'Meet Zahraa' },
       sub:    { ar:'خبرة معتمدة. أسلوب عملي. بدون تطرّف.', en:'Certified expertise. A practical approach. No extremes.' },
       sign:   { ar:'زهراء هاشم', en:'Zahraa Hashim' },
-      script: { ar:'نساء أقوى\nحياة أحلى', en:'Stronger women\nbrighter lives' }
+      script: { ar:'نساء أقوى\nحياة أحلى', en:'Stronger women\nbrighter lives' },
+      quote:  { ar:'صرت أقوى، أثق بنفسي أكثر، وأخيراً ملتزمة.', en:'I feel stronger, more confident, and finally consistent.' },
+      quoteBy:{ ar:'سارة', en:'Sara' }
     },
     reviews: {
       kicker: { ar:'آراء المتدربات', en:'Testimonials' },
@@ -69,7 +72,17 @@
       sub:    { ar:'اختاري باقتچ وادفعي بأمان — ونبدي سوية من اليوم.', en:'Pick a plan, pay securely, and we start today.' },
       cta:    { ar:'اشتركي الآن', en:'Subscribe' },
       popular:{ ar:'الأكثر طلباً', en:'Most popular' },
-      note:   { ar:'الدفع آمن عن طريق Wayl — بطاقة أو محفظة إلكترونية.', en:'Secure checkout via Wayl — card or e-wallet.' }
+      note:   { ar:'الدفع آمن عن طريق Wayl — بطاقة أو محفظة إلكترونية.', en:'Secure checkout via Wayl — card or e-wallet.' },
+      details:{ ar:'التفاصيل', en:'Details' },
+      back:   { ar:'رجوع', en:'Back' }
+    },
+    classes: {
+      kicker: { ar:'الكلاسات', en:'Classes' },
+      title:  { ar:'تمرّني *ويّانا* بالكلاس', en:'Train *with us* in class' },
+      sub:    { ar:'جلسات جماعية بمواعيد ثابتة، طاقة عالية، ومتابعة مباشرة من الكوتش.', en:'Group sessions on a fixed schedule — high energy, coached live.' },
+      cta:    { ar:'احجزي مكانچ', en:'Book your spot' },
+      popular:{ ar:'الأكثر حجزاً', en:'Most booked' },
+      wa:     { ar:'مرحبا كوتش، أريد أحجز بكلاس: {class}', en:'Hi coach, I’d like to book the {class} class' }
     },
     faq: {
       kicker: { ar:'أسئلة', en:'Support' },
@@ -112,23 +125,28 @@
   /* مخطط اللوحة — الترتيب هنا هو ترتيب ظهور الأقسام بالصفحة */
   var S = [
     { g:'nav',      t:'شريط التنقل',          icon:'i-menu', f:[
-      ['services','رابط الخدمات'],['about','رابط عنّي'],['plans','رابط الباقات'],['faq','رابط الأسئلة'],
+      ['services','رابط الخدمات'],['about','رابط عنّي'],['plans','رابط الباقات'],['classes','رابط الكلاسات'],['faq','رابط الأسئلة'],
       ['contact','رابط التواصل'],['food','رابط صفحة الأكل (إذا شغّالة)'],['courses','رابط صفحة التمارين (إذا شغّالة)'],
       ['cta','زر الاشتراك']]},
     { g:'intro',    t:'بطاقة البداية',         icon:'i-spark', f:[
       ['kicker','السطر الصغير فوق العنوان'],['title','العنوان الكبير','title'],['sub','الوصف','area'],
-      ['cta1','الزر الأول'],['cta2','الزر الثاني'],['badge','رقم النجمة الدوّارة'],['badgeSub','كلمة تحت الرقم'],
+      ['cta1','الزر الأول (يودّي للباقات)'],['ctaClasses','الزر الثاني (يودّي للكلاسات)'],['badge','رقم النجمة الدوّارة'],['badgeSub','كلمة تحت الرقم'],
       ['floatT','البطاقة العائمة — العنوان'],['floatS','البطاقة العائمة — السطر الثاني']]},
     { g:'marquee',  t:'الشريط المتحرك',        icon:'i-check-circle', f:[ ['items','المميزات — كل سطر عنصر','lines'] ]},
     { g:'services', t:'قسم الخدمات',           icon:'i-dumbbell', f:[
       ['kicker','السطر الصغير'],['title','العنوان','title'],['sub','الوصف','area']]},
     { g:'about',    t:'قسم تعرّفي عليّ',        icon:'i-user', f:[
-      ['kicker','السطر الصغير'],['title','العنوان'],['sub','الوصف'],['sign','التوقيع'],['script','الكتابة المائلة على الصورة','area']]},
+      ['kicker','السطر الصغير'],['title','العنوان'],['sub','الوصف'],['sign','التوقيع'],['script','الكتابة المائلة على الصورة','area'],
+      ['quote','الاقتباس بالبطاقة الوردية (فاضي = تختفي البطاقة)','area'],['quoteBy','اسم صاحبة الاقتباس']]},
     { g:'reviews',  t:'قسم الآراء',            icon:'i-star', f:[
       ['kicker','السطر الصغير'],['title','العنوان','title'],['sub','الوصف','area']]},
     { g:'plans',    t:'قسم الباقات',           icon:'i-check-circle', f:[
       ['kicker','السطر الصغير'],['title','العنوان','title'],['sub','الوصف','area'],
-      ['cta','زر الاشتراك بكل باقة'],['popular','شارة الباقة المميزة'],['note','ملاحظة الدفع تحت الباقات','area']]},
+      ['cta','زر الاشتراك بكل باقة'],['popular','شارة الباقة المميزة'],['note','ملاحظة الدفع تحت الباقات','area'],
+      ['details','زر «التفاصيل» اللي يقلب البطاقة (الباقات والكلاسات)'],['back','زر الرجوع بظهر البطاقة']]},
+    { g:'classes',  t:'قسم الكلاسات',          icon:'i-users', f:[
+      ['kicker','السطر الصغير'],['title','العنوان','title'],['sub','الوصف','area'],
+      ['cta','زر الحجز بكل كلاس'],['popular','شارة الكلاس المميز'],['wa','رسالة الواتساب الجاهزة ({class} = اسم الكلاس)','area']]},
     { g:'faq',      t:'قسم الأسئلة',           icon:'i-info', f:[
       ['kicker','السطر الصغير'],['title','العنوان'],['sub','الوصف','area']]},
     { g:'contact',  t:'قسم التواصل',           icon:'i-whatsapp', f:[

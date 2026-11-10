@@ -8,7 +8,7 @@
 /* ⚠️ ارفع الرقم مع كل تعديل جوهري على index.html أو catalog.html أو admin.html.
    الاستراتيجية «الشبكة أول» فالنسخة الجديدة توصل عادةً، بس النسخة
    المخزونة هي اللي تنعرض أوفلاين — وبدون رفع الرقم تبقى القديمة. */
-const V     = 'cz-v8';
+const V     = 'cz-v9';
 const SHELL = ['./', './index.html', './landing-defaults.js', './manifest.webmanifest'];
 
 self.addEventListener('install', e => {
