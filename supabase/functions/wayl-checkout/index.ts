@@ -97,11 +97,20 @@ function sameText(a: string, b: string): boolean {
 
 // ═══ ② حالة الدفع ═══
 type Status = "pending" | "paid" | "failed";
-/* Wayl يرجّع الحالة كنص — نوحّدها لثلاث حالات بس */
+/* Wayl يرجّع الحالة كنص — نوحّدها لثلاث حالات بس.
+   ⚠️ مطابقة تامة للكلمة، مو «يحتوي على»: المطابقة الجزئية چانت تحسب
+   unpaid و incomplete و unsuccessful كـ «مدفوع». أي حالة ما نعرفها
+   تبقى pending — الغلط الآمن إن الطلب ينتظر، مو إنه ينحسب مدفوع.
+   إذا Wayl يستعمل اسم حالة غير موجود هنا، ضيفيه للقائمة المناسبة. */
+const PAID_WORDS = new Set(["complete", "completed", "paid", "success", "successful", "succeeded", "captured"]);
+const FAILED_WORDS = new Set([
+  "failed", "failure", "cancelled", "canceled", "expired", "rejected", "declined",
+  "refunded", "voided", "void",
+]);
 function normStatus(raw: unknown): Status {
-  const s = String(raw ?? "").toLowerCase();
-  if (/(complete|paid|success|succeeded|captured)/.test(s)) return "paid";
-  if (/(fail|cancel|expire|reject|declin|refund|void)/.test(s)) return "failed";
+  const s = String(raw ?? "").trim().toLowerCase();
+  if (PAID_WORDS.has(s)) return "paid";
+  if (FAILED_WORDS.has(s)) return "failed";
   return "pending";
 }
 
@@ -136,19 +145,32 @@ async function waylCreateLink(o: {
   return { url, raw };
 }
 
-async function waylGetStatus(ref: string): Promise<{ status: Status; raw: unknown }> {
+async function waylGetStatus(ref: string, amount: number): Promise<{ status: Status; raw: unknown }> {
   const res = await fetch(`${WAYL_API()}/api/v1/links/${encodeURIComponent(ref)}`, { headers: waylHeaders() });
   const raw = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(`wayl ${res.status}`);
   const d = (raw as Record<string, any>).data ?? raw;
-  return { status: normStatus(d?.status ?? d?.paymentStatus), raw };
+  let status = normStatus(d?.status ?? d?.paymentStatus);
+  /* «مدفوع» ما ينقبل إلا إذا الرد يخص هذا الطلب بالذات وبنفس المبلغ.
+     الفحص يشتغل بس إذا Wayl رجّع الحقل — الحقل الناقص ما يمنع الدفع */
+  if (status === "paid") {
+    const gotRef = d?.referenceId ?? d?.reference;
+    const gotTotal = d?.total ?? d?.amount;
+    const refBad = gotRef != null && String(gotRef) !== ref;
+    const totalBad = gotTotal != null && Number(gotTotal) !== amount;
+    if (refBad || totalBad) {
+      console.error(`wayl mismatch for ${ref}: ref=${gotRef} total=${gotTotal} expected=${amount}`);
+      status = "pending";
+    }
+  }
+  return { status, raw };
 }
 
 /* يسأل Wayl عن الطلب ويحدّث الصف — المصدر الوحيد للحقيقة.
    ما نرجّع طلب مدفوع لـ pending أبداً */
 async function refreshOrder(order: Record<string, any>): Promise<Status> {
   if (order.status === "paid") return "paid";
-  const { status, raw } = await waylGetStatus(order.wayl_ref || order.id);
+  const { status, raw } = await waylGetStatus(order.wayl_ref || order.id, Number(order.amount));
   if (status !== order.status) {
     await db().from("orders").update({
       status,

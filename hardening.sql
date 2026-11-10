@@ -60,24 +60,38 @@ $$;
 --  ③  تسجيل حسابج + حاجز الأمان
 -- ═══════════════════════════════════════════════════════════════
 
--- شوفي أول شنو الحسابات الموجودة:
---     select id, email, created_at from auth.users order by created_at;
+-- ⚠️ اكتبي إيميل حسابج بالسطر المعلَّم تحت قبل أول تشغيل.
 --
--- السطر الجاي ياخذ كل الحسابات الموجودة حالياً. إذا عندج حساب وحيد (وهذا
--- المفروض يكون الوضع) فهو الصح. إذا طلعت حسابات ما تعرفينها، احذفي الصف
--- الزايد بعدين:  delete from public.admins where user_id = '<id>';
+-- قبل، هذا القسم چان يضيف **كل** الحسابات الموجودة بـ auth.users كمشرفات،
+-- وكل إعادة تشغيل ترجّع أي حساب شلتيه. يعني لو التسجيل الذاتي انفتح يوم،
+-- أي حساب غريب يصير مشرفة بأول تشغيل للملف. هسه ينضاف حساب واحد بالاسم.
+--
+-- إذا تردين تشوفين الحسابات الموجودة:
+--     select id, email, created_at from auth.users order by created_at;
+-- وإذا تردين تشيلين مشرفة:
+--     delete from public.admins where user_id = '<id>';
 
-insert into public.admins (user_id, note)
-select id, coalesce(email, '') from auth.users
-on conflict (user_id) do nothing;
-
--- الحاجز: لا تكمل إذا الجدول فاضي — وإلا تنقفل اللوحة بوجهج ولا تكدرين
--- تعدّلين ولا تحذفين أي شي.
 do $$
+declare
+  v_email text := 'اكتبي-إيميلج-هنا';        -- ◀◀ غيّري هذا السطر
+  v_id    uuid;
 begin
+  if v_email like '%@%' then
+    select id into v_id from auth.users where lower(email) = lower(trim(v_email));
+    if v_id is null then
+      raise exception
+        'توقف: ماكو حساب بالإيميل %. سوّي الحساب من Authentication → Users، وبعدين شغّلي الملف مرة ثانية.', v_email;
+    end if;
+    insert into public.admins (user_id, note) values (v_id, v_email)
+    on conflict (user_id) do nothing;
+  end if;
+
+  -- الحاجز: لا تكمل إذا الجدول فاضي — وإلا تنقفل اللوحة بوجهج ولا تكدرين
+  -- تعدّلين ولا تحذفين أي شي. (إذا الإيميل ما انكتب بس الجدول بيه مشرفة
+  -- من قبل، الملف يكمل عادي وما يضيف أحد.)
   if not exists (select 1 from public.admins) then
     raise exception
-      'توقف: جدول admins فاضي. سوّي حساب من Authentication → Users، وبعدين شغّلي الملف مرة ثانية.';
+      'توقف: جدول admins فاضي. اكتبي إيميل حسابج بالمتغير v_email بالخطوة ③ وشغّلي الملف مرة ثانية.';
   end if;
 end $$;
 

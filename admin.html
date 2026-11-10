@@ -827,6 +827,7 @@ const PAGE_SECTIONS = [
 let OPEN = new Set(['intro']);
 
 function drawPage(){
+  if (!D) return;
   $('#pageBody').innerHTML = PAGE_SECTIONS.map(s => {
     const on = s.toggle ? D.sections[s.toggle] !== false : true;
     return `<details class="card${on ? '' : ' off'}" data-sec="${s.id}"${OPEN.has(s.id) ? ' open' : ''}>
@@ -1033,6 +1034,7 @@ function paintNav(){
     ${ico(v.icon)}${v.t}${v.id === 'orders' && waiting ? `<span class="dot num">${waiting}</span>` : ''}</button>`).join('');
 }
 function go(v, push = true){
+  if (!D) return;      /* البيانات ما انحمّلت — شاشة الخطأ تبقى لحد إعادة المحاولة */
   if (!VIEWS.some(x => x.id === v)) v = 'page';
   VIEW = v;
   VIEWS.forEach(x => $('#v-' + x.id).hidden = x.id !== v);
@@ -1061,10 +1063,26 @@ function paintBrand(){
 /* ══════════════════════════════════════════════════════════
    ⑦ التحميل والحفظ
    ══════════════════════════════════════════════════════════ */
+/* فشل تحميل البيانات: ماكو مسودة، ماكو تحرير، ماكو حفظ — بس إعادة محاولة */
+function loadFailed(msg){
+  INFO = null; D = null; BASE = '';
+  VIEW = 'page';
+  VIEWS.forEach(x => $('#v-' + x.id).hidden = x.id !== 'page');
+  $('#viewTitle').textContent = VIEWS[0].title;
+  paintNav(); markDirty(); paintBrand();
+  $('#pageBody').innerHTML = `<div class="empty">${ico('i-alert')}<b>ما كدرت أجيب بيانات الموقع</b>
+    <span>${esc(msg)}</span><span>التحرير موقوف حتى ما ينكتب فوق المحتوى المحفوظ.</span>
+    <button class="btn btn-ghost btn-sm" type="button" data-retry style="margin-top:10px">إعادة المحاولة</button></div>`;
+}
+
 async function loadAll(){
   $('#pageBody').innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
-  const { data, error } = await sb.from('site_info').select('*').eq('id', 1).maybeSingle();
-  if (error){ toast('ما كدرت أجيب البيانات — ' + error.message, 'bad') }
+  let data = null, error = null;
+  try { ({ data, error } = await sb.from('site_info').select('*').eq('id', 1).maybeSingle()) }
+  catch(x){ error = x }
+  /* ⚠️ إذا فشل الجلب نوقف هنا. قبل، اللوحة چانت تكمل بمسودة من القيم
+     الافتراضية، وأي حفظ بعدها يكتب فوق محتوى الموقع الحقيقي كله. */
+  if (error) return loadFailed(error.message || String(error));
   INFO = data || { id:1 };
   D = buildDraft(INFO);
   BASE = JSON.stringify(D);
@@ -1171,6 +1189,7 @@ function wire(){
 
   /* القوائم: إضافة · حذف · ترتيب */
   document.addEventListener('click', async e => {
+    if (e.target.closest('[data-retry]')) return loadAll();
     const add = e.target.closest('[data-add]');
     if (add){ const k = add.dataset.add; FALLBACK.delete(k); D[k].push(BLANKS[k]()); markDirty(); drawPage(); return }
     const del = e.target.closest('[data-del]');

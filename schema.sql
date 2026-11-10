@@ -134,9 +134,11 @@ create trigger t_site_info_touch before update on public.site_info for each row 
 --
 --  بعد تنفيذ هذا الملف على مشروع جديد:
 --    ١. سوّي حساب المدربة من Authentication → Users
---    ٢. نفّذ:  insert into public.admins (user_id)
---              select id from auth.users on conflict do nothing;
---    (أو نفّذ `hardening.sql` — يسوي الخطوة ٢ لوحده مع حاجز أمان)
+--    ٢. نفّذ (بإيميل المدربة حصراً — مو كل الحسابات):
+--              insert into public.admins (user_id)
+--              select id from auth.users where email = '<إيميل المدربة>'
+--              on conflict do nothing;
+--    (أو نفّذ `hardening.sql` بعد ما تكتبين الإيميل بالخطوة ③ — بيه حاجز أمان)
 -- ═══════════════════════════════════════════════════════════════
 
 create table if not exists public.admins (
