@@ -91,7 +91,7 @@ Wayl ← webhook ← wayl-checkout?hook=1 ← يسأل Wayl بنفسه ← يح�
 2. Edge Functions ← انشر `wayl-checkout` و **Verify JWT مطفي**
    (`supabase functions deploy wayl-checkout --no-verify-jwt`)
 3. Secrets: `WAYL_TOKEN` (من لوحة Wayl) · `WAYL_WEBHOOK_SECRET` (نص عشوائي
-   طويل) · `SITE_ORIGINS=https://zahraa-hashim.github.io` (+ الدومين الخاص إذا صار)
+   طويل) · `SITE_ORIGINS=https://coach-zahraa.com,https://www.coach-zahraa.com`
 4. ⚠️ طابق أسماء حقول Wayl بقسم «③ Wayl» بالدالة ويّا توثيقهم الرسمي
    (`/api/v1/links` · `X-WAYL-AUTHENTICATION` · `referenceId` · `lineItem` ·
    `redirectionUrl` · `webhookUrl`) — مأخوذة من توثيق عام قبل فتح الحساب
@@ -119,7 +119,8 @@ Wayl ← webhook ← wayl-checkout?hook=1 ← يسأل Wayl بنفسه ← يح�
 ## التقنيات (لا تغيّرها)
 
 * **Vanilla HTML/CSS/JS** بملف واحد لكل صفحة — بدون React، بدون build tools، بدون npm
-* **الاستضافة:** GitHub Pages → https://zahraa-hashim.github.io/Zahraa/
+* **الاستضافة:** GitHub Pages → **https://coach-zahraa.com** (دومين من Cloudflare، ملف `CNAME` بالريبو)
+  الرابط القديم https://zahraa-hashim.github.io/Zahraa/ يحوّل للدومين تلقائياً
 * **الباك اند:** Supabase (قاعدة بيانات + مصادقة + تخزين صور)
 * كل الروابط الداخلية **نسبية** (`admin.html` مو `/Zahraa/admin.html`) لأن الموقع تحت
 مجلد فرعي وممكن ينتقل لدومين خاص لاحقاً

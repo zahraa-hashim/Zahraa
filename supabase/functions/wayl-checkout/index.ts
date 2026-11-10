@@ -16,7 +16,7 @@
 //   WAYL_TOKEN           مفتاح التاجر من لوحة Wayl            (ضروري)
 //   WAYL_WEBHOOK_SECRET  أي نص عشوائي طويل — يتأكد إن الإشعار من Wayl (ضروري)
 //   SITE_ORIGINS         الدومينات المسموح ترجع لها الزبونة بعد الدفع،
-//                        مفصولة بفاصلة. مثال: https://zahraa-hashim.github.io
+//                        مفصولة بفاصلة. مثال: https://coach-zahraa.com,https://www.coach-zahraa.com
 //   WAYL_API             (اختياري) الافتراضي https://api.thewayl.com
 //   SUPABASE_URL و SUPABASE_SERVICE_ROLE_KEY — موجودات تلقائياً
 //
