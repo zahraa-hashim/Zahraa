@@ -702,7 +702,9 @@ function mergeLanding(saved){
     g.f.forEach(([k, , kind]) => {
       const sv = saved && saved[g.g] && saved[g.g][k];
       const dv = (DEF[g.g] || {})[k] || (kind === 'lines' ? { ar:[], en:[] } : emptyBi());
-      const src = (sv && typeof sv === 'object' && ('ar' in sv || 'en' in sv)) ? sv : dv;
+      /* النص القديم الموجّه للبنات ← النص العام الجديد (ينحفظ بأول حفظ) */
+      const old = sv && window.LANDING_IS_LEGACY && LANDING_IS_LEGACY(g.g, k, sv.ar);
+      const src = (!old && sv && typeof sv === 'object' && ('ar' in sv || 'en' in sv)) ? sv : dv;
       out[g.g][k] = kind === 'lines' ? { ar:[...(src.ar || [])], en:[...(src.en || [])] } : { ar:src.ar || '', en:src.en || '' };
     });
   });

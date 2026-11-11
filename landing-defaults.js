@@ -29,48 +29,48 @@
       contact:  { ar:'تواصل',          en:'Contact' },
       food:     { ar:'الأكل',          en:'Recipes' },
       courses:  { ar:'التمارين',       en:'Workouts' },
-      cta:      { ar:'اشتركي',         en:'Join now' }
+      cta:      { ar:'اشتراك',         en:'Join now' }
     },
     intro: {
       kicker: { ar:'مدرّبة شخصية · أونلاين وحضوري', en:'Personal trainer · online & in person' },
-      title:  { ar:'القوة *تليق* بيچ.', en:'Strong *looks good* on you.' },
-      sub:    { ar:'تدريب مصمّم لحياتچ الحقيقية — على أهدافچ، ووقتچ، والنسخة الأقوى منچ اللي ديتبنى.',
+      title:  { ar:'القوة *تليق* بيك.', en:'Strong *looks good* on you.' },
+      sub:    { ar:'تدريب مصمّم لحياتك الحقيقية — على أهدافك، ووقتك، والنسخة الأقوى منك اللي ديتبنى.',
                 en:'Training built for real life — around your goals, your schedule, and the stronger you in the making.' },
-      cta1:   { ar:'ابدئي خطتچ',    en:'Start your plan' },
+      cta1:   { ar:'شوف الباقات',   en:'See plans' },
       ctaClasses:{ ar:'الكلاسات',    en:'Classes' },
       badge:  { ar:'+١٢٠',          en:'120+' },
-      badgeSub:{ ar:'متدربة',        en:'women coached' },
+      badgeSub:{ ar:'مشترك',         en:'clients coached' },
       floatT: { ar:'متابعة أسبوعية', en:'Weekly check-ins' },
-      floatS: { ar:'ويّاچ خطوة بخطوة', en:'With you every step' }
+      floatS: { ar:'ويّاك خطوة بخطوة', en:'With you every step' }
     },
     marquee: {
-      items: { ar:['بدون حرمان','أكل من السوق المحلي','متابعة أسبوعية','مناسب للمبتدئات','تمارين بيت ونادي','نتائج تدوم'],
+      items: { ar:['بدون حرمان','أكل من السوق المحلي','متابعة أسبوعية','مناسب للمبتدئين','تمارين بيت ونادي','نتائج تدوم'],
                en:['No starving','Local-market food','Weekly check-ins','Beginner friendly','Home & gym workouts','Results that last'] }
     },
     services: {
       kicker: { ar:'الخدمات',  en:'Services' },
-      title:  { ar:'تدريب مبني *على مقاسچ*', en:'Coaching *built around you*' },
-      sub:    { ar:'دعم مرن. نتائج حقيقية. نسخة أقوى وأصح منچ.', en:'Flexible support. Real results. A stronger, healthier you.' }
+      title:  { ar:'تدريب مبني *على مقاسك*', en:'Coaching *built around you*' },
+      sub:    { ar:'دعم مرن. نتائج حقيقية. نسخة أقوى وأصح منك.', en:'Flexible support. Real results. A stronger, healthier you.' }
     },
     about: {
-      kicker: { ar:'تعرّفي عليّ', en:'About' },
+      kicker: { ar:'نبذة عنّي', en:'About' },
       title:  { ar:'أهلاً، آني زهراء', en:'Meet Zahraa' },
       sub:    { ar:'خبرة معتمدة. أسلوب عملي. بدون تطرّف.', en:'Certified expertise. A practical approach. No extremes.' },
       sign:   { ar:'زهراء هاشم', en:'Zahraa Hashim' },
-      script: { ar:'نساء أقوى\nحياة أحلى', en:'Stronger women\nbrighter lives' },
+      script: { ar:'أقوى كل يوم\nحياة أحلى', en:'Stronger every day\nbrighter lives' },
       quote:  { ar:'صرت أقوى، أثق بنفسي أكثر، وأخيراً ملتزمة.', en:'I feel stronger, more confident, and finally consistent.' },
       quoteBy:{ ar:'سارة', en:'Sara' }
     },
     reviews: {
-      kicker: { ar:'آراء المتدربات', en:'Testimonials' },
-      title:  { ar:'كلامهن *يحچي*', en:'In *their* words' },
+      kicker: { ar:'آراء المشتركين', en:'Testimonials' },
+      title:  { ar:'كلامهم *يحچي*', en:'In *their* words' },
       sub:    { ar:'', en:'' }
     },
     plans: {
       kicker: { ar:'الاشتراك', en:'Plans' },
-      title:  { ar:'الباقة اللي *تناسبچ*', en:'The plan that *fits you*' },
-      sub:    { ar:'اختاري باقتچ وادفعي بأمان — ونبدي سوية من اليوم.', en:'Pick a plan, pay securely, and we start today.' },
-      cta:    { ar:'اشتركي الآن', en:'Subscribe' },
+      title:  { ar:'الباقة اللي *تناسبك*', en:'The plan that *fits you*' },
+      sub:    { ar:'اختار الباقة اللي تناسب هدفك — ونبدي سوية من اليوم.', en:'Pick a plan, pay securely, and we start today.' },
+      cta:    { ar:'اشترك الآن', en:'Subscribe' },
       popular:{ ar:'الأكثر طلباً', en:'Most popular' },
       note:   { ar:'الدفع آمن عن طريق Wayl — بطاقة أو محفظة إلكترونية.', en:'Secure checkout via Wayl — card or e-wallet.' },
       details:{ ar:'التفاصيل', en:'Details' },
@@ -78,9 +78,9 @@
     },
     classes: {
       kicker: { ar:'الكلاسات', en:'Classes' },
-      title:  { ar:'تمرّني *ويّانا* بالكلاس', en:'Train *with us* in class' },
+      title:  { ar:'تمرين جماعي *ويّانا*', en:'Train *with us* in class' },
       sub:    { ar:'جلسات جماعية بمواعيد ثابتة، طاقة عالية، ومتابعة مباشرة من الكوتش.', en:'Group sessions on a fixed schedule — high energy, coached live.' },
-      cta:    { ar:'احجزي مكانچ', en:'Book your spot' },
+      cta:    { ar:'احجز مكانك', en:'Book your spot' },
       popular:{ ar:'الأكثر حجزاً', en:'Most booked' },
       wa:     { ar:'مرحبا كوتش، أريد أحجز بكلاس: {class}', en:'Hi coach, I’d like to book the {class} class' }
     },
@@ -91,10 +91,10 @@
     },
     contact: {
       kicker: { ar:'تواصل', en:'Contact' },
-      title:  { ar:'جاهزة *نبدي*؟', en:'Ready to *start*?' },
-      sub:    { ar:'راسليني وخلّي نسوي خطة على مقاسچ.', en:'Message me and let’s build a plan around you.' },
-      wa:     { ar:'راسليني واتساب', en:'Message on WhatsApp' },
-      ig:     { ar:'تابعيني انستغرام', en:'Follow on Instagram' }
+      title:  { ar:'يلّا *نبدي*؟', en:'Ready to *start*?' },
+      sub:    { ar:'راسلني وخلّي نسوي خطة على مقاسك.', en:'Message me and let’s build a plan around you.' },
+      wa:     { ar:'راسلني واتساب', en:'Message on WhatsApp' },
+      ig:     { ar:'تابعني انستغرام', en:'Follow on Instagram' }
     },
     footer: {
       rights: { ar:'كل الحقوق محفوظة', en:'All rights reserved' },
@@ -102,39 +102,39 @@
     },
     form: {
       title:  { ar:'استمارة التقييم الأولي', en:'Initial assessment' },
-      sub:    { ar:'جاوبي بدقة حتى نصمم برنامج يناسب هدفچ ومستواچ وحالتچ الصحية.', en:'Answer carefully so we can build a plan around your goal, level and health.' },
+      sub:    { ar:'الإجابة الدقيقة تساعدنا نصمم برنامج يناسب هدفك ومستواك وحالتك الصحية.', en:'Answer carefully so we can build a plan around your goal, level and health.' },
       next:   { ar:'التالي', en:'Next' },
       prev:   { ar:'السابق', en:'Back' },
       submit: { ar:'إرسال الاستمارة', en:'Send form' },
       wait:   { ar:'ديرسل…', en:'Sending…' },
-      need:   { ar:'جاوبي على الأسئلة المطلوبة (*)', en:'Please answer the required questions (*)' },
-      okT:    { ar:'وصلت معلوماتچ', en:'Your answers are in' },
-      okS:    { ar:'خطوة أخيرة: دزّي رسالة للكوتش على واتساب حتى نبدي.', en:'Last step: message the coach on WhatsApp so we can start.' },
-      waBtn:  { ar:'أرسلي على واتساب', en:'Send on WhatsApp' },
+      need:   { ar:'الأسئلة المطلوبة (*) لازم تنجاوب', en:'Please answer the required questions (*)' },
+      okT:    { ar:'وصلت معلوماتك', en:'Your answers are in' },
+      okS:    { ar:'خطوة أخيرة: رسالة للكوتش على واتساب حتى نبدي.', en:'Last step: message the coach on WhatsApp so we can start.' },
+      waBtn:  { ar:'إرسال على واتساب', en:'Send on WhatsApp' },
       payBtn: { ar:'متابعة للدفع', en:'Continue to payment' },
-      err:    { ar:'ما انحفظت بالموقع — بس تكدرين تدزين كل معلوماتچ على واتساب من الزر تحت.', en:'Could not save on the site — you can still send everything on WhatsApp below.' },
+      err:    { ar:'ما انحفظت بالموقع — بس معلوماتك توصل كاملة على واتساب من الزر تحت.', en:'Could not save on the site — you can still send everything on WhatsApp below.' },
       wa:     { ar:'مرحبا كوتش، آني {name}، قمت بإرسال كافة معلوماتي — الباقة: {plan}', en:'Hi coach, I’m {name}, I’ve sent all my details — plan: {plan}' },
       consent:{ ar:'أوافق على استخدام معلوماتي لغرض التقييم الأولي وإعداد البرنامج المناسب.', en:'I agree to my information being used for the initial assessment and to build my plan.' },
       note:   { ar:'هذه الاستمارة للتقييم الأولي ولا تُعد تشخيصاً طبياً.', en:'This form is an initial assessment, not a medical diagnosis.' }
     },
     pay: {
       title:   { ar:'تأكيد الاشتراك', en:'Confirm subscription' },
-      sub:     { ar:'اكتبي اسمچ ورقمچ، وبعدها تنتقلين لصفحة الدفع الآمنة.', en:'Enter your name and number, then continue to secure checkout.' },
+      sub:     { ar:'الاسم والرقم، وبعدها صفحة الدفع الآمنة.', en:'Enter your name and number, then continue to secure checkout.' },
       plan:    { ar:'الباقة', en:'Plan' },
       name:    { ar:'الاسم الكامل', en:'Full name' },
       phone:   { ar:'رقم الهاتف (واتساب)', en:'Phone (WhatsApp)' },
       submit:  { ar:'متابعة للدفع', en:'Continue to payment' },
       wait:    { ar:'لحظة…', en:'One moment…' },
       secure:  { ar:'الدفع يتم بصفحة Wayl المشفّرة — ما نشوف ولا نخزن معلومات البطاقة.', en:'Payment happens on Wayl’s encrypted page — we never see or store card details.' },
-      okT:     { ar:'وصلنا اشتراكچ 🎉', en:'Subscription received 🎉' },
-      okS:     { ar:'راح أتواصل وياچ على الواتساب خلال ٢٤ ساعة حتى نبدي.', en:'I’ll reach out on WhatsApp within 24 hours to get started.' },
+      okT:     { ar:'وصلنا اشتراكك 🎉', en:'Subscription received 🎉' },
+      okS:     { ar:'راح أتواصل وياك على الواتساب خلال ٢٤ ساعة حتى نبدي.', en:'I’ll reach out on WhatsApp within 24 hours to get started.' },
       pendT:   { ar:'ديتأكد الدفع…', en:'Confirming payment…' },
-      pendS:   { ar:'إذا كمّلتي الدفع، راح يتأكد خلال دقايق وأتواصل وياچ. إذا ما كمّلتيه، تكدرين تحاولين مرة ثانية.', en:'If you completed payment it will be confirmed within minutes and I’ll reach out. If not, you can try again.' },
+      pendS:   { ar:'إذا الدفع كمل، راح يتأكد خلال دقايق وأتواصل وياك. وإذا ما كمل، المحاولة مرة ثانية متاحة.', en:'If you completed payment it will be confirmed within minutes and I’ll reach out. If not, you can try again.' },
       failT:   { ar:'الدفع ما كمل', en:'Payment not completed' },
-      failS:   { ar:'ما انسحب أي مبلغ. تكدرين تحاولين مرة ثانية أو تراسليني.', en:'Nothing was charged. Try again or message me.' },
-      err:     { ar:'صار خطأ بالاتصال — جرّبي مرة ثانية أو راسليني واتساب.', en:'Connection error — try again or message me on WhatsApp.' },
-      needName:{ ar:'اكتبي اسمچ', en:'Please enter your name' },
-      needPhone:{ ar:'اكتبي رقم صحيح', en:'Please enter a valid number' },
+      failS:   { ar:'ما انسحب أي مبلغ. المحاولة مرة ثانية متاحة، أو راسلني واتساب.', en:'Nothing was charged. Try again or message me.' },
+      err:     { ar:'صار خطأ بالاتصال — جرّب مرة ثانية أو راسلني واتساب.', en:'Connection error — try again or message me on WhatsApp.' },
+      needName:{ ar:'الاسم مطلوب', en:'Please enter your name' },
+      needPhone:{ ar:'الرقم مو صحيح', en:'Please enter a valid number' },
       wa:      { ar:'مرحبا كوتش، أريد أشترك بباقة: {plan}', en:'Hi coach, I’d like to join the {plan} plan' }
     }
   };
@@ -227,7 +227,46 @@
     ]
   };
 
+  /* ── النصوص القديمة (موجّهة للبنات بس) ──
+     اللوحة تحفظ كل النصوص بالداتابيس، فالقديمة انحفظت حرفياً. أي نص
+     محفوظ يطابق وحدة من هاي بالضبط ينعامل كأنه ما متغيّر ويطلع
+     بداله النص العام الجديد فوق. النص اللي الكوتش كتبته بنفسها يبقى. */
+  var OLD = {
+    nav:     { cta:['اشتركي'] },
+    intro:   { title:['القوة *تليق* بيچ.'], cta1:['ابدئي خطتچ'], badgeSub:['متدربة'], floatS:['ويّاچ خطوة بخطوة'],
+               sub:['تدريب مصمّم لحياتچ الحقيقية — على أهدافچ، ووقتچ، والنسخة الأقوى منچ اللي ديتبنى.'] },
+    marquee: { items:[['بدون حرمان','أكل من السوق المحلي','متابعة أسبوعية','مناسب للمبتدئات','تمارين بيت ونادي','نتائج تدوم']] },
+    services:{ title:['تدريب مبني *على مقاسچ*'], sub:['دعم مرن. نتائج حقيقية. نسخة أقوى وأصح منچ.'] },
+    about:   { kicker:['تعرّفي عليّ'], script:['نساء أقوى\nحياة أحلى'] },
+    reviews: { kicker:['آراء المتدربات'], title:['كلامهن *يحچي*'] },
+    plans:   { title:['الباقة اللي *تناسبچ*'], sub:['اختاري باقتچ وادفعي بأمان — ونبدي سوية من اليوم.'], cta:['اشتركي الآن'] },
+    classes: { title:['تمرّني *ويّانا* بالكلاس'], cta:['احجزي مكانچ'] },
+    contact: { title:['جاهزة *نبدي*؟'], sub:['راسليني وخلّي نسوي خطة على مقاسچ.'], wa:['راسليني واتساب'], ig:['تابعيني انستغرام'] },
+    form:    { sub:['جاوبي بدقة حتى نصمم برنامج يناسب هدفچ ومستواچ وحالتچ الصحية.'], need:['جاوبي على الأسئلة المطلوبة (*)'],
+               okT:['وصلت معلوماتچ','وصلت معلوماتچ ✓'], okS:['خطوة أخيرة: دزّي رسالة للكوتش على واتساب حتى نبدي.'], waBtn:['أرسلي على واتساب'],
+               err:['ما انحفظت بالموقع — بس تكدرين تدزين كل معلوماتچ على واتساب من الزر تحت.'] },
+    pay:     { sub:['اكتبي اسمچ ورقمچ، وبعدها تنتقلين لصفحة الدفع الآمنة.'], okT:['وصلنا اشتراكچ 🎉'],
+               okS:['راح أتواصل وياچ على الواتساب خلال ٢٤ ساعة حتى نبدي.'],
+               pendS:['إذا كمّلتي الدفع، راح يتأكد خلال دقايق وأتواصل وياچ. إذا ما كمّلتيه، تكدرين تحاولين مرة ثانية.'],
+               failS:['ما انسحب أي مبلغ. تكدرين تحاولين مرة ثانية أو تراسليني.'], err:['صار خطأ بالاتصال — جرّبي مرة ثانية أو راسليني واتساب.'],
+               needName:['اكتبي اسمچ'], needPhone:['اكتبي رقم صحيح'] }
+  };
+  var AR = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+  var norm = function(v){
+    if (Array.isArray(v)) return JSON.stringify(v.map(norm));
+    return String(v == null ? '' : v).replace(/[٠-٩]/g, function(c){ return AR[c] }).replace(/\s+/g, ' ').trim();
+  };
+  /* هل النص المحفوظ (العربي) = نص قديم موجّه للبنات؟ */
+  var isLegacy = function(g, k, ar){
+    var list = OLD[g] && OLD[g][k];
+    if (!list || ar == null) return false;
+    var n = norm(ar);
+    for (var i = 0; i < list.length; i++) if (norm(list[i]) === n) return true;
+    return false;
+  };
+
   window.LANDING_DEFAULTS = D;
+  window.LANDING_IS_LEGACY = isLegacy;
   window.LANDING_LISTS    = LISTS;
   window.LANDING_SCHEMA   = S;
 })();

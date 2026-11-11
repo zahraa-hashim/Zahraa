@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>كوتش زهراء — مدرّبة شخصية</title>
-<meta name="description" content="كوتش زهراء — مدرّبة شخصية أونلاين وحضوري ببغداد. تدريب وتغذية ومتابعة أسبوعية مصممة على حياتچ.">
+<meta name="description" content="كوتش زهراء — مدرّبة شخصية أونلاين وحضوري ببغداد. تدريب وتغذية ومتابعة أسبوعية مصممة على حياتك.">
 <meta name="theme-color" content="#F7F0E8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#110F0C" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="كوتش زهراء — مدرّبة شخصية" id="ogTitle">
-<meta property="og:description" content="تدريب وتغذية ومتابعة أسبوعية مصممة على حياتچ." id="ogDesc">
+<meta property="og:description" content="تدريب وتغذية ومتابعة أسبوعية مصممة على حياتك." id="ogDesc">
 <meta property="og:image" content="" id="ogImage">
 <meta property="og:url" content="" id="ogUrl">
 <meta property="og:locale" content="ar_IQ" id="ogLocale">
@@ -1180,7 +1180,9 @@ const biArr = v => {
 function Lraw(path){
   const [g, k] = path.split('.');
   const saved = SITE.landing && SITE.landing[g] && SITE.landing[g][k];
-  if (saved && typeof saved === 'object' && ('ar' in saved || 'en' in saved)){
+  /* نص محفوظ يطابق نص قديم موجّه للبنات بس ← النص العام الجديد */
+  const legacy = saved && window.LANDING_IS_LEGACY && LANDING_IS_LEGACY(g, k, saved.ar);
+  if (!legacy && saved && typeof saved === 'object' && ('ar' in saved || 'en' in saved)){
     const v = saved[LANG];
     if (Array.isArray(v) ? v.length : String(v ?? '').trim()) return saved;
     /* الإنكليزي فاضي → العربي */
@@ -1840,41 +1842,57 @@ function openPay(i){
    • تنطفي من اللوحة: sections.form = false ← يرجع السلوك القديم
    ══════════════════════════════════════════════════════════ */
 const Bq = (ar, en) => ({ ar, en });
+/* نص يتغير حسب الجنس: f للبنت، m للولد. ar = f حتى يبقى شكل البيانات نفسه */
+const Bg = (f, m, en) => ({ ar:f, m, en });
 const YN = [Bq('نعم','Yes'), Bq('لا','No')];
+/* أول سؤال بالاستمارة = بنت لو ولد، وباقي الأسئلة تنكتب على أساسه.
+   short = اسم السؤال المختصر اللي يوصل للكوتش (واتساب واللوحة) */
 const FORM = [
   { t:Bq('المعلومات الشخصية','About you'), f:[
-    { k:'name',  type:'text', req:1, label:Bq('الاسم الثلاثي','Full name'), auto:'name' },
+    { k:'sex',   type:'radio', req:1, gender:1, short:'الجنس', label:Bq('الجنس','Sex'), opts:[Bq('أنثى','Female'), Bq('ذكر','Male')] },
+    { k:'name',  type:'text', req:1, short:'الاسم', label:Bq('الاسم الثلاثي','Full name'), auto:'name' },
     { row:[
-      { k:'age',    type:'num', req:1, label:Bq('العمر','Age'), min:10, max:100 },
-      { k:'sex',    type:'select', req:1, label:Bq('الجنس','Sex'), opts:[Bq('أنثى','Female'), Bq('ذكر','Male'), Bq('أفضّل عدم الإجابة','Prefer not to say')] } ]},
+      { k:'age',    type:'num', req:1, short:'العمر', label:Bq('العمر','Age'), min:10, max:100 },
+      { k:'phone',  type:'tel', req:1, short:'الهاتف', label:Bq('رقم الهاتف / واتساب','Phone / WhatsApp') } ]},
     { row:[
-      { k:'weight', type:'num', req:1, label:Bq('الوزن (كغم)','Weight (kg)'), min:20, max:400, step:.1 },
-      { k:'height', type:'num', req:1, label:Bq('الطول (سم)','Height (cm)'), min:80, max:250 } ]},
-    { k:'phone', type:'tel', req:1, label:Bq('رقم الهاتف / واتساب','Phone / WhatsApp') } ]},
+      { k:'weight', type:'num', req:1, short:'الوزن (كغم)', label:Bq('الوزن (كغم)','Weight (kg)'), min:20, max:400, step:.1 },
+      { k:'height', type:'num', req:1, short:'الطول (سم)', label:Bq('الطول (سم)','Height (cm)'), min:80, max:250 } ]} ]},
   { t:Bq('الهدف من الاشتراك','Your goal'), f:[
-    { k:'service', type:'radio', req:1, col:1, short:'نوع البرنامج', label:Bq('نوع البرنامج اللي تريدينه','Which program do you want?'),
+    { k:'service', type:'radio', req:1, col:1, short:'نوع البرنامج', label:Bg('نوع البرنامج اللي تريدينه','نوع البرنامج اللي تريده','Which program do you want?'),
       opts:[Bq('برنامج غذائي','Nutrition plan'), Bq('برنامج تدريبي','Training plan'), Bq('برنامج غذائي وتدريبي','Nutrition + training')] },
-    { k:'goals', type:'checks', req:1, col:1, short:'الأهداف', label:Bq('شنو الأهداف اللي تريدين توصلين إلها؟ (تكدرين تختارين أكثر من وحدة)','What are your goals? (pick any)'),
+    { k:'goals', type:'checks', req:1, col:1, short:'الأهداف',
+      label:Bg('شنو الأهداف اللي تريدين توصلين إلها؟ (تكدرين تختارين أكثر من وحدة)','شنو الأهداف اللي تريد توصل إلها؟ (تكدر تختار أكثر من وحدة)','What are your goals? (pick any)'),
       opts:[Bq('خسارة الدهون','Lose fat'), Bq('زيادة الكتلة العضلية','Build muscle'), Bq('زيادة القوة العضلية','Get stronger'),
             Bq('تحسين اللياقة والتحمل','Improve fitness & endurance'), Bq('تحسين المرونة والمدى الحركي','Improve mobility'), Bq('تحسين الصحة العامة','Improve overall health')] },
-    { k:'specific', type:'area', short:'هدف محدد / مشكلة', label:Bq('عندچ هدف محدد أو مشكلة تريدين نعالجها بالبرنامج؟','Any specific goal or problem to address?') } ]},
+    { k:'specific', type:'area', short:'هدف محدد / مشكلة', label:Bg('عندچ هدف محدد أو مشكلة تريدين نعالجها بالبرنامج؟','عندك هدف محدد أو مشكلة تريد نعالجها بالبرنامج؟','Any specific goal or problem to address?') } ]},
   { t:Bq('الحالة الصحية','Health'), f:[
-    { k:'conditions',  type:'yn', req:1, label:Bq('تعانين من أمراض مزمنة أو حالات صحية مشخّصة؟','Any chronic or diagnosed conditions?'), hint:Bq('اذكري الحالة وتفاصيلها','Describe the condition') },
-    { k:'injuries',    type:'yn', req:1, label:Bq('عندچ إصابات سابقة أو حالية أو آلام تأثر على الحركة؟','Any past/current injuries or pain affecting movement?'), hint:Bq('نوع الإصابة ومكانها، وهل الألم بعده موجود','Type, location, and is it still painful?') },
-    { k:'medications', type:'yn', req:1, label:Bq('تاخذين أدوية بانتظام ممكن تأثر على التمرين أو التغذية؟','Regular medication that may affect training or diet?'), hint:Bq('اذكري التفاصيل','Details') },
-    { k:'symptoms',    type:'yn', req:1, label:Bq('صار وحسّيتي بألم بالصدر أو دوخة شديدة أو إغماء أثناء المجهود؟','Ever had chest pain, severe dizziness or fainting during exercise?'), hint:Bq('شنو الأعراض ووكتيش صارت','Symptoms and when'),
-      note:Bq('إذا الجواب نعم، ممكن تحتاجين تقييم طبي قبل ما تبدين التمرين.','If yes, you may need a medical check before training.') } ]},
+    { k:'conditions',  type:'yn', req:1, short:'أمراض مزمنة / حالات صحية', label:Bg('تعانين من أمراض مزمنة أو حالات صحية مشخّصة؟','تعاني من أمراض مزمنة أو حالات صحية مشخّصة؟','Any chronic or diagnosed conditions?'),
+      hint:Bg('اذكري الحالة وتفاصيلها','اذكر الحالة وتفاصيلها','Describe the condition') },
+    { k:'injuries',    type:'yn', req:1, short:'إصابات أو آلام', label:Bg('عندچ إصابات سابقة أو حالية أو آلام تأثر على الحركة؟','عندك إصابات سابقة أو حالية أو آلام تأثر على الحركة؟','Any past/current injuries or pain affecting movement?'),
+      hint:Bq('نوع الإصابة ومكانها، وهل الألم بعده موجود','Type, location, and is it still painful?') },
+    { k:'medications', type:'yn', req:1, short:'أدوية منتظمة', label:Bg('تاخذين أدوية بانتظام ممكن تأثر على التمرين أو التغذية؟','تاخذ أدوية بانتظام ممكن تأثر على التمرين أو التغذية؟','Regular medication that may affect training or diet?'),
+      hint:Bg('اذكري التفاصيل','اذكر التفاصيل','Details') },
+    { k:'symptoms',    type:'yn', req:1, short:'ألم بالصدر / دوخة / إغماء أثناء المجهود',
+      label:Bg('صار وحسّيتي بألم بالصدر أو دوخة شديدة أو إغماء أثناء المجهود؟','صار وحسّيت بألم بالصدر أو دوخة شديدة أو إغماء أثناء المجهود؟','Ever had chest pain, severe dizziness or fainting during exercise?'),
+      hint:Bq('شنو الأعراض ووكتيش صارت','Symptoms and when'),
+      note:Bg('إذا الجواب نعم، ممكن تحتاجين تقييم طبي قبل ما تبدين التمرين.','إذا الجواب نعم، ممكن تحتاج تقييم طبي قبل ما تبدي التمرين.','If yes, you may need a medical check before training.') } ]},
   { t:Bq('النشاط والخبرة','Activity & experience'), f:[
-    { k:'activity',   type:'radio', col:1, label:Bq('شلون توصفين نشاطچ اليومي؟','Your daily activity level?'), opts:[Bq('قليل الحركة','Mostly sitting'), Bq('متوسط الحركة','Moderately active'), Bq('عالي الحركة','Very active')] },
-    { k:'experience', type:'radio', label:Bq('مستوى خبرتچ بالتمارين؟','Training experience?'), opts:[Bq('مبتدئة','Beginner'), Bq('متوسطة','Intermediate'), Bq('متقدمة','Advanced')] },
-    { k:'place', type:'radio', train:1, label:Bq('وين تفضّلين تتمرنين؟','Where do you prefer to train?'), opts:[Bq('البيت','Home'), Bq('الجيم','Gym')] },
-    { k:'days',  type:'radio', train:1, label:Bq('كم يوم تكدرين تلتزمين بالتمرين بالأسبوع؟','How many days a week can you train?'),
+    { k:'activity',   type:'radio', col:1, short:'النشاط اليومي', label:Bg('شلون توصفين نشاطچ اليومي؟','شلون توصف نشاطك اليومي؟','Your daily activity level?'),
+      opts:[Bq('قليل الحركة','Mostly sitting'), Bq('متوسط الحركة','Moderately active'), Bq('عالي الحركة','Very active')] },
+    { k:'experience', type:'radio', short:'الخبرة بالتمارين', label:Bg('مستوى خبرتچ بالتمارين؟','مستوى خبرتك بالتمارين؟','Training experience?'),
+      opts:[Bg('مبتدئة','مبتدئ','Beginner'), Bg('متوسطة','متوسط','Intermediate'), Bg('متقدمة','متقدم','Advanced')] },
+    { k:'place', type:'radio', train:1, short:'مكان التمرين', label:Bg('وين تفضّلين تتمرنين؟','وين تفضّل تتمرن؟','Where do you prefer to train?'), opts:[Bq('البيت','Home'), Bq('الجيم','Gym')] },
+    { k:'days',  type:'radio', train:1, short:'أيام التمرين بالأسبوع', label:Bg('كم يوم تكدرين تلتزمين بالتمرين بالأسبوع؟','كم يوم تكدر تلتزم بالتمرين بالأسبوع؟','How many days a week can you train?'),
       opts:[Bq('يومين','2 days'), Bq('3 أيام','3 days'), Bq('4 أيام','4 days'), Bq('5 أيام أو أكثر','5+ days')] } ]},
   { t:Bq('التغذية ونمط الحياة','Nutrition & lifestyle'), f:[
-    { k:'allergy', type:'yn', label:Bq('عندچ حساسية غذائية أو أكلات لازم تتجنبينها لأسباب صحية؟','Food allergies or foods you must avoid?'), hint:Bq('اذكري التفاصيل','Details') },
-    { k:'barrier', type:'area', short:'أكبر عائق', label:Bq('شنو أكبر عائق يمنعچ توصلين لهدفچ؟','What’s the biggest thing stopping you from reaching your goal?') },
+    { k:'allergy', type:'yn', short:'حساسية غذائية / أكلات ممنوعة', label:Bg('عندچ حساسية غذائية أو أكلات لازم تتجنبينها لأسباب صحية؟','عندك حساسية غذائية أو أكلات لازم تتجنبها لأسباب صحية؟','Food allergies or foods you must avoid?'),
+      hint:Bg('اذكري التفاصيل','اذكر التفاصيل','Details') },
+    { k:'barrier', type:'area', short:'أكبر عائق', label:Bg('شنو أكبر عائق يمنعچ توصلين لهدفچ؟','شنو أكبر عائق يمنعك توصل لهدفك؟','What’s the biggest thing stopping you from reaching your goal?') },
     { k:'consent', type:'consent', req:1 } ]}
 ];
+/* النسخة المناسبة من النص حسب الجنس المختار */
+const male = () => FDATA.sex === 'ذكر';
+const gx = o => o && o.m && male() ? { ar:o.m, en:o.en } : o;
 const formFields = () => FORM.flatMap(st => st.f.flatMap(x => x.row || [x]));
 
 let FSTEP = 0, FPLAN = 0, FDATA = {};
@@ -1892,7 +1910,7 @@ function openPlan(i){
 
 /* الخطوة الحالية — القيم المختارة تبقى بـ FDATA بين الخطوات */
 function drawForm(){
-  const st = FORM[FSTEP], lab = o => esc(bi(o));
+  const st = FORM[FSTEP], lab = o => esc(bi(gx(o)));
   const train = !/^برنامج غذائي$/.test(FDATA.service || '');
   const star = f => f.req ? ' <span class="req">*</span>' : '';
   const one = f => {
@@ -1910,7 +1928,7 @@ function drawForm(){
       const val = f.type === 'yn' ? (v && v.a) : v;
       const on = o => multi ? (Array.isArray(v) && v.includes(o.ar)) : val === o.ar;
       return `<div class="fld" role="group" aria-labelledby="${id}"><span class="lbl" id="${id}">${lab(f.label)}${star(f)}</span>
-        <div class="opts${f.col ? ' col' : ''}${f.type === 'yn' ? ' yn' : ''}">${opts.map(o =>
+        <div class="opts${f.col ? ' col' : ''}${f.type === 'yn' || f.gender ? ' yn' : ''}">${opts.map(o =>
           `<label class="opt"><input type="${multi ? 'checkbox' : 'radio'}" name="${f.k}" value="${esc(o.ar)}"${on(o) ? ' checked' : ''}><span>${lab(o)}</span></label>`).join('')}</div>
         ${f.type === 'yn' ? `<textarea class="sub-q" name="${f.k}_d" placeholder="${lab(f.hint)}"${val === 'نعم' ? '' : ' hidden'}>${esc(v && v.d || '')}</textarea>` : ''}
         ${f.note ? `<p class="fp-note">${lab(f.note)}</p>` : ''}</div>`;
@@ -1975,7 +1993,9 @@ function formLines(){
   const train = !/^برنامج غذائي$/.test(FDATA.service || '');
   return formFields().filter(f => f.type !== 'consent' && !(f.train && !train)).map(f => {
     let v = FDATA[f.k];
-    if (f.type === 'checks') v = (v || []).join('، ');
+    const disp = x => { const o = (f.opts || []).find(o => o.ar === x); return o ? gx(o).ar : x };
+    if (f.type === 'checks') v = (v || []).map(disp).join('، ');
+    else if (f.type === 'radio') v = disp(v);
     else if (f.type === 'yn') v = v && v.a ? v.a + (v.d ? ' — ' + v.d : '') : '';
     return [f.short || f.label.ar, String(v ?? '').trim()];
   }).filter(([, v]) => v);
