@@ -855,12 +855,14 @@ const PAGE_SECTIONS = [
         <div class="fld"><label class="lbl">الأيقونة</label><select class="inp" data-k="creds.${i}.icon">
           ${SVC_ICONS.map(([v, n]) => `<option value="${v}"${v === it.icon ? ' selected' : ''}>${n}</option>`).join('')}</select></div>
         ${biField('العنوان', `creds.${i}.t`)}${biField('الوصف', `creds.${i}.s`, 'area')}`)}` },
-  { id:'about', icon:'i-user', t:'تعرّفي عليّ', sub:'الصورة، النبذة، والتوقيع', anchor:'about', toggle:'about',
-    body:() => `${slotHtml('about')}${group('about')}
+  { id:'about', icon:'i-user', t:'تعرّفي عليّ', sub:'الصورة، النبذة، التوقيع، والبطاقة الوردية', anchor:'about', toggle:'about',
+    body:() => `${slotHtml('about')}${group('about', ['quote','quoteBy'])}
       <div class="fld"><span class="lbl">النبذة</span>
         <textarea class="inp" rows="6" data-k="bio">${esc(D.bio)}</textarea>
         <div class="f-en"><textarea class="inp" rows="6" data-k="bio_en" dir="ltr">${esc(D.bio_en)}</textarea></div></div>
-      <p class="hint">«الاقتباس بالبطاقة الوردية» فوق هو البطاقة الوردية اللي جنب النبذة. إذا فرّغتيه تختفي البطاقة.</p>` },
+      <h4 class="sub">البطاقة الوردية (الاقتباس جنب النبذة)</h4>
+      ${biField('نص الاقتباس', 'landing.about.quote', 'area', 'إذا فرّغتيه وحفظتي، تختفي البطاقة الوردية من الصفحة.')}
+      ${biField('اسم صاحبة الاقتباس (يبين تحته)', 'landing.about.quoteBy')}` },
   { id:'reviews', icon:'i-star', t:'الآراء', sub:'آراء المتدربات — يتقلبن تلقائياً', anchor:'reviews', toggle:'reviews',
     body:() => `${group('reviews')}<h4 class="sub">الآراء</h4>
       <p class="hint">البطاقة الوردية جنب النبذة تتعدّل من قسم «تعرّفي عليّ».</p>
