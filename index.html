@@ -357,6 +357,19 @@ h1,h2,h3{font-family:var(--f-head);line-height:1.15;text-wrap:balance}
 .intro-art{position:relative;min-height:clamp(380px,62vw,520px);order:1;overflow:hidden}
 .intro-photo{position:absolute;inset:-8% 0;will-change:transform}
 .intro-photo img{width:100%;height:100%;object-fit:cover;object-position:center 25%}
+/* سلايد صور البداية: تتبدل بتلاشي ناعم وتكبير بطيء */
+.intro-photo .sl{position:absolute;inset:0;opacity:0;transition:opacity 1.4s var(--ease)}
+.intro-photo .sl.on{opacity:1}
+.intro-photo .sl img{transform:scale(1.04);transition:transform 6.5s linear}
+.intro-photo .sl.on img{transform:scale(1.13)}
+.sl-bars{position:absolute;z-index:3;inset-block-end:14px;inset-inline-start:22px;display:flex;gap:6px}
+.sl-bars button{position:relative;width:28px;height:4px;border-radius:4px;background:rgba(247,240,232,.3);overflow:hidden}
+.sl-bars button::before{content:"";position:absolute;inset:-14px -4px}
+.sl-bars button i{position:absolute;inset:0;transform-origin:left;transform:scaleX(0);background:var(--gold)}
+:root[dir="rtl"] .sl-bars button i{transform-origin:right}
+.sl-bars button.on i{animation:slfill 5s linear forwards}
+.sl-bars button.done i{transform:none}
+@keyframes slfill{to{transform:none}}
 .intro-photo::after{ /* دمج الصورة بالبطاقة */
   content:"";position:absolute;inset:0;
   background:linear-gradient(to top,var(--night) 0%,transparent 40%);
@@ -901,6 +914,7 @@ dialog[open]::backdrop{animation:fade .3s var(--ease)}
         </div>
         <div class="intro-art">
           <div class="intro-photo" id="introPhoto" data-par="-0.12"></div>
+          <div class="sl-bars" id="slBars" role="group" aria-label="الصور"></div>
           <div class="burst" aria-hidden="true">
             <svg viewBox="0 0 100 100" id="burstSvg"></svg>
             <span><b data-l="intro.badge"></b><span data-l="intro.badgeSub"></span></span>
@@ -1267,6 +1281,27 @@ function photoInto(el, src, pos){
   } else {
     el.innerHTML = `<div class="ph-empty">${esc(SITE.initial || 'ز')}</div>`;
   }
+}
+
+/* صور بطاقة البداية — وحدة أو أكثر. أكثر من وحدة = سلايد كل ٥ ثواني */
+let SL_I = 0, slTimer = null;
+function heroSlides(urls){
+  const el = $('#introPhoto'), bars = $('#slBars');
+  clearInterval(slTimer); SL_I = 0;
+  if (urls.length < 2){ bars.innerHTML = ''; return photoInto(el, urls[0]) }
+  el.innerHTML = urls.map((u, i) => `<div class="sl${i === 0 ? ' on' : ''}"><img src="${esc(u)}" alt="" decoding="async"${i ? ' loading="lazy"' : ''}></div>`).join('');
+  bars.innerHTML = urls.map((_, i) => `<button type="button" data-sl="${i}" aria-label="${i + 1}"${i === 0 ? ' class="on"' : ''}><i></i></button>`).join('');
+  const show = i => {
+    SL_I = (i + urls.length) % urls.length;
+    el.querySelectorAll('.sl').forEach((s, k) => s.classList.toggle('on', k === SL_I));
+    bars.querySelectorAll('button').forEach((b, k) => {
+      b.classList.remove('on'); b.classList.toggle('done', k < SL_I);
+      if (k === SL_I){ void b.offsetWidth; b.classList.add('on') }    /* يعيد حركة الشريط */
+    });
+  };
+  const run = () => { clearInterval(slTimer); if (!RM.matches) slTimer = setInterval(() => { if (!document.hidden) show(SL_I + 1) }, 5000) };
+  bars.onclick = e => { const b = e.target.closest('[data-sl]'); if (b){ show(+b.dataset.sl); run() } };
+  run();
 }
 
 /* العنوان الكبير: كل كلمة بغلاف حتى تطلع وحدة وحدة */
@@ -1647,7 +1682,7 @@ function paint(){
   /* الصور من خاناتها باللوحة (landing.photos)، وإذا ماكو، من الأعمدة القديمة */
   const ph = photos(), lp = (SITE.landing && SITE.landing.photos) || {};
   const pick = (v, fb) => v !== undefined ? v : fb;
-  photoInto($('#introPhoto'), pick(lp.intro, ph[0]));
+  heroSlides([pick(lp.intro, ph[0]), ...(Array.isArray(lp.slides) ? lp.slides : [])].filter(u => /^https?:\/\//i.test(String(u || ''))));
   photoInto($('#aboutPhoto'), pick(lp.about, SITE.about_image || ph[1] || ph[0]));
   photoInto($('#faqPhoto'),   pick(lp.faq, ph[1] || ph[0] || SITE.about_image));
 

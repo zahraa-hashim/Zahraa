@@ -671,10 +671,17 @@ const SLOTS = [
 /* خانة صورة — الثابتة من SLOTS، وصورة كل كلاس «class:رقم» */
 function slotDef(id){
   const m = /^class:(\d+)$/.exec(id);
+  const sl = /^slide:(\d+|new)$/.exec(id);
+  if (sl){
+    const n = sl[1] === 'new' ? (D.landing.photos.slides || []).length : +sl[1];
+    return { id, path:`landing.photos.slides.${n}`, folder:'site', t:sl[1] === 'new' ? 'صورة جديدة للسلايد' : `صورة السلايد ${n + 2}`,
+             where:'بطاقة البداية — تتقلب ويّا الصورة الأولى' };
+  }
   if (m) return { id, path:`classes.${m[1]}.image`, folder:'site', t:`غلاف الكلاس ${+m[1] + 1}`, where:'صورة أعلى بطاقة الكلاس — الأفضل صورة عريضة' };
   return SLOTS.find(s => s.id === id);
 }
-const classSlots = () => (D && D.classes || []).map((_, i) => slotDef('class:' + i));
+const classSlots = () => [...(D && D.classes || []).map((_, i) => slotDef('class:' + i)),
+                           ...(D && D.landing.photos.slides || []).map((_, i) => slotDef('slide:' + i))];
 
 function getPath(o, path){ return path.split('.').reduce((n, k) => n == null ? n : n[k], o) }
 function setPath(o, path, v){
@@ -719,6 +726,8 @@ function buildDraft(s){
   /* الصور: الحقول الجديدة، وإذا فاضية من الأعمدة القديمة */
   d.landing.photos = {
     intro: sp.intro ?? (hi[0] || s.hero_image || ''),
+    /* صور إضافية تتقلب ويّا صورة البداية (سلايد) */
+    slides: Array.isArray(sp.slides) ? sp.slides.filter(Boolean) : [],
     about: sp.about ?? (s.about_image || ''),
     faq:   sp.faq   ?? (hi[1] || '')
   };
@@ -829,7 +838,12 @@ const PAGE_SECTIONS = [
       <h4 class="sub">روابط التنقل</h4>${group('nav')}
       <h4 class="sub">الفوتر</h4>${group('footer')}` },
   { id:'intro', icon:'i-spark', t:'بطاقة البداية', sub:'أول شي يشوفه الزائر', anchor:'intro',
-    body:() => `${slotHtml('intro')}${group('intro')}
+    body:() => `${slotHtml('intro')}
+      <div class="fld"><span class="lbl">صور إضافية للسلايد</span>
+        ${(D.landing.photos.slides || []).map((_, j) => slotHtml('slide:' + j)).join('')}
+        <button class="add" type="button" data-pick="slide:new">${ico('i-plus')}إضافة صورة للسلايد</button>
+        <span class="hint">الصور تتقلب وحدة بعد الثانية كل ٥ ثواني. الأفضل صورة طولية (مثل 1080 × 1350) والشخص بالنص.</span></div>
+      ${group('intro')}
       <h4 class="sub">الأرقام (أول ٣ يبينن ويعدّن من الصفر)</h4>
       ${listEditor('stats','رقم', it => biTxt(it.n) + ' ' + biTxt(it.l), (it, i) =>
         `<div class="grid2">${biField('الرقم', `stats.${i}.n`)}${biField('الوصف', `stats.${i}.l`)}</div>`)}` },
@@ -1030,6 +1044,8 @@ function drawPicker(){
 function setSlot(slotId, url){
   const s = slotDef(slotId);
   setPath(D, s.path, url);
+  /* إزالة صورة سلايد = تنشال من القائمة */
+  if (/^slide:/.test(slotId)) D.landing.photos.slides = (D.landing.photos.slides || []).filter(Boolean);
   markDirty();
   if (VIEW === 'page') drawPage(); else drawPhotos();
   paintBrand();
