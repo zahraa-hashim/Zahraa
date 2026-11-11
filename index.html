@@ -28,6 +28,7 @@
   font-src 'self';
   img-src 'self' data: https://*.supabase.co https://images.unsplash.com;
   connect-src https://*.supabase.co;
+  media-src https://*.supabase.co;
   manifest-src 'self';
   worker-src 'self';
   base-uri 'none';
@@ -719,6 +720,80 @@ dialog[open]::backdrop{animation:fade .3s var(--ease)}
 .res .big{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;font-size:32px;background:var(--gold);color:var(--night);animation:pop .6s var(--spring)}
 .res.bad .big{background:var(--blush);color:#3A1E24}
 
+/* ══ استمارة التقييم ══ */
+.form-dlg{width:min(600px,calc(100% - 20px))}
+.fp-plan{font-size:13.5px;color:var(--gold-ink);font-weight:700;margin-top:2px}
+.fp-bar{height:4px;margin:10px 24px 0;border-radius:4px;background:var(--line);overflow:hidden}
+.fp-bar i{display:block;height:100%;width:0;background:var(--gold);border-radius:inherit;transition:width .5s var(--ease)}
+.fp-step{font-family:var(--f-head);font-weight:900;font-size:18px;margin-top:4px}
+#formSteps .fld{margin-bottom:16px}
+#formSteps .lbl{font-size:14px;font-weight:700;color:var(--ink-2);line-height:1.5}
+#formSteps .req{color:#C0392B}
+.fld textarea{
+  width:100%;min-height:84px;padding:12px 16px;border-radius:14px;resize:vertical;
+  border:1.5px solid var(--line-2);background:var(--bg);color:var(--ink);font:inherit;font-size:16px;
+}
+.fld textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(227,160,92,.2)}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+@media (max-width:480px){ .f2{grid-template-columns:1fr} }
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts.col{display:grid}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt span{
+  display:flex;align-items:center;gap:10px;min-height:46px;padding:10px 14px;border-radius:14px;cursor:pointer;
+  border:1.5px solid var(--line-2);background:var(--bg);font-size:15px;line-height:1.4;
+  transition:border-color .2s,background-color .2s;
+}
+.opt span::before{
+  content:"";flex:none;width:18px;height:18px;border-radius:50%;border:2px solid var(--line-2);
+  transition:border-color .2s,background-color .2s,box-shadow .2s;
+}
+.opt input[type=checkbox] + span::before{border-radius:6px}
+.opt input:checked + span{border-color:var(--gold);background:rgba(227,160,92,.12)}
+.opt input:checked + span::before{border-color:var(--gold);background:var(--gold);box-shadow:inset 0 0 0 3px var(--bg)}
+.opt input:focus-visible + span{box-shadow:0 0 0 4px rgba(227,160,92,.25)}
+.opts.yn .opt{flex:1;min-width:110px}
+.sub-q{margin-top:8px}
+.fp-note{font-size:12.5px;color:var(--soft);margin-top:6px}
+.fp-acts{display:flex;gap:10px}
+.fp-acts .btn{flex:1}
+.fp-acts #formPrev[hidden] + .btn{flex:1}
+#formDone .btn{margin-top:4px}
+
+/* ══ فيديوهات الكلاسات ══ */
+.vids-h{display:flex;align-items:center;gap:10px;margin:44px 0 16px;font-family:var(--f-head);font-weight:900;font-size:20px}
+.vids-h .icon{color:var(--gold)}
+.vids{
+  display:grid;grid-auto-flow:column;grid-auto-columns:clamp(150px,22vw,210px);gap:14px;
+  overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;scrollbar-width:thin;
+}
+.vid{
+  position:relative;aspect-ratio:9/16;border-radius:20px;overflow:hidden;scroll-snap-align:start;
+  background:var(--night-2);border:1px solid rgba(247,240,232,.12);cursor:pointer;
+  transition:transform .4s var(--spring);
+}
+.vid:hover{transform:translateY(-4px)}
+.vid video{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.vid::after{content:"";position:absolute;inset:auto 0 0;height:45%;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+.vid .play{
+  position:absolute;inset:0;margin:auto;width:54px;height:54px;border-radius:50%;z-index:1;
+  display:grid;place-items:center;background:rgba(227,160,92,.92);color:var(--night);
+}
+.vid .play .icon{width:22px;height:22px;margin-inline-start:3px}
+:root[dir="rtl"] .vid .play .icon{margin-inline-start:0;margin-inline-end:3px}
+.vid b{position:absolute;inset:auto 12px 12px;z-index:1;color:#fff;font-family:var(--f-head);font-size:14px;line-height:1.3}
+.cls-play{
+  position:absolute;inset-block-end:12px;inset-inline-start:12px;z-index:2;
+  display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;
+  background:rgba(22,19,15,.72);color:#fff;font-size:12.5px;font-weight:700;backdrop-filter:blur(6px);
+}
+.cls-play .icon{width:14px;height:14px;color:var(--gold)}
+.vid-dlg{width:min(440px,calc(100% - 20px));background:#000;padding:0;position:relative}
+.vid-dlg video{display:block;width:100%;max-height:calc(100svh - 90px);background:#000}
+.vid-dlg .ibtn{position:absolute;top:10px;inset-inline-end:10px;z-index:2;background:rgba(0,0,0,.55);color:#fff}
+.vid-dlg p{color:#fff;padding:12px 16px;font-family:var(--f-head);font-weight:800}
+
 /* ══ ⑰  تقليل الحركة — كل الحركات تنطفي، والمحتوى يبين فوراً ══ */
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
@@ -916,6 +991,7 @@ dialog[open]::backdrop{animation:fade .3s var(--ease)}
         <p data-l="classes.sub"></p>
       </div>
       <div class="cf" id="classCf" data-rv></div>
+      <div id="classVids"></div>
     </div>
   </section>
 
@@ -986,6 +1062,41 @@ dialog[open]::backdrop{animation:fade .3s var(--ease)}
       <p class="secure"><svg class="icon"><use href="#i-shield"></use></svg><span data-l="pay.secure"></span></p>
     </div>
   </form>
+</dialog>
+
+<!-- ══ استمارة التقييم — تطلع لما تختار باقة ══ -->
+<dialog id="formDlg" class="form-dlg" aria-labelledby="formTitle">
+  <form id="asForm" novalidate method="dialog">
+    <div class="dlg-head">
+      <div style="flex:1"><h2 id="formTitle" data-l="form.title"></h2><p class="fp-plan" id="formPlan"></p></div>
+      <button class="ibtn" type="button" data-close aria-label="إغلاق"><svg class="icon"><use href="#i-close"></use></svg></button>
+    </div>
+    <div class="fp-bar" aria-hidden="true"><i id="formBar"></i></div>
+    <div class="dlg-body">
+      <p class="fp-step" id="formStepT"></p>
+      <div id="formSteps"></div>
+      <p class="err" id="formErr" role="alert"></p>
+      <div class="fp-acts">
+        <button class="btn btn-line" type="button" id="formPrev" data-l="form.prev"></button>
+        <button class="btn btn-gold" type="submit" id="formNext"><span></span><svg class="icon arr"><use href="#i-arrow"></use></svg></button>
+      </div>
+    </div>
+  </form>
+  <div class="dlg-body res" id="formDone" hidden style="padding-top:32px">
+    <span class="big">✓</span>
+    <h2 style="font-size:24px" data-l="form.okT"></h2>
+    <p style="color:var(--soft)" data-l="form.okS"></p>
+    <p class="err" id="formSaveErr" hidden data-l="form.err"></p>
+    <a class="btn btn-gold" id="formWa" href="#" target="_blank" rel="noopener" style="width:100%"><svg class="icon"><use href="#i-whatsapp"></use></svg><span data-l="form.waBtn"></span></a>
+    <button class="btn btn-dark" type="button" id="formPay" hidden style="width:100%"><svg class="icon"><use href="#i-lock"></use></svg><span data-l="form.payBtn"></span></button>
+  </div>
+</dialog>
+
+<!-- فيديو الكلاس -->
+<dialog id="vidDlg" class="vid-dlg" aria-label="video">
+  <button class="ibtn" type="button" data-close aria-label="إغلاق"><svg class="icon"><use href="#i-close"></use></svg></button>
+  <video id="vidPlayer" controls playsinline preload="auto"></video>
+  <p id="vidCap"></p>
 </dialog>
 
 <!-- نتيجة الدفع بعد الرجوع من Wayl -->
@@ -1084,6 +1195,8 @@ const list = key => (Array.isArray(SITE[key]) && SITE[key].length) ? SITE[key] :
    ماكو قائمة احتياطية: إذا ماكو كلاسات، القسم وزرّه ورابطه يختفون. */
 const classList = () => (SITE.landing && Array.isArray(SITE.landing.classes) ? SITE.landing.classes : []).filter(c => bi(c.name));
 const hasClasses = () => sec('classes') && classList().length > 0;
+/* روابط فيديو الكلاس — بس روابط https (من باكت videos) */
+const classVideos = c => (Array.isArray(c && c.videos) ? c.videos : []).filter(u => /^https:\/\//i.test(String(u || '')));
 
 const siteName = () => (LANG === 'en' && SITE.name_en) ? SITE.name_en : (SITE.name || (LANG === 'en' ? 'Coach Zahraa' : 'كوتش زهراء'));
 const siteBio  = () => latin((LANG === 'en' && SITE.bio_en) ? SITE.bio_en : (SITE.bio || ''));
@@ -1301,7 +1414,8 @@ function classCard(c, i){
   return {
     feat: !!c.featured, label: name, cls: true,
     front: `${c.featured ? `<span class="badge">${esc(L('classes.popular'))}</span>` : ''}
-      <div class="cls-img">${img !== '#' ? `<img src="${esc(img)}" alt="" loading="lazy" decoding="async">` : `<span class="ph">${ico('i-users')}</span>`}</div>
+      <div class="cls-img">${img !== '#' ? `<img src="${esc(img)}" alt="" loading="lazy" decoding="async">` : `<span class="ph">${ico('i-users')}</span>`}
+        ${classVideos(c).length ? `<button class="cls-play" type="button" data-vid="${esc(classVideos(c)[0])}" data-cap="${esc(name)}">${ico('i-play')}<span>${LANG === 'ar' ? 'فيديو' : 'Video'}${classVideos(c).length > 1 ? ' ×' + classVideos(c).length : ''}</span></button>` : ''}</div>
       <div class="cls-body">
         <div><h3>${esc(name)}</h3>${bi(c.tag) ? `<span class="tag">${esc(bi(c.tag))}</span>` : ''}</div>
         ${meta ? `<div class="meta">${meta}</div>` : ''}
@@ -1312,7 +1426,7 @@ function classCard(c, i){
     back: `${backHead(name)}
       <div class="back-list">${bi(c.desc) ? `<p class="desc">${esc(bi(c.desc))}</p>` : ''}${featList(feats)}</div>
       ${meta ? `<div class="meta">${meta}</div>` : ''}
-      <div class="face-acts">${book}</div>`
+      <div class="face-acts">${book}${classVideos(c).length ? `<button class="flip-btn" type="button" data-vid="${esc(classVideos(c)[0])}" data-cap="${esc(name)}">${ico('i-play')}<span>${LANG === 'ar' ? 'فيديو' : 'Video'}</span></button>` : ''}</div>`
   };
 }
 
@@ -1323,6 +1437,15 @@ function paintPlans(){
 function paintClasses(){
   const cs = classList();
   CF.classes = coverflow($('#classCf'), cs.map(classCard), CF.classes);
+  /* شريط الفيديوهات تحت الكلاسات — كل فيديوهات كل الكلاسات */
+  const vids = cs.flatMap(c => classVideos(c).map(u => ({ u, cap:bi(c.name) })));
+  $('#classVids').innerHTML = vids.length ? `
+    <h3 class="vids-h">${ico('i-play')}${LANG === 'ar' ? 'من الكلاسات' : 'Inside the classes'}</h3>
+    <div class="vids">${vids.map(v => `
+      <button class="vid" type="button" data-vid="${esc(v.u)}" data-cap="${esc(v.cap)}" aria-label="${esc(v.cap)}">
+        <video src="${esc(v.u)}#t=0.1" muted playsinline preload="metadata"></video>
+        <span class="play">${ico('i-play')}</span><b>${esc(v.cap)}</b>
+      </button>`).join('')}</div>` : '';
   $('#classes').classList.toggle('sec-hidden', !hasClasses());
   $('#classesCta').hidden = !hasClasses();
 }
@@ -1670,6 +1793,233 @@ function openPay(i){
   setTimeout(() => $('#payName').focus(), 60);
 }
 
+/* ══════════════════════════════════════════════════════════
+   استمارة التقييم — تطلع لما تختار المشتركة باقة
+   • تنحفظ بجدول assessments (تبين باللوحة ← الاستمارات)
+   • بعد الإرسال: زر واتساب برسالة جاهزة بيها كل الأجوبة، وزر
+     الدفع إذا الدفع شغّال
+   • إذا الحفظ فشل (مثلاً الجدول بعده ما انسوّى) زر الواتساب يبقى
+     يشتغل — فالمعلومات توصل للكوتش بكل الأحوال
+   • تنطفي من اللوحة: sections.form = false ← يرجع السلوك القديم
+   ══════════════════════════════════════════════════════════ */
+const Bq = (ar, en) => ({ ar, en });
+const YN = [Bq('نعم','Yes'), Bq('لا','No')];
+const FORM = [
+  { t:Bq('المعلومات الشخصية','About you'), f:[
+    { k:'name',  type:'text', req:1, label:Bq('الاسم الثلاثي','Full name'), auto:'name' },
+    { row:[
+      { k:'age',    type:'num', req:1, label:Bq('العمر','Age'), min:10, max:100 },
+      { k:'sex',    type:'select', req:1, label:Bq('الجنس','Sex'), opts:[Bq('أنثى','Female'), Bq('ذكر','Male'), Bq('أفضّل عدم الإجابة','Prefer not to say')] } ]},
+    { row:[
+      { k:'weight', type:'num', req:1, label:Bq('الوزن (كغم)','Weight (kg)'), min:20, max:400, step:.1 },
+      { k:'height', type:'num', req:1, label:Bq('الطول (سم)','Height (cm)'), min:80, max:250 } ]},
+    { k:'phone', type:'tel', req:1, label:Bq('رقم الهاتف / واتساب','Phone / WhatsApp') } ]},
+  { t:Bq('الهدف من الاشتراك','Your goal'), f:[
+    { k:'service', type:'radio', req:1, col:1, short:'نوع البرنامج', label:Bq('نوع البرنامج اللي تريدينه','Which program do you want?'),
+      opts:[Bq('برنامج غذائي','Nutrition plan'), Bq('برنامج تدريبي','Training plan'), Bq('برنامج غذائي وتدريبي','Nutrition + training')] },
+    { k:'goals', type:'checks', req:1, col:1, short:'الأهداف', label:Bq('شنو الأهداف اللي تريدين توصلين إلها؟ (تكدرين تختارين أكثر من وحدة)','What are your goals? (pick any)'),
+      opts:[Bq('خسارة الدهون','Lose fat'), Bq('زيادة الكتلة العضلية','Build muscle'), Bq('زيادة القوة العضلية','Get stronger'),
+            Bq('تحسين اللياقة والتحمل','Improve fitness & endurance'), Bq('تحسين المرونة والمدى الحركي','Improve mobility'), Bq('تحسين الصحة العامة','Improve overall health')] },
+    { k:'specific', type:'area', short:'هدف محدد / مشكلة', label:Bq('عندچ هدف محدد أو مشكلة تريدين نعالجها بالبرنامج؟','Any specific goal or problem to address?') } ]},
+  { t:Bq('الحالة الصحية','Health'), f:[
+    { k:'conditions',  type:'yn', req:1, label:Bq('تعانين من أمراض مزمنة أو حالات صحية مشخّصة؟','Any chronic or diagnosed conditions?'), hint:Bq('اذكري الحالة وتفاصيلها','Describe the condition') },
+    { k:'injuries',    type:'yn', req:1, label:Bq('عندچ إصابات سابقة أو حالية أو آلام تأثر على الحركة؟','Any past/current injuries or pain affecting movement?'), hint:Bq('نوع الإصابة ومكانها، وهل الألم بعده موجود','Type, location, and is it still painful?') },
+    { k:'medications', type:'yn', req:1, label:Bq('تاخذين أدوية بانتظام ممكن تأثر على التمرين أو التغذية؟','Regular medication that may affect training or diet?'), hint:Bq('اذكري التفاصيل','Details') },
+    { k:'symptoms',    type:'yn', req:1, label:Bq('صار وحسّيتي بألم بالصدر أو دوخة شديدة أو إغماء أثناء المجهود؟','Ever had chest pain, severe dizziness or fainting during exercise?'), hint:Bq('شنو الأعراض ووكتيش صارت','Symptoms and when'),
+      note:Bq('إذا الجواب نعم، ممكن تحتاجين تقييم طبي قبل ما تبدين التمرين.','If yes, you may need a medical check before training.') } ]},
+  { t:Bq('النشاط والخبرة','Activity & experience'), f:[
+    { k:'activity',   type:'radio', col:1, label:Bq('شلون توصفين نشاطچ اليومي؟','Your daily activity level?'), opts:[Bq('قليل الحركة','Mostly sitting'), Bq('متوسط الحركة','Moderately active'), Bq('عالي الحركة','Very active')] },
+    { k:'experience', type:'radio', label:Bq('مستوى خبرتچ بالتمارين؟','Training experience?'), opts:[Bq('مبتدئة','Beginner'), Bq('متوسطة','Intermediate'), Bq('متقدمة','Advanced')] },
+    { k:'place', type:'radio', train:1, label:Bq('وين تفضّلين تتمرنين؟','Where do you prefer to train?'), opts:[Bq('البيت','Home'), Bq('الجيم','Gym')] },
+    { k:'days',  type:'radio', train:1, label:Bq('كم يوم تكدرين تلتزمين بالتمرين بالأسبوع؟','How many days a week can you train?'),
+      opts:[Bq('يومين','2 days'), Bq('3 أيام','3 days'), Bq('4 أيام','4 days'), Bq('5 أيام أو أكثر','5+ days')] } ]},
+  { t:Bq('التغذية ونمط الحياة','Nutrition & lifestyle'), f:[
+    { k:'allergy', type:'yn', label:Bq('عندچ حساسية غذائية أو أكلات لازم تتجنبينها لأسباب صحية؟','Food allergies or foods you must avoid?'), hint:Bq('اذكري التفاصيل','Details') },
+    { k:'barrier', type:'area', short:'أكبر عائق', label:Bq('شنو أكبر عائق يمنعچ توصلين لهدفچ؟','What’s the biggest thing stopping you from reaching your goal?') },
+    { k:'consent', type:'consent', req:1 } ]}
+];
+const formFields = () => FORM.flatMap(st => st.f.flatMap(x => x.row || [x]));
+
+let FSTEP = 0, FPLAN = 0, FDATA = {};
+
+function openPlan(i){
+  if (!sec('form')) return openPay(i);
+  const p = list('plans')[i]; if (!p) return;
+  FPLAN = i; FSTEP = 0; FDATA = {};
+  $('#asForm').reset();
+  $('#asForm').hidden = false; $('#formDone').hidden = true;
+  $('#formPlan').textContent = bi(p.name);
+  drawForm();
+  $('#formDlg').showModal();
+}
+
+/* الخطوة الحالية — القيم المختارة تبقى بـ FDATA بين الخطوات */
+function drawForm(){
+  const st = FORM[FSTEP], lab = o => esc(bi(o));
+  const train = !/^برنامج غذائي$/.test(FDATA.service || '');
+  const star = f => f.req ? ' <span class="req">*</span>' : '';
+  const one = f => {
+    if (f.train && !train) return '';
+    const v = FDATA[f.k];
+    const id = 'f_' + f.k;
+    if (f.type === 'consent')
+      return `<div class="fld"><label class="opt"><input type="checkbox" name="consent"${v ? ' checked' : ''}><span>${esc(L('form.consent'))} <span class="req">*</span></span></label>
+        <p class="fp-note">${esc(L('form.note'))}</p></div>`;
+    if (f.type === 'select')
+      return `<div class="fld"><label for="${id}">${lab(f.label)}${star(f)}</label><select id="${id}" name="${f.k}">
+        <option value="">—</option>${f.opts.map(o => `<option value="${esc(o.ar)}"${v === o.ar ? ' selected' : ''}>${lab(o)}</option>`).join('')}</select></div>`;
+    if (f.type === 'radio' || f.type === 'checks' || f.type === 'yn'){
+      const multi = f.type === 'checks', opts = f.type === 'yn' ? YN : f.opts;
+      const val = f.type === 'yn' ? (v && v.a) : v;
+      const on = o => multi ? (Array.isArray(v) && v.includes(o.ar)) : val === o.ar;
+      return `<div class="fld" role="group" aria-labelledby="${id}"><span class="lbl" id="${id}">${lab(f.label)}${star(f)}</span>
+        <div class="opts${f.col ? ' col' : ''}${f.type === 'yn' ? ' yn' : ''}">${opts.map(o =>
+          `<label class="opt"><input type="${multi ? 'checkbox' : 'radio'}" name="${f.k}" value="${esc(o.ar)}"${on(o) ? ' checked' : ''}><span>${lab(o)}</span></label>`).join('')}</div>
+        ${f.type === 'yn' ? `<textarea class="sub-q" name="${f.k}_d" placeholder="${lab(f.hint)}"${val === 'نعم' ? '' : ' hidden'}>${esc(v && v.d || '')}</textarea>` : ''}
+        ${f.note ? `<p class="fp-note">${lab(f.note)}</p>` : ''}</div>`;
+    }
+    if (f.type === 'area')
+      return `<div class="fld"><label for="${id}">${lab(f.label)}${star(f)}</label><textarea id="${id}" name="${f.k}" maxlength="800">${esc(v || '')}</textarea></div>`;
+    const attrs = f.type === 'num' ? ` type="number" inputmode="decimal" min="${f.min}" max="${f.max}"${f.step ? ` step="${f.step}"` : ''}`
+                : f.type === 'tel' ? ' type="tel" inputmode="tel" dir="ltr" placeholder="07XX XXX XXXX" autocomplete="tel"'
+                : ` maxlength="80"${f.auto ? ` autocomplete="${f.auto}"` : ''}`;
+    return `<div class="fld"><label for="${id}">${lab(f.label)}${star(f)}</label><input id="${id}" name="${f.k}"${attrs} value="${esc(v ?? '')}"></div>`;
+  };
+  $('#formSteps').innerHTML = st.f.map(x => x.row ? `<div class="f2">${x.row.map(one).join('')}</div>` : one(x)).join('');
+  $('#formStepT').textContent = `${FSTEP + 1}/${FORM.length} · ${bi(st.t)}`;
+  $('#formBar').style.width = ((FSTEP + 1) / FORM.length * 100) + '%';
+  $('#formPrev').hidden = FSTEP === 0;
+  const last = FSTEP === FORM.length - 1;
+  $('#formNext span').textContent = L(last ? 'form.submit' : 'form.next');
+  $('#formNext .arr').style.display = last ? 'none' : '';
+  $('#formErr').textContent = '';
+  $('#formDlg').scrollTop = 0;
+}
+
+/* اقرا الخطوة الحالية لـ FDATA */
+function readStep(){
+  const fm = $('#asForm');
+  FORM[FSTEP].f.flatMap(x => x.row || [x]).forEach(f => {
+    const els = [...fm.querySelectorAll(`[name="${f.k}"]`)];
+    if (!els.length) return;
+    if (f.type === 'checks') FDATA[f.k] = els.filter(e => e.checked).map(e => e.value);
+    else if (f.type === 'consent') FDATA[f.k] = els[0].checked;
+    else if (f.type === 'radio') FDATA[f.k] = (els.find(e => e.checked) || {}).value || '';
+    else if (f.type === 'yn'){
+      const a = (els.find(e => e.checked) || {}).value || '';
+      const d = (fm.querySelector(`[name="${f.k}_d"]`) || {}).value || '';
+      FDATA[f.k] = { a, d:a === 'نعم' ? d.trim().slice(0, 800) : '' };
+    }
+    else FDATA[f.k] = String(els[0].value || '').trim();
+  });
+}
+function stepError(){
+  const train = !/^برنامج غذائي$/.test(FDATA.service || '');
+  for (const f of FORM[FSTEP].f.flatMap(x => x.row || [x])){
+    if (f.train && !train) continue;
+    const v = FDATA[f.k];
+    if (f.req){
+      const empty = f.type === 'checks' ? !(v && v.length) : f.type === 'yn' ? !(v && v.a) : f.type === 'consent' ? !v : !String(v ?? '').trim();
+      if (empty) return [f.k, L('form.need')];
+    }
+    if (f.type === 'yn' && v && v.a === 'نعم' && !v.d) return [f.k + '_d', L('form.need')];
+    if (f.type === 'num' && v !== '' && v != null){
+      const n = +latin(v);
+      if (!(n >= f.min && n <= f.max)) return [f.k, `${bi(f.label)}: ${f.min}–${f.max}`];
+    }
+    if (f.k === 'name' && String(v).length < 2) return [f.k, L('pay.needName')];
+    if (f.k === 'phone' && !/^\+?\d{10,15}$/.test(latin(v).replace(/[^\d+]/g, ''))) return [f.k, L('pay.needPhone')];
+  }
+  return null;
+}
+
+/* الأجوبة كنص: سطر لكل سؤال — للواتساب وللوحة */
+function formLines(){
+  const train = !/^برنامج غذائي$/.test(FDATA.service || '');
+  return formFields().filter(f => f.type !== 'consent' && !(f.train && !train)).map(f => {
+    let v = FDATA[f.k];
+    if (f.type === 'checks') v = (v || []).join('، ');
+    else if (f.type === 'yn') v = v && v.a ? v.a + (v.d ? ' — ' + v.d : '') : '';
+    return [f.short || f.label.ar, String(v ?? '').trim()];
+  }).filter(([, v]) => v);
+}
+
+async function submitForm(){
+  const p = list('plans')[FPLAN] || {};
+  const num = k => { const n = parseFloat(latin(FDATA[k])); return Number.isFinite(n) ? n : null };
+  const phone = latin(FDATA.phone).replace(/[^\d+]/g, '');
+  const core = ['name','phone','age','sex','weight','height','service','goals'];
+  const answers = Object.fromEntries(formLines().filter(([q]) => !core.some(k => (f => f.short || f.label.ar)(formFields().find(f => f.k === k)) === q)));
+  const row = {
+    plan_index:FPLAN, plan_name:bi(p.name).trim().slice(0, 200), name:FDATA.name.slice(0, 80), phone,
+    age:num('age') == null ? null : Math.round(num('age')), sex:FDATA.sex || '', weight:num('weight'), height:num('height'),
+    service:FDATA.service || '', goals:FDATA.goals || [], answers, consent:true, lang:LANG
+  };
+  const btn = $('#formNext'); btn.disabled = true; $('#formNext span').textContent = L('form.wait');
+  let ok = false;
+  try { const { error } = await sb.from('assessments').insert(row); ok = !error }
+  catch(e){}
+  btn.disabled = false;
+
+  /* رسالة الواتساب: السطر الأول من اللوحة + كل الأجوبة */
+  const head = L('form.wa').split('{name}').join(row.name).split('{plan}').join(row.plan_name);
+  const body = formLines().map(([q, a]) => `• ${q}: ${a}`).join('\n');
+  const wa = waLink(head + '\n\n' + body);
+  $('#formWa').href = wa; $('#formWa').hidden = wa === '#';
+  $('#formSaveErr').hidden = ok;
+  $('#formPay').hidden = !page('pay');
+  $('#asForm').hidden = true; $('#formDone').hidden = false;
+}
+
+function wireForm(){
+  const fm = $('#asForm');
+  fm.addEventListener('change', e => {
+    const t = e.target;
+    /* «نعم» تفتح مربع التفاصيل */
+    if (t.type === 'radio'){
+      const d = fm.querySelector(`[name="${t.name}_d"]`);
+      if (d){ d.hidden = t.value !== 'نعم'; if (!d.hidden) d.focus() }
+    }
+    $('#formErr').textContent = '';
+  });
+  fm.addEventListener('submit', e => {
+    e.preventDefault();
+    readStep();
+    const bad = stepError();
+    if (bad){
+      $('#formErr').textContent = bad[1];
+      const el = fm.querySelector(`[name="${bad[0]}"]`);
+      el && el.focus && el.focus();
+      return;
+    }
+    if (FSTEP < FORM.length - 1){ FSTEP++; drawForm(); fm.querySelector('input,select,textarea')?.focus({ preventScroll:true }); return }
+    submitForm();
+  });
+  $('#formPrev').addEventListener('click', () => { readStep(); if (FSTEP > 0){ FSTEP--; drawForm() } });
+  /* الدفع بعد الاستمارة: الاسم والرقم يتعبّون تلقائياً */
+  $('#formPay').addEventListener('click', () => {
+    $('#formDlg').close();
+    openPay(FPLAN);
+    $('#payName').value = FDATA.name || '';
+    $('#payPhone').value = FDATA.phone || '';
+  });
+}
+
+/* فيديوهات الكلاسات — تنفتح بنافذة بصوت */
+function wireVideos(){
+  const dlg = $('#vidDlg'), v = $('#vidPlayer');
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-vid]'); if (!b) return;
+    if (b.closest('.cf-card:not(.on)')) return;    /* بطاقة جانبية: الضغطة تنقلها للنص بس */
+    e.stopPropagation();
+    const u = b.dataset.vid; if (!/^https:\/\//i.test(u)) return;
+    v.src = u; $('#vidCap').textContent = b.dataset.cap || '';
+    dlg.showModal();
+    v.play().catch(() => {});
+  }, true);
+  dlg.addEventListener('close', () => { v.pause(); v.removeAttribute('src'); v.load() });
+}
+
 /* حجز كلاس: رسالة واتساب جاهزة باسم الكلاس */
 function openClass(i){
   const c = classList()[i]; if (!c) return;
@@ -1798,12 +2148,14 @@ function wire(){
   $('#reviews').addEventListener('pointerleave', startReviews);
 
   $('#planCf').addEventListener('click', e => {
-    const b = e.target.closest('.cf-card.on [data-plan]'); if (b) openPay(+b.dataset.plan);
+    const b = e.target.closest('.cf-card.on [data-plan]'); if (b) openPlan(+b.dataset.plan);
   });
   $('#classCf').addEventListener('click', e => {
     const b = e.target.closest('.cf-card.on [data-class]'); if (b) openClass(+b.dataset.class);
   });
   $('#payForm').addEventListener('submit', submitPay);
+  wireForm();
+  wireVideos();
   $('#payForm').addEventListener('input', () => { $('#payErr').textContent = '' });
   $$('dialog [data-close]').forEach(b => b.addEventListener('click', () => b.closest('dialog').close()));
   $$('dialog').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close() }));

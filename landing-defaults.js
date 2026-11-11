@@ -100,6 +100,23 @@
       rights: { ar:'كل الحقوق محفوظة', en:'All rights reserved' },
       admin:  { ar:'لوحة التحكم', en:'Admin' }
     },
+    form: {
+      title:  { ar:'استمارة التقييم الأولي', en:'Initial assessment' },
+      sub:    { ar:'جاوبي بدقة حتى نصمم برنامج يناسب هدفچ ومستواچ وحالتچ الصحية.', en:'Answer carefully so we can build a plan around your goal, level and health.' },
+      next:   { ar:'التالي', en:'Next' },
+      prev:   { ar:'السابق', en:'Back' },
+      submit: { ar:'إرسال الاستمارة', en:'Send form' },
+      wait:   { ar:'ديرسل…', en:'Sending…' },
+      need:   { ar:'جاوبي على الأسئلة المطلوبة (*)', en:'Please answer the required questions (*)' },
+      okT:    { ar:'وصلت معلوماتچ', en:'Your answers are in' },
+      okS:    { ar:'خطوة أخيرة: دزّي رسالة للكوتش على واتساب حتى نبدي.', en:'Last step: message the coach on WhatsApp so we can start.' },
+      waBtn:  { ar:'أرسلي على واتساب', en:'Send on WhatsApp' },
+      payBtn: { ar:'متابعة للدفع', en:'Continue to payment' },
+      err:    { ar:'ما انحفظت بالموقع — بس تكدرين تدزين كل معلوماتچ على واتساب من الزر تحت.', en:'Could not save on the site — you can still send everything on WhatsApp below.' },
+      wa:     { ar:'مرحبا كوتش، آني {name}، قمت بإرسال كافة معلوماتي — الباقة: {plan}', en:'Hi coach, I’m {name}, I’ve sent all my details — plan: {plan}' },
+      consent:{ ar:'أوافق على استخدام معلوماتي لغرض التقييم الأولي وإعداد البرنامج المناسب.', en:'I agree to my information being used for the initial assessment and to build my plan.' },
+      note:   { ar:'هذه الاستمارة للتقييم الأولي ولا تُعد تشخيصاً طبياً.', en:'This form is an initial assessment, not a medical diagnosis.' }
+    },
     pay: {
       title:   { ar:'تأكيد الاشتراك', en:'Confirm subscription' },
       sub:     { ar:'اكتبي اسمچ ورقمچ، وبعدها تنتقلين لصفحة الدفع الآمنة.', en:'Enter your name and number, then continue to secure checkout.' },
@@ -152,6 +169,11 @@
     { g:'contact',  t:'قسم التواصل',           icon:'i-whatsapp', f:[
       ['kicker','السطر الصغير'],['title','العنوان','title'],['sub','الوصف','area'],['wa','زر الواتساب'],['ig','زر الانستغرام']]},
     { g:'footer',   t:'الفوتر',                icon:'i-book', f:[ ['rights','سطر الحقوق'],['admin','رابط اللوحة'] ]},
+    { g:'form',     t:'استمارة التقييم',        icon:'i-edit', f:[
+      ['title','عنوان الاستمارة'],['sub','الوصف','area'],['next','زر التالي'],['prev','زر السابق'],['submit','زر الإرسال'],
+      ['wait','نص الانتظار'],['need','تنبيه: أسئلة ناقصة'],['okT','بعد الإرسال — العنوان'],['okS','بعد الإرسال — الوصف','area'],
+      ['waBtn','زر الواتساب'],['payBtn','زر الدفع (إذا الدفع شغّال)'],['err','رسالة إذا فشل الحفظ','area'],
+      ['wa','أول سطر برسالة الواتساب ({name} = الاسم، {plan} = الباقة)','area'],['consent','نص الموافقة','area'],['note','الملاحظة تحت الموافقة','area']]},
     { g:'pay',      t:'نافذة الدفع والرسائل',   icon:'i-lock', f:[
       ['title','عنوان النافذة'],['sub','الوصف','area'],['plan','كلمة «الباقة»'],['name','حقل الاسم'],['phone','حقل الرقم'],
       ['submit','زر المتابعة'],['wait','نص الانتظار'],['secure','ملاحظة الأمان','area'],
