@@ -822,7 +822,7 @@ const BLANKS = {
   stats:  () => ({ n:emptyBi(), l:emptyBi() }),
   creds:  () => ({ icon:'i-spark', t:emptyBi(), s:emptyBi() }),
   quotes: () => ({ t:emptyBi(), n:emptyBi(), r:emptyBi() }),
-  plans:  () => ({ featured:false, name:emptyBi(), tag:emptyBi(), price:emptyBi(), unit:emptyBi(), amount:null, desc:emptyBi(), features:{ ar:[], en:[] } }),
+  plans:  () => ({ featured:false, name:emptyBi(), tag:emptyBi(), promise:emptyBi(), price:emptyBi(), was:emptyBi(), unit:emptyBi(), priceNote:emptyBi(), amount:null, desc:emptyBi(), features:{ ar:[], en:[] }, fit:emptyBi(), review:emptyBi() }),
   faq:    () => ({ q:emptyBi(), a:emptyBi() }),
   classes:() => ({ featured:false, name:emptyBi(), tag:emptyBi(), image:'', schedule:emptyBi(), duration:emptyBi(), place:emptyBi(), seats:emptyBi(),
                    price:emptyBi(), unit:emptyBi(), desc:emptyBi(), features:{ ar:[], en:[] }, videos:[] })
@@ -875,11 +875,15 @@ const PAGE_SECTIONS = [
       ${listEditor('plans','باقة', it => biTxt(it.name), (it, i) => `
         <label class="en-toggle" style="justify-self:start"><span class="sw"><input type="checkbox" data-k="plans.${i}.featured" data-bool${it.featured ? ' checked' : ''}><i></i></span>الباقة المميّزة (غامقة وفيها شارة)</label>
         ${biField('اسم الباقة', `plans.${i}.name`)}
-        <div class="grid2">${biField('السعر كما يبين (مثل 60,000)', `plans.${i}.price`)}${biField('الوحدة (مثل د.ع / شهر)', `plans.${i}.unit`)}</div>
-        ${plain('المبلغ اللي ينسحب بالدفع (رقم بالدينار)', `plans.${i}.amount`, { num:true, ltr:true, ph:'60000', hint:'إذا فاضي ينحسب من السعر المكتوب.' })}
         ${biField('سطر تحت الاسم (اختياري)', `plans.${i}.tag`)}
-        ${biField('الوصف', `plans.${i}.desc`)}
-        ${biField('المزايا', `plans.${i}.features`, 'lines')}`)}` },
+        ${biField('الوعد — النتيجة اللي يحصلها المشترك (أول شي يقراه)', `plans.${i}.promise`, 'area')}
+        ${biField('الفوائد — كل سطر فائدة (أول ٣ تبين على البطاقة)', `plans.${i}.features`, 'lines')}
+        ${biField('تناسبك إذا… (لمن هاي الباقة)', `plans.${i}.fit`, 'area')}
+        <div class="grid2">${biField('السعر كما يبين (مثل 60,000)', `plans.${i}.price`)}${biField('الوحدة (مثل د.ع / شهر)', `plans.${i}.unit`)}</div>
+        <div class="grid2">${biField('السعر قبل الخصم — يبين مشطوب (اختياري)', `plans.${i}.was`)}${biField('سطر تحت السعر (مثل: يعني 2,000 د.ع باليوم)', `plans.${i}.priceNote`)}</div>
+        ${plain('المبلغ اللي ينسحب بالدفع (رقم بالدينار)', `plans.${i}.amount`, { num:true, ltr:true, ph:'60000', hint:'إذا فاضي ينحسب من السعر المكتوب.' })}
+        ${biField('الوصف (يبين بظهر البطاقة)', `plans.${i}.desc`)}
+        ${biField('رأي مشترك بهاي الباقة (يبين بظهر البطاقة، اختياري)', `plans.${i}.review`, 'area')}`)}` },
   { id:'classes', icon:'i-users', t:'الكلاسات', sub:'الكلاسات الجماعية — تبين بشريط دوّار مثل الباقات', anchor:'classes', toggle:'classes',
     body:() => `${group('classes')}<h4 class="sub">الكلاسات</h4>
       <p class="hint">إذا ماكو ولا كلاس، القسم وزرّه بأول الصفحة يختفون تلقائياً. الحجز يفتح واتساب برسالة باسم الكلاس.</p>

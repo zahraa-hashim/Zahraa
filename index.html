@@ -596,6 +596,33 @@ h1,h2,h3{font-family:var(--f-head);line-height:1.15;text-wrap:balance}
 .feat .back-head .ibtn{background:rgba(247,240,232,.1)}
 .back-list{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-inline-end:4px;scrollbar-width:thin}
 .back-list .desc{-webkit-line-clamp:unset;display:block;margin-bottom:14px;white-space:pre-line}
+/* الباقات: الوعد فوك، السعر تحت */
+#planCf{--h:640px}
+.promise{font-family:var(--f-head);font-size:16.5px;font-weight:800;line-height:1.55;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.feat .promise{color:var(--on-night)}
+#planCf .peek{gap:9px}
+.fit{font-size:13.5px;line-height:1.6;color:var(--soft);padding:9px 12px;border-radius:12px;background:rgba(227,160,92,.1);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.fit b{color:var(--gold-ink);font-weight:800}
+.feat .fit{color:var(--on-night-soft);background:rgba(227,160,92,.14)}
+.feat .fit b{color:var(--gold)}
+.pbox{display:grid;gap:4px;padding-top:14px;border-top:1px solid var(--line)}
+.feat .pbox{border-color:rgba(247,240,232,.14)}
+.pbox .price b{font-size:clamp(32px,3.6vw,38px)}
+.pbox.sum{padding-top:12px}
+.pbox.sum .price b{font-size:26px}
+.was{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px}
+.was s{color:var(--soft);direction:ltr;unicode-bidi:isolate;text-decoration-thickness:1.5px}
+.feat .was s{color:var(--on-night-soft)}
+.save{padding:2px 10px;border-radius:999px;background:var(--blush);color:#3A1E24;font-family:var(--f-head);font-size:12px;font-weight:800}
+.pnote{font-size:13px;color:var(--soft)}
+.feat .pnote{color:var(--on-night-soft)}
+.assure{display:flex;gap:7px;align-items:flex-start;margin-top:-4px;font-size:12.5px;line-height:1.5;color:var(--soft)}
+.assure .icon{flex:none;width:15px;height:15px;margin-top:.15em;color:var(--gold-ink)}
+.feat .assure{color:var(--on-night-soft)}
+.feat .assure .icon{color:var(--gold)}
+.p-review{display:flex;gap:9px;margin:16px 0 0;padding:12px 14px;border-radius:14px;background:rgba(241,201,207,.35);font-size:14px;line-height:1.6}
+.p-review .icon{flex:none;color:var(--gold);margin-top:.25em}
+.feat .p-review{background:rgba(241,201,207,.1)}
 .back-sum{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-family:var(--f-head)}
 .back-sum b{font-size:24px;font-weight:900;font-variant-numeric:tabular-nums}
 .feat .back-sum b{color:var(--gold)}
@@ -1422,24 +1449,43 @@ const backHead = name => `<div class="back-head"><b>${esc(name)}</b>
   <button class="ibtn" type="button" data-unflip aria-label="${esc(L('plans.back'))}" title="${esc(L('plans.back'))}">${ico('i-rotate')}</button></div>`;
 const featList = feats => `<ul>${feats.map(f => `<li>${ico('i-check')}<span>${esc(f)}</span></li>`).join('')}</ul>`;
 
+/* البطاقة من فوك لجوة: الاسم ← الوعد ← الفوائد ← «تناسبك إذا» ← السعر آخر شي.
+   السعر القديم (was) يبين مشطوب، والتوفير ينحسب وحده من الفرق. */
+const numOf = v => +latin(bi(v)).replace(/[^\d]/g, '') || 0;
+const fmtNum = n => n.toLocaleString('en-US');
+function planPrice(p, cls){
+  const was = numOf(p.was), save = was - planAmount(p);
+  return `<div class="pbox${cls ? ' ' + cls : ''}">
+      ${was && save > 0 ? `<div class="was"><s>${esc(bi(p.was))}</s><span class="save">${esc(L('plans.save').split('{n}').join(fmtNum(save)))}</span></div>` : ''}
+      <div class="price"><b>${esc(bi(p.price))}</b><span>${esc(bi(p.unit))}</span></div>
+      ${bi(p.priceNote) ? `<p class="pnote">${esc(bi(p.priceNote))}</p>` : ''}
+    </div>`;
+}
+
 function planCard(p, i){
   const feats = biArr(p.features), name = bi(p.name);
+  const promise = bi(p.promise) || bi(p.desc), fit = bi(p.fit), review = bi(p.review);
   const buy = `<button class="btn ${p.featured ? 'btn-gold' : 'btn-dark'}" type="button" data-plan="${i}">
       <span>${esc(L('plans.cta'))}</span><svg class="icon arr"><use href="#i-arrow"></use></svg></button>`;
+  const assure = sec('form') && L('plans.assure') ? `<p class="assure">${ico('i-shield')}<span>${esc(L('plans.assure'))}</span></p>` : '';
   const more = feats.length - 3;
+  const hasBack = feats.length > 3 || bi(p.desc) || review;
   return {
     feat: !!p.featured, label: name,
     front: `${p.featured ? `<span class="badge">${esc(L('plans.popular'))}</span>` : ''}
       <div><h3>${esc(name)}</h3>${bi(p.tag) ? `<span class="tag">${esc(bi(p.tag))}</span>` : ''}</div>
-      <div class="price"><b>${esc(bi(p.price))}</b><span>${esc(bi(p.unit))}</span></div>
-      ${bi(p.desc) ? `<p class="desc">${esc(bi(p.desc))}</p>` : ''}
+      ${promise ? `<p class="promise">${esc(promise)}</p>` : ''}
       ${feats.length ? `<ul class="peek">${feats.slice(0, 3).map(f => `<li>${ico('i-check')}<span>${esc(f)}</span></li>`).join('')}
         ${more > 0 ? `<li class="more">+${more} ${LANG === 'ar' ? 'بالتفاصيل' : 'more'}</li>` : ''}</ul>` : ''}
+      ${fit ? `<p class="fit"><b>${esc(L('plans.fit'))}</b> ${esc(fit)}</p>` : ''}
       <div class="grow"></div>
-      <div class="face-acts">${buy}${feats.length || bi(p.desc) ? flipBtn() : ''}</div>`,
+      ${planPrice(p)}
+      <div class="face-acts">${buy}${hasBack ? flipBtn() : ''}</div>
+      ${assure}`,
     back: `${backHead(name)}
-      <div class="back-list">${bi(p.desc) ? `<p class="desc">${esc(bi(p.desc))}</p>` : ''}${featList(feats)}</div>
-      <div class="back-sum"><b>${esc(bi(p.price))}</b><span>${esc(bi(p.unit))}</span></div>
+      <div class="back-list">${bi(p.desc) ? `<p class="desc">${esc(bi(p.desc))}</p>` : ''}${featList(feats)}
+        ${review ? `<blockquote class="p-review">${ico('i-star')}<span>${esc(review)}</span></blockquote>` : ''}</div>
+      ${planPrice(p, 'sum')}
       <div class="face-acts">${buy}</div>`
   };
 }
