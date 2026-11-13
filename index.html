@@ -1613,6 +1613,7 @@ function coverflow(root, cards, prev){
 
   /* الضغط: بطاقة جانبية = تصير بالنص؛ أزرار القلب؛ الأسهم والنقاط */
   let dragX = null, dragged = false;
+  /* البطاقة تنقلب بس بزر «التفاصيل» — لا بالمرور ولا باللمس على وجهها */
   const onClick = e => {
     if (dragged){ dragged = false; return }
     const card = e.target.closest('.cf-card');
@@ -1623,20 +1624,6 @@ function coverflow(root, cards, prev){
     if (!card.classList.contains('on')){ e.preventDefault(); go(+card.dataset.i); tick(); return }
     if (e.target.closest('[data-flip]')){ setFlip(card, true); card._pinned = true; card.querySelector('[data-unflip]')?.focus({ preventScroll:true }); return }
     if (e.target.closest('[data-unflip]')){ card._pinned = false; card._noHover = true; setFlip(card, false); card.querySelector('[data-flip]')?.focus({ preventScroll:true }); return }
-    /* لمس على وجه البطاقة (مو على زر) يقلبها — للموبايل */
-    if (!FINE.matches && !e.target.closest('button,a') && e.target.closest('.front')){ setFlip(card, true); card._pinned = true }
-  };
-  /* المرور بالمؤشر يقلب البطاقة الفعّالة (مثل الكارت) */
-  const onEnter = e => {
-    if (!FINE.matches) return;
-    const card = e.target.closest('.cf-card.on'); if (!card || card._noHover) return;
-    if (!card.classList.contains('flipped')){ card._hoverFlip = true; setFlip(card, true) }
-  };
-  const onLeave = e => {
-    const card = e.target.closest('.cf-card'); if (!card) return;
-    if (e.relatedTarget && card.contains(e.relatedTarget)) return;
-    card._noHover = false;
-    if (card._hoverFlip && !card._pinned) setFlip(card, false);
   };
   const onDown = e => { if (e.pointerType !== 'mouse' || e.button === 0){ dragX = e.clientX; dragged = false } };
   const onUp = e => {
@@ -1656,8 +1643,6 @@ function coverflow(root, cards, prev){
   };
 
   root.addEventListener('click', onClick);
-  stage.addEventListener('pointerover', onEnter);
-  stage.addEventListener('pointerout', onLeave);
   stage.addEventListener('pointerdown', onDown);
   stage.addEventListener('pointerup', onUp);
   stage.addEventListener('pointercancel', () => { dragX = null });
