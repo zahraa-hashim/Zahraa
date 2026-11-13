@@ -547,6 +547,11 @@ h1,h2,h3{font-family:var(--f-head);line-height:1.15;text-wrap:balance}
   -webkit-backface-visibility:hidden;backface-visibility:hidden;transition:filter .5s var(--ease);
 }
 .face.back{transform:rotateY(180deg)}
+/* بالموبايل (خصوصاً آيفون) العناصر اللي إلها طبقة خاصة (الشارة، زر الذهبي) تطلع
+   معكوسة من الوجه على الظهر ويتخربط النص. فنخفي الوجه المقلوب بنص الدوران. */
+.cf-card .face{transition:filter .5s var(--ease),visibility 0s linear .2s}
+.cf-card .back,.cf-card.flipped .front{visibility:hidden}
+.cf-card.flipped .back{visibility:visible}
 .feat .face{background:var(--night);color:var(--on-night);border-color:transparent}
 .feat .face::before{
   content:"";position:absolute;inset:0;pointer-events:none;
